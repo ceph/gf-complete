@@ -1,0 +1,110 @@
+static
+void
+gf_w16_bytwo_b_sse_region_2_noxor(gf_region_data *rd, struct gf_w16_bytwo_data *btd)
+{
+#ifdef   INTEL_SSE4
+  int i;
+  uint8_t *d8, *s8, tb;
+  __m128i pp, m1, m2, t1, t2, va, vb;
+
+  s8 = (uint8_t *) rd->s_start;
+  d8 = (uint8_t *) rd->d_start;
+
+  pp = _mm_set1_epi16(btd->prim_poly&0xffff);
+  m1 = _mm_set1_epi16((btd->mask1)&0xffff);
+  m2 = _mm_set1_epi16((btd->mask2)&0xffff);
+
+  while (d8 < (uint8_t *) rd->d_top) {
+    va = _mm_load_si128 ((__m128i *)(s8));
+    SSE_AB2(pp, m1, m2, va, t1, t2);
+    _mm_store_si128((__m128i *)d8, va);
+    d8 += 16;
+    s8 += 16;
+  }
+#endif
+}
+
+static
+void
+gf_w16_bytwo_b_sse_region_2_xor(gf_region_data *rd, struct gf_w16_bytwo_data *btd)
+{
+#ifdef   INTEL_SSE4
+  int i;
+  uint8_t *d8, *s8, tb;
+  __m128i pp, m1, m2, t1, t2, va, vb;
+
+  s8 = (uint8_t *) rd->s_start;
+  d8 = (uint8_t *) rd->d_start;
+
+  pp = _mm_set1_epi16(btd->prim_poly&0xffff);
+  m1 = _mm_set1_epi16((btd->mask1)&0xffff);
+  m2 = _mm_set1_epi16((btd->mask2)&0xffff);
+
+  while (d8 < (uint8_t *) rd->d_top) {
+    va = _mm_load_si128 ((__m128i *)(s8));
+    SSE_AB2(pp, m1, m2, va, t1, t2);
+    vb = _mm_load_si128 ((__m128i *)(d8));
+    vb = _mm_xor_si128(vb, va);
+    _mm_store_si128((__m128i *)d8, vb);
+    d8 += 16;
+    s8 += 16;
+  }
+#endif
+}
+
+
+static
+void 
+gf_w16_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
+{
+#ifdef   INTEL_SSE4
+  int itb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, m2, t1, t2, va, vb;
+  struct gf_w16_bytwo_data *btd;
+  gf_region_data rd;
+    
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 16);
+  gf_do_initial_region_alignment(&rd);
+
+  btd = (struct gf_w16_bytwo_data *) ((gf_internal_t *) (gf->scratch))->private;
+
+  if (val == 2) {
+    if (xor) {
+      gf_w16_bytwo_b_sse_region_2_xor(&rd, btd);
+    } else {
+      gf_w16_bytwo_b_sse_region_2_noxor(&rd, btd);
+    }
+    gf_do_final_region_alignment(&rd);
+    return;
+  }
+
+  s8 = (uint8_t *) rd.s_start;
+  d8 = (uint8_t *) rd.d_start;
+
+  pp = _mm_set1_epi16(btd->prim_poly&0xffff);
+  m1 = _mm_set1_epi16((btd->mask1)&0xffff);
+  m2 = _mm_set1_epi16((btd->mask2)&0xffff);
+
+  while (d8 < (uint8_t *) rd.d_top) {
+    va = _mm_load_si128 ((__m128i *)(s8));
+    vb = (!xor) ? _mm_setzero_si128() : _mm_load_si128 ((__m128i *)(d8));
+    itb = val;
+    while (1) {
+      if (itb & 1) vb = _mm_xor_si128(vb, va);
+      itb >>= 1;
+      if (itb == 0) break;
+      SSE_AB2(pp, m1, m2, va, t1, t2);
+    }
+    _mm_store_si128((__m128i *)d8, vb);
+    d8 += 16;
+    s8 += 16;
+  }
+
+  gf_do_final_region_alignment(&rd);
+#endif
+}
+

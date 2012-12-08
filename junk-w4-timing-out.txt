@@ -1,0 +1,792 @@
+Seed: 1352748099
+Buffer-Const,s!=d,xor=0:    0.608121 s      210.484 MB/s
+Buffer-Const,s!=d,xor=1:    0.692329 s      184.883 MB/s
+1024 131072 4 LOG - -
+Seed: 1352748102
+Buffer-Const,s!=d,xor=0:    0.699226 s      183.060 MB/s
+Buffer-Const,s!=d,xor=1:    0.687310 s      186.233 MB/s
+2048 65536 4 LOG - -
+Seed: 1352748106
+Buffer-Const,s!=d,xor=0:    0.604397 s      211.781 MB/s
+Buffer-Const,s!=d,xor=1:    0.682591 s      187.521 MB/s
+4096 32768 4 LOG - -
+Seed: 1352748109
+Buffer-Const,s!=d,xor=0:    0.602384 s      212.489 MB/s
+Buffer-Const,s!=d,xor=1:    0.678849 s      188.555 MB/s
+8192 16384 4 LOG - -
+Seed: 1352748112
+Buffer-Const,s!=d,xor=0:    0.602103 s      212.588 MB/s
+Buffer-Const,s!=d,xor=1:    0.688450 s      185.925 MB/s
+16384 8192 4 LOG - -
+Seed: 1352748115
+Buffer-Const,s!=d,xor=0:    0.598464 s      213.881 MB/s
+Buffer-Const,s!=d,xor=1:    0.676076 s      189.328 MB/s
+32768 4096 4 LOG - -
+Seed: 1352748119
+Buffer-Const,s!=d,xor=0:    0.611499 s      209.322 MB/s
+Buffer-Const,s!=d,xor=1:    0.693351 s      184.611 MB/s
+65536 2048 4 LOG - -
+Seed: 1352748122
+Buffer-Const,s!=d,xor=0:    0.609786 s      209.910 MB/s
+Buffer-Const,s!=d,xor=1:    0.689794 s      185.563 MB/s
+131072 1024 4 LOG - -
+Seed: 1352748125
+Buffer-Const,s!=d,xor=0:    0.619027 s      206.776 MB/s
+Buffer-Const,s!=d,xor=1:    0.703627 s      181.915 MB/s
+262144 512 4 LOG - -
+Seed: 1352748129
+Buffer-Const,s!=d,xor=0:    0.605785 s      211.296 MB/s
+Buffer-Const,s!=d,xor=1:    0.696728 s      183.716 MB/s
+524288 256 4 LOG - -
+Seed: 1352748132
+Buffer-Const,s!=d,xor=0:    0.591555 s      216.379 MB/s
+Buffer-Const,s!=d,xor=1:    0.666735 s      191.980 MB/s
+1048576 128 4 LOG - -
+Seed: 1352748135
+Buffer-Const,s!=d,xor=0:    0.623167 s      205.403 MB/s
+Buffer-Const,s!=d,xor=1:    0.675010 s      189.627 MB/s
+2097152 64 4 LOG - -
+Seed: 1352748138
+Buffer-Const,s!=d,xor=0:    0.572467 s      223.594 MB/s
+Buffer-Const,s!=d,xor=1:    0.733714 s      174.455 MB/s
+4194304 32 4 LOG - -
+Seed: 1352748142
+Buffer-Const,s!=d,xor=0:    0.617676 s      207.228 MB/s
+Buffer-Const,s!=d,xor=1:    0.742744 s      172.334 MB/s
+8388608 16 4 LOG - -
+Seed: 1352748145
+Buffer-Const,s!=d,xor=0:    0.579833 s      220.753 MB/s
+Buffer-Const,s!=d,xor=1:    0.736355 s      173.829 MB/s
+16777216 8 4 LOG - -
+Seed: 1352748148
+Buffer-Const,s!=d,xor=0:    0.682980 s      187.414 MB/s
+Buffer-Const,s!=d,xor=1:    0.738846 s      173.243 MB/s
+33554432 4 4 LOG - -
+Seed: 1352748152
+Buffer-Const,s!=d,xor=0:    0.692141 s      184.933 MB/s
+Buffer-Const,s!=d,xor=1:    0.725968 s      176.316 MB/s
+67108864 2 4 LOG - -
+Seed: 1352748155
+Buffer-Const,s!=d,xor=0:    0.737346 s      173.596 MB/s
+Buffer-Const,s!=d,xor=1:    0.725769 s      176.365 MB/s
+134217728 1 4 LOG - -
+Seed: 1352748159
+Buffer-Const,s!=d,xor=0:    0.252694 s      506.541 MB/s
+Buffer-Const,s!=d,xor=1:    0.280102 s      456.976 MB/s
+1024 131072 4 TABLE SINGLE -
+Seed: 1352748160
+Buffer-Const,s!=d,xor=0:    0.246866 s      518.501 MB/s
+Buffer-Const,s!=d,xor=1:    0.276830 s      462.377 MB/s
+2048 65536 4 TABLE SINGLE -
+Seed: 1352748162
+Buffer-Const,s!=d,xor=0:    0.246874 s      518.482 MB/s
+Buffer-Const,s!=d,xor=1:    0.274016 s      467.125 MB/s
+4096 32768 4 TABLE SINGLE -
+Seed: 1352748164
+Buffer-Const,s!=d,xor=0:    0.247869 s      516.402 MB/s
+Buffer-Const,s!=d,xor=1:    0.271679 s      471.144 MB/s
+8192 16384 4 TABLE SINGLE -
+Seed: 1352748166
+Buffer-Const,s!=d,xor=0:    0.244581 s      523.345 MB/s
+Buffer-Const,s!=d,xor=1:    0.270779 s      472.710 MB/s
+16384 8192 4 TABLE SINGLE -
+Seed: 1352748167
+Buffer-Const,s!=d,xor=0:    0.256167 s      499.675 MB/s
+Buffer-Const,s!=d,xor=1:    0.278188 s      460.121 MB/s
+32768 4096 4 TABLE SINGLE -
+Seed: 1352748169
+Buffer-Const,s!=d,xor=0:    0.248786 s      514.498 MB/s
+Buffer-Const,s!=d,xor=1:    0.305109 s      419.522 MB/s
+65536 2048 4 TABLE SINGLE -
+Seed: 1352748171
+Buffer-Const,s!=d,xor=0:    0.249003 s      514.050 MB/s
+Buffer-Const,s!=d,xor=1:    0.276043 s      463.696 MB/s
+131072 1024 4 TABLE SINGLE -
+Seed: 1352748173
+Buffer-Const,s!=d,xor=0:    0.249019 s      514.016 MB/s
+Buffer-Const,s!=d,xor=1:    0.278464 s      459.665 MB/s
+262144 512 4 TABLE SINGLE -
+Seed: 1352748174
+Buffer-Const,s!=d,xor=0:    0.257905 s      496.308 MB/s
+Buffer-Const,s!=d,xor=1:    0.266241 s      480.767 MB/s
+524288 256 4 TABLE SINGLE -
+Seed: 1352748176
+Buffer-Const,s!=d,xor=0:    0.254655 s      502.641 MB/s
+Buffer-Const,s!=d,xor=1:    0.267730 s      478.093 MB/s
+1048576 128 4 TABLE SINGLE -
+Seed: 1352748178
+Buffer-Const,s!=d,xor=0:    0.264532 s      483.874 MB/s
+Buffer-Const,s!=d,xor=1:    0.270533 s      473.140 MB/s
+2097152 64 4 TABLE SINGLE -
+Seed: 1352748180
+Buffer-Const,s!=d,xor=0:    0.249658 s      512.702 MB/s
+Buffer-Const,s!=d,xor=1:    0.265106 s      482.826 MB/s
+4194304 32 4 TABLE SINGLE -
+Seed: 1352748181
+Buffer-Const,s!=d,xor=0:    0.244030 s      524.527 MB/s
+Buffer-Const,s!=d,xor=1:    0.301052 s      425.176 MB/s
+8388608 16 4 TABLE SINGLE -
+Seed: 1352748183
+Buffer-Const,s!=d,xor=0:    0.263009 s      486.676 MB/s
+Buffer-Const,s!=d,xor=1:    0.270075 s      473.943 MB/s
+16777216 8 4 TABLE SINGLE -
+Seed: 1352748185
+Buffer-Const,s!=d,xor=0:    0.318133 s      402.348 MB/s
+Buffer-Const,s!=d,xor=1:    0.315726 s      405.415 MB/s
+33554432 4 4 TABLE SINGLE -
+Seed: 1352748187
+Buffer-Const,s!=d,xor=0:    0.329082 s      388.961 MB/s
+Buffer-Const,s!=d,xor=1:    0.303774 s      421.366 MB/s
+67108864 2 4 TABLE SINGLE -
+Seed: 1352748189
+Buffer-Const,s!=d,xor=0:    0.373282 s      342.904 MB/s
+Buffer-Const,s!=d,xor=1:    0.299255 s      427.729 MB/s
+134217728 1 4 TABLE SINGLE -
+Seed: 1352748191
+Buffer-Const,s!=d,xor=0:    0.026432 s     4842.652 MB/s
+Buffer-Const,s!=d,xor=1:    0.028027 s     4566.976 MB/s
+1024 131072 4 TABLE SINGLE,SSE -
+Seed: 1352748192
+Buffer-Const,s!=d,xor=0:    0.020923 s     6117.629 MB/s
+Buffer-Const,s!=d,xor=1:    0.021753 s     5884.226 MB/s
+2048 65536 4 TABLE SINGLE,SSE -
+Seed: 1352748193
+Buffer-Const,s!=d,xor=0:    0.017533 s     7300.592 MB/s
+Buffer-Const,s!=d,xor=1:    0.018308 s     6991.599 MB/s
+4096 32768 4 TABLE SINGLE,SSE -
+Seed: 1352748193
+Buffer-Const,s!=d,xor=0:    0.016224 s     7889.591 MB/s
+Buffer-Const,s!=d,xor=1:    0.016537 s     7740.353 MB/s
+8192 16384 4 TABLE SINGLE,SSE -
+Seed: 1352748194
+Buffer-Const,s!=d,xor=0:    0.015627 s     8191.000 MB/s
+Buffer-Const,s!=d,xor=1:    0.016160 s     7921.020 MB/s
+16384 8192 4 TABLE SINGLE,SSE -
+Seed: 1352748195
+Buffer-Const,s!=d,xor=0:    0.015679 s     8163.599 MB/s
+Buffer-Const,s!=d,xor=1:    0.016548 s     7735.000 MB/s
+32768 4096 4 TABLE SINGLE,SSE -
+Seed: 1352748196
+Buffer-Const,s!=d,xor=0:    0.016351 s     7828.046 MB/s
+Buffer-Const,s!=d,xor=1:    0.017147 s     7464.939 MB/s
+65536 2048 4 TABLE SINGLE,SSE -
+Seed: 1352748196
+Buffer-Const,s!=d,xor=0:    0.015204 s     8418.863 MB/s
+Buffer-Const,s!=d,xor=1:    0.016621 s     7701.049 MB/s
+131072 1024 4 TABLE SINGLE,SSE -
+Seed: 1352748197
+Buffer-Const,s!=d,xor=0:    0.019366 s     6609.594 MB/s
+Buffer-Const,s!=d,xor=1:    0.020611 s     6210.405 MB/s
+262144 512 4 TABLE SINGLE,SSE -
+Seed: 1352748198
+Buffer-Const,s!=d,xor=0:    0.019287 s     6636.721 MB/s
+Buffer-Const,s!=d,xor=1:    0.020470 s     6253.155 MB/s
+524288 256 4 TABLE SINGLE,SSE -
+Seed: 1352748199
+Buffer-Const,s!=d,xor=0:    0.019210 s     6663.244 MB/s
+Buffer-Const,s!=d,xor=1:    0.021175 s     6044.754 MB/s
+1048576 128 4 TABLE SINGLE,SSE -
+Seed: 1352748199
+Buffer-Const,s!=d,xor=0:    0.035533 s     3602.314 MB/s
+Buffer-Const,s!=d,xor=1:    0.032351 s     3956.628 MB/s
+2097152 64 4 TABLE SINGLE,SSE -
+Seed: 1352748200
+Buffer-Const,s!=d,xor=0:    0.048733 s     2626.557 MB/s
+Buffer-Const,s!=d,xor=1:    0.044163 s     2898.370 MB/s
+4194304 32 4 TABLE SINGLE,SSE -
+Seed: 1352748201
+Buffer-Const,s!=d,xor=0:    0.051737 s     2474.071 MB/s
+Buffer-Const,s!=d,xor=1:    0.048826 s     2621.555 MB/s
+8388608 16 4 TABLE SINGLE,SSE -
+Seed: 1352748202
+Buffer-Const,s!=d,xor=0:    0.056330 s     2272.306 MB/s
+Buffer-Const,s!=d,xor=1:    0.029557 s     4330.617 MB/s
+16777216 8 4 TABLE SINGLE,SSE -
+Seed: 1352748203
+Buffer-Const,s!=d,xor=0:    0.066551 s     1923.338 MB/s
+Buffer-Const,s!=d,xor=1:    0.037378 s     3424.489 MB/s
+33554432 4 4 TABLE SINGLE,SSE -
+Seed: 1352748203
+Buffer-Const,s!=d,xor=0:    0.082171 s     1557.728 MB/s
+Buffer-Const,s!=d,xor=1:    0.048228 s     2654.058 MB/s
+67108864 2 4 TABLE SINGLE,SSE -
+Seed: 1352748204
+Buffer-Const,s!=d,xor=0:    0.125187 s     1022.469 MB/s
+Buffer-Const,s!=d,xor=1:    0.047497 s     2694.905 MB/s
+134217728 1 4 TABLE SINGLE,SSE -
+Seed: 1352748205
+Buffer-Const,s!=d,xor=0:    0.151542 s      844.651 MB/s
+Buffer-Const,s!=d,xor=1:    0.153138 s      835.847 MB/s
+1024 131072 4 TABLE DOUBLE -
+Seed: 1352748207
+Buffer-Const,s!=d,xor=0:    0.146267 s      875.111 MB/s
+Buffer-Const,s!=d,xor=1:    0.150025 s      853.189 MB/s
+2048 65536 4 TABLE DOUBLE -
+Seed: 1352748208
+Buffer-Const,s!=d,xor=0:    0.145038 s      882.529 MB/s
+Buffer-Const,s!=d,xor=1:    0.146365 s      874.525 MB/s
+4096 32768 4 TABLE DOUBLE -
+Seed: 1352748209
+Buffer-Const,s!=d,xor=0:    0.142601 s      897.608 MB/s
+Buffer-Const,s!=d,xor=1:    0.144650 s      884.893 MB/s
+8192 16384 4 TABLE DOUBLE -
+Seed: 1352748211
+Buffer-Const,s!=d,xor=0:    0.141861 s      902.293 MB/s
+Buffer-Const,s!=d,xor=1:    0.142722 s      896.848 MB/s
+16384 8192 4 TABLE DOUBLE -
+Seed: 1352748212
+Buffer-Const,s!=d,xor=0:    0.140131 s      913.433 MB/s
+Buffer-Const,s!=d,xor=1:    0.143035 s      894.888 MB/s
+32768 4096 4 TABLE DOUBLE -
+Seed: 1352748213
+Buffer-Const,s!=d,xor=0:    0.141368 s      905.436 MB/s
+Buffer-Const,s!=d,xor=1:    0.142083 s      900.879 MB/s
+65536 2048 4 TABLE DOUBLE -
+Seed: 1352748214
+Buffer-Const,s!=d,xor=0:    0.144412 s      886.351 MB/s
+Buffer-Const,s!=d,xor=1:    0.145837 s      877.693 MB/s
+131072 1024 4 TABLE DOUBLE -
+Seed: 1352748216
+Buffer-Const,s!=d,xor=0:    0.141466 s      904.810 MB/s
+Buffer-Const,s!=d,xor=1:    0.146338 s      874.686 MB/s
+262144 512 4 TABLE DOUBLE -
+Seed: 1352748217
+Buffer-Const,s!=d,xor=0:    0.141775 s      902.837 MB/s
+Buffer-Const,s!=d,xor=1:    0.143733 s      890.543 MB/s
+524288 256 4 TABLE DOUBLE -
+Seed: 1352748218
+Buffer-Const,s!=d,xor=0:    0.144309 s      886.984 MB/s
+Buffer-Const,s!=d,xor=1:    0.145978 s      876.843 MB/s
+1048576 128 4 TABLE DOUBLE -
+Seed: 1352748219
+Buffer-Const,s!=d,xor=0:    0.145523 s      879.584 MB/s
+Buffer-Const,s!=d,xor=1:    0.152104 s      841.530 MB/s
+2097152 64 4 TABLE DOUBLE -
+Seed: 1352748221
+Buffer-Const,s!=d,xor=0:    0.150421 s      850.944 MB/s
+Buffer-Const,s!=d,xor=1:    0.154586 s      828.018 MB/s
+4194304 32 4 TABLE DOUBLE -
+Seed: 1352748222
+Buffer-Const,s!=d,xor=0:    0.151304 s      845.978 MB/s
+Buffer-Const,s!=d,xor=1:    0.151530 s      844.720 MB/s
+8388608 16 4 TABLE DOUBLE -
+Seed: 1352748223
+Buffer-Const,s!=d,xor=0:    0.160126 s      799.369 MB/s
+Buffer-Const,s!=d,xor=1:    0.151316 s      845.910 MB/s
+16777216 8 4 TABLE DOUBLE -
+Seed: 1352748224
+Buffer-Const,s!=d,xor=0:    0.167688 s      763.323 MB/s
+Buffer-Const,s!=d,xor=1:    0.152321 s      840.331 MB/s
+33554432 4 4 TABLE DOUBLE -
+Seed: 1352748226
+Buffer-Const,s!=d,xor=0:    0.194515 s      658.047 MB/s
+Buffer-Const,s!=d,xor=1:    0.149023 s      858.929 MB/s
+67108864 2 4 TABLE DOUBLE -
+Seed: 1352748227
+Buffer-Const,s!=d,xor=0:    0.237898 s      538.046 MB/s
+Buffer-Const,s!=d,xor=1:    0.148526 s      861.802 MB/s
+134217728 1 4 TABLE DOUBLE -
+Seed: 1352748229
+Buffer-Const,s!=d,xor=0:    0.151483 s      844.979 MB/s
+Buffer-Const,s!=d,xor=1:    0.153012 s      836.535 MB/s
+1024 131072 4 TABLE DOUBLE -
+Seed: 1352748230
+Buffer-Const,s!=d,xor=0:    0.146577 s      873.259 MB/s
+Buffer-Const,s!=d,xor=1:    0.146274 s      875.070 MB/s
+2048 65536 4 TABLE DOUBLE -
+Seed: 1352748231
+Buffer-Const,s!=d,xor=0:    0.145069 s      882.341 MB/s
+Buffer-Const,s!=d,xor=1:    0.143911 s      889.436 MB/s
+4096 32768 4 TABLE DOUBLE -
+Seed: 1352748233
+Buffer-Const,s!=d,xor=0:    0.143011 s      895.035 MB/s
+Buffer-Const,s!=d,xor=1:    0.142096 s      900.798 MB/s
+8192 16384 4 TABLE DOUBLE -
+Seed: 1352748234
+Buffer-Const,s!=d,xor=0:    0.142743 s      896.719 MB/s
+Buffer-Const,s!=d,xor=1:    0.142004 s      901.383 MB/s
+16384 8192 4 TABLE DOUBLE -
+Seed: 1352748235
+Buffer-Const,s!=d,xor=0:    0.141290 s      905.940 MB/s
+Buffer-Const,s!=d,xor=1:    0.142891 s      895.785 MB/s
+32768 4096 4 TABLE DOUBLE -
+Seed: 1352748236
+Buffer-Const,s!=d,xor=0:    0.141509 s      904.534 MB/s
+Buffer-Const,s!=d,xor=1:    0.142357 s      899.150 MB/s
+65536 2048 4 TABLE DOUBLE -
+Seed: 1352748237
+Buffer-Const,s!=d,xor=0:    0.141353 s      905.532 MB/s
+Buffer-Const,s!=d,xor=1:    0.147224 s      869.422 MB/s
+131072 1024 4 TABLE DOUBLE -
+Seed: 1352748239
+Buffer-Const,s!=d,xor=0:    0.142758 s      896.623 MB/s
+Buffer-Const,s!=d,xor=1:    0.144537 s      885.585 MB/s
+262144 512 4 TABLE DOUBLE -
+Seed: 1352748240
+Buffer-Const,s!=d,xor=0:    0.141772 s      902.858 MB/s
+Buffer-Const,s!=d,xor=1:    0.145832 s      877.723 MB/s
+524288 256 4 TABLE DOUBLE -
+Seed: 1352748241
+Buffer-Const,s!=d,xor=0:    0.142111 s      900.705 MB/s
+Buffer-Const,s!=d,xor=1:    0.143957 s      889.155 MB/s
+1048576 128 4 TABLE DOUBLE -
+Seed: 1352748242
+Buffer-Const,s!=d,xor=0:    0.144863 s      883.596 MB/s
+Buffer-Const,s!=d,xor=1:    0.148948 s      859.359 MB/s
+2097152 64 4 TABLE DOUBLE -
+Seed: 1352748244
+Buffer-Const,s!=d,xor=0:    0.150453 s      850.766 MB/s
+Buffer-Const,s!=d,xor=1:    0.151897 s      842.677 MB/s
+4194304 32 4 TABLE DOUBLE -
+Seed: 1352748245
+Buffer-Const,s!=d,xor=0:    0.152495 s      839.371 MB/s
+Buffer-Const,s!=d,xor=1:    0.153424 s      834.289 MB/s
+8388608 16 4 TABLE DOUBLE -
+Seed: 1352748246
+Buffer-Const,s!=d,xor=0:    0.159227 s      803.886 MB/s
+Buffer-Const,s!=d,xor=1:    0.151101 s      847.118 MB/s
+16777216 8 4 TABLE DOUBLE -
+Seed: 1352748248
+Buffer-Const,s!=d,xor=0:    0.167903 s      762.344 MB/s
+Buffer-Const,s!=d,xor=1:    0.152000 s      842.106 MB/s
+33554432 4 4 TABLE DOUBLE -
+Seed: 1352748249
+Buffer-Const,s!=d,xor=0:    0.193370 s      661.943 MB/s
+Buffer-Const,s!=d,xor=1:    0.153193 s      835.547 MB/s
+67108864 2 4 TABLE DOUBLE -
+Seed: 1352748250
+Buffer-Const,s!=d,xor=0:    0.241834 s      529.288 MB/s
+Buffer-Const,s!=d,xor=1:    0.150811 s      848.745 MB/s
+134217728 1 4 TABLE DOUBLE -
+Seed: 1352748252
+Buffer-Const,s!=d,xor=0:    0.158047 s      809.887 MB/s
+Buffer-Const,s!=d,xor=1:    0.156660 s      817.057 MB/s
+1024 131072 4 TABLE QUAD -
+Seed: 1352748253
+Buffer-Const,s!=d,xor=0:    0.141239 s      906.264 MB/s
+Buffer-Const,s!=d,xor=1:    0.146382 s      874.422 MB/s
+2048 65536 4 TABLE QUAD -
+Seed: 1352748254
+Buffer-Const,s!=d,xor=0:    0.134986 s      948.245 MB/s
+Buffer-Const,s!=d,xor=1:    0.140656 s      910.023 MB/s
+4096 32768 4 TABLE QUAD -
+Seed: 1352748256
+Buffer-Const,s!=d,xor=0:    0.153383 s      834.514 MB/s
+Buffer-Const,s!=d,xor=1:    0.128968 s      992.498 MB/s
+8192 16384 4 TABLE QUAD -
+Seed: 1352748257
+Buffer-Const,s!=d,xor=0:    0.120985 s     1057.984 MB/s
+Buffer-Const,s!=d,xor=1:    0.121486 s     1053.618 MB/s
+16384 8192 4 TABLE QUAD -
+Seed: 1352748258
+Buffer-Const,s!=d,xor=0:    0.113212 s     1130.626 MB/s
+Buffer-Const,s!=d,xor=1:    0.116994 s     1094.076 MB/s
+32768 4096 4 TABLE QUAD -
+Seed: 1352748259
+Buffer-Const,s!=d,xor=0:    0.106910 s     1197.266 MB/s
+Buffer-Const,s!=d,xor=1:    0.109951 s     1164.152 MB/s
+65536 2048 4 TABLE QUAD -
+Seed: 1352748260
+Buffer-Const,s!=d,xor=0:    0.106585 s     1200.916 MB/s
+Buffer-Const,s!=d,xor=1:    0.119656 s     1069.735 MB/s
+131072 1024 4 TABLE QUAD -
+Seed: 1352748261
+Buffer-Const,s!=d,xor=0:    0.108813 s     1176.332 MB/s
+Buffer-Const,s!=d,xor=1:    0.109021 s     1174.081 MB/s
+262144 512 4 TABLE QUAD -
+Seed: 1352748263
+Buffer-Const,s!=d,xor=0:    0.103341 s     1238.614 MB/s
+Buffer-Const,s!=d,xor=1:    0.108952 s     1174.826 MB/s
+524288 256 4 TABLE QUAD -
+Seed: 1352748264
+Buffer-Const,s!=d,xor=0:    0.105469 s     1213.627 MB/s
+Buffer-Const,s!=d,xor=1:    0.110848 s     1154.735 MB/s
+1048576 128 4 TABLE QUAD -
+Seed: 1352748265
+Buffer-Const,s!=d,xor=0:    0.105542 s     1212.785 MB/s
+Buffer-Const,s!=d,xor=1:    0.108646 s     1178.134 MB/s
+2097152 64 4 TABLE QUAD -
+Seed: 1352748266
+Buffer-Const,s!=d,xor=0:    0.106677 s     1199.889 MB/s
+Buffer-Const,s!=d,xor=1:    0.112022 s     1142.631 MB/s
+4194304 32 4 TABLE QUAD -
+Seed: 1352748267
+Buffer-Const,s!=d,xor=0:    0.110966 s     1153.507 MB/s
+Buffer-Const,s!=d,xor=1:    0.100766 s     1270.264 MB/s
+8388608 16 4 TABLE QUAD -
+Seed: 1352748268
+Buffer-Const,s!=d,xor=0:    0.108207 s     1182.915 MB/s
+Buffer-Const,s!=d,xor=1:    0.113488 s     1127.871 MB/s
+16777216 8 4 TABLE QUAD -
+Seed: 1352748269
+Buffer-Const,s!=d,xor=0:    0.129142 s      991.157 MB/s
+Buffer-Const,s!=d,xor=1:    0.110923 s     1153.953 MB/s
+33554432 4 4 TABLE QUAD -
+Seed: 1352748270
+Buffer-Const,s!=d,xor=0:    0.156426 s      818.279 MB/s
+Buffer-Const,s!=d,xor=1:    0.110093 s     1162.652 MB/s
+67108864 2 4 TABLE QUAD -
+Seed: 1352748272
+Buffer-Const,s!=d,xor=0:    0.203508 s      628.967 MB/s
+Buffer-Const,s!=d,xor=1:    0.111907 s     1143.807 MB/s
+134217728 1 4 TABLE QUAD -
+Seed: 1352748273
+Buffer-Const,s!=d,xor=0:    8.741033 s       14.644 MB/s
+Buffer-Const,s!=d,xor=1:    8.972750 s       14.265 MB/s
+1024 131072 4 TABLE QUAD,LAZY -
+Seed: 1352748309
+Buffer-Const,s!=d,xor=0:    4.387740 s       29.172 MB/s
+Buffer-Const,s!=d,xor=1:    4.401799 s       29.079 MB/s
+2048 65536 4 TABLE QUAD,LAZY -
+Seed: 1352748327
+Buffer-Const,s!=d,xor=0:    2.255454 s       56.751 MB/s
+Buffer-Const,s!=d,xor=1:    2.243299 s       57.059 MB/s
+4096 32768 4 TABLE QUAD,LAZY -
+Seed: 1352748337
+Buffer-Const,s!=d,xor=0:    1.166870 s      109.695 MB/s
+Buffer-Const,s!=d,xor=1:    1.180004 s      108.474 MB/s
+8192 16384 4 TABLE QUAD,LAZY -
+Seed: 1352748342
+Buffer-Const,s!=d,xor=0:    0.661613 s      193.467 MB/s
+Buffer-Const,s!=d,xor=1:    0.629827 s      203.230 MB/s
+16384 8192 4 TABLE QUAD,LAZY -
+Seed: 1352748345
+Buffer-Const,s!=d,xor=0:    0.364647 s      351.024 MB/s
+Buffer-Const,s!=d,xor=1:    0.376395 s      340.069 MB/s
+32768 4096 4 TABLE QUAD,LAZY -
+Seed: 1352748348
+Buffer-Const,s!=d,xor=0:    0.226271 s      565.694 MB/s
+Buffer-Const,s!=d,xor=1:    0.234560 s      545.704 MB/s
+65536 2048 4 TABLE QUAD,LAZY -
+Seed: 1352748349
+Buffer-Const,s!=d,xor=0:    0.160475 s      797.630 MB/s
+Buffer-Const,s!=d,xor=1:    0.166329 s      769.561 MB/s
+131072 1024 4 TABLE QUAD,LAZY -
+Seed: 1352748351
+Buffer-Const,s!=d,xor=0:    0.130999 s      977.110 MB/s
+Buffer-Const,s!=d,xor=1:    0.134676 s      950.431 MB/s
+262144 512 4 TABLE QUAD,LAZY -
+Seed: 1352748352
+Buffer-Const,s!=d,xor=0:    0.110626 s     1157.057 MB/s
+Buffer-Const,s!=d,xor=1:    0.118067 s     1084.134 MB/s
+524288 256 4 TABLE QUAD,LAZY -
+Seed: 1352748353
+Buffer-Const,s!=d,xor=0:    0.105213 s     1216.581 MB/s
+Buffer-Const,s!=d,xor=1:    0.109697 s     1166.854 MB/s
+1048576 128 4 TABLE QUAD,LAZY -
+Seed: 1352748354
+Buffer-Const,s!=d,xor=0:    0.107641 s     1189.138 MB/s
+Buffer-Const,s!=d,xor=1:    0.108062 s     1184.502 MB/s
+2097152 64 4 TABLE QUAD,LAZY -
+Seed: 1352748355
+Buffer-Const,s!=d,xor=0:    0.103473 s     1237.035 MB/s
+Buffer-Const,s!=d,xor=1:    0.098362 s     1301.310 MB/s
+4194304 32 4 TABLE QUAD,LAZY -
+Seed: 1352748356
+Buffer-Const,s!=d,xor=0:    0.107058 s     1195.616 MB/s
+Buffer-Const,s!=d,xor=1:    0.097883 s     1307.687 MB/s
+8388608 16 4 TABLE QUAD,LAZY -
+Seed: 1352748357
+Buffer-Const,s!=d,xor=0:    0.116388 s     1099.769 MB/s
+Buffer-Const,s!=d,xor=1:    0.098690 s     1296.990 MB/s
+16777216 8 4 TABLE QUAD,LAZY -
+Seed: 1352748358
+Buffer-Const,s!=d,xor=0:    0.129120 s      991.325 MB/s
+Buffer-Const,s!=d,xor=1:    0.109833 s     1165.403 MB/s
+33554432 4 4 TABLE QUAD,LAZY -
+Seed: 1352748360
+Buffer-Const,s!=d,xor=0:    0.157534 s      812.524 MB/s
+Buffer-Const,s!=d,xor=1:    0.114721 s     1115.750 MB/s
+67108864 2 4 TABLE QUAD,LAZY -
+Seed: 1352748361
+Buffer-Const,s!=d,xor=0:    0.205053 s      624.229 MB/s
+Buffer-Const,s!=d,xor=1:    0.110099 s     1162.589 MB/s
+134217728 1 4 TABLE QUAD,LAZY -
+Seed: 1352748362
+Buffer-Const,s!=d,xor=0:    0.142388 s      898.955 MB/s
+Buffer-Const,s!=d,xor=1:    0.146045 s      876.440 MB/s
+1024 131072 4 BYTWO_p - -
+Seed: 1352748363
+Buffer-Const,s!=d,xor=0:    0.135040 s      947.867 MB/s
+Buffer-Const,s!=d,xor=1:    0.140142 s      913.360 MB/s
+2048 65536 4 BYTWO_p - -
+Seed: 1352748365
+Buffer-Const,s!=d,xor=0:    0.131358 s      974.437 MB/s
+Buffer-Const,s!=d,xor=1:    0.137115 s      933.525 MB/s
+4096 32768 4 BYTWO_p - -
+Seed: 1352748366
+Buffer-Const,s!=d,xor=0:    0.129772 s      986.347 MB/s
+Buffer-Const,s!=d,xor=1:    0.135098 s      947.462 MB/s
+8192 16384 4 BYTWO_p - -
+Seed: 1352748367
+Buffer-Const,s!=d,xor=0:    0.128670 s      994.795 MB/s
+Buffer-Const,s!=d,xor=1:    0.133591 s      958.145 MB/s
+16384 8192 4 BYTWO_p - -
+Seed: 1352748368
+Buffer-Const,s!=d,xor=0:    0.130064 s      984.129 MB/s
+Buffer-Const,s!=d,xor=1:    0.135170 s      946.959 MB/s
+32768 4096 4 BYTWO_p - -
+Seed: 1352748369
+Buffer-Const,s!=d,xor=0:    0.129942 s      985.052 MB/s
+Buffer-Const,s!=d,xor=1:    0.134780 s      949.695 MB/s
+65536 2048 4 BYTWO_p - -
+Seed: 1352748371
+Buffer-Const,s!=d,xor=0:    0.130649 s      979.725 MB/s
+Buffer-Const,s!=d,xor=1:    0.134556 s      951.280 MB/s
+131072 1024 4 BYTWO_p - -
+Seed: 1352748372
+Buffer-Const,s!=d,xor=0:    0.129390 s      989.255 MB/s
+Buffer-Const,s!=d,xor=1:    0.134418 s      952.257 MB/s
+262144 512 4 BYTWO_p - -
+Seed: 1352748373
+Buffer-Const,s!=d,xor=0:    0.130153 s      983.455 MB/s
+Buffer-Const,s!=d,xor=1:    0.137027 s      934.126 MB/s
+524288 256 4 BYTWO_p - -
+Seed: 1352748374
+Buffer-Const,s!=d,xor=0:    0.128065 s      999.493 MB/s
+Buffer-Const,s!=d,xor=1:    0.136548 s      937.402 MB/s
+1048576 128 4 BYTWO_p - -
+Seed: 1352748375
+Buffer-Const,s!=d,xor=0:    0.137841 s      928.608 MB/s
+Buffer-Const,s!=d,xor=1:    0.149983 s      853.428 MB/s
+2097152 64 4 BYTWO_p - -
+Seed: 1352748377
+Buffer-Const,s!=d,xor=0:    0.143009 s      895.049 MB/s
+Buffer-Const,s!=d,xor=1:    0.151799 s      843.218 MB/s
+4194304 32 4 BYTWO_p - -
+Seed: 1352748378
+Buffer-Const,s!=d,xor=0:    0.148001 s      864.859 MB/s
+Buffer-Const,s!=d,xor=1:    0.150979 s      847.802 MB/s
+8388608 16 4 BYTWO_p - -
+Seed: 1352748379
+Buffer-Const,s!=d,xor=0:    0.153637 s      833.133 MB/s
+Buffer-Const,s!=d,xor=1:    0.133152 s      961.307 MB/s
+16777216 8 4 BYTWO_p - -
+Seed: 1352748380
+Buffer-Const,s!=d,xor=0:    0.164125 s      779.894 MB/s
+Buffer-Const,s!=d,xor=1:    0.150620 s      849.821 MB/s
+33554432 4 4 BYTWO_p - -
+Seed: 1352748382
+Buffer-Const,s!=d,xor=0:    0.188526 s      678.952 MB/s
+Buffer-Const,s!=d,xor=1:    0.153114 s      835.979 MB/s
+67108864 2 4 BYTWO_p - -
+Seed: 1352748383
+Buffer-Const,s!=d,xor=0:    0.235626 s      543.234 MB/s
+Buffer-Const,s!=d,xor=1:    0.158839 s      805.847 MB/s
+134217728 1 4 BYTWO_p - -
+Seed: 1352748385
+Buffer-Const,s!=d,xor=0:    0.076323 s     1677.087 MB/s
+Buffer-Const,s!=d,xor=1:    0.077654 s     1648.345 MB/s
+1024 131072 4 BYTWO_b - -
+Seed: 1352748386
+Buffer-Const,s!=d,xor=0:    0.068027 s     1881.605 MB/s
+Buffer-Const,s!=d,xor=1:    0.070778 s     1808.462 MB/s
+2048 65536 4 BYTWO_b - -
+Seed: 1352748387
+Buffer-Const,s!=d,xor=0:    0.065722 s     1947.591 MB/s
+Buffer-Const,s!=d,xor=1:    0.068535 s     1867.669 MB/s
+4096 32768 4 BYTWO_b - -
+Seed: 1352748388
+Buffer-Const,s!=d,xor=0:    0.063732 s     2008.398 MB/s
+Buffer-Const,s!=d,xor=1:    0.066054 s     1937.805 MB/s
+8192 16384 4 BYTWO_b - -
+Seed: 1352748389
+Buffer-Const,s!=d,xor=0:    0.062660 s     2042.779 MB/s
+Buffer-Const,s!=d,xor=1:    0.065213 s     1962.793 MB/s
+16384 8192 4 BYTWO_b - -
+Seed: 1352748390
+Buffer-Const,s!=d,xor=0:    0.062758 s     2039.566 MB/s
+Buffer-Const,s!=d,xor=1:    0.066957 s     1911.668 MB/s
+32768 4096 4 BYTWO_b - -
+Seed: 1352748390
+Buffer-Const,s!=d,xor=0:    0.063058 s     2029.865 MB/s
+Buffer-Const,s!=d,xor=1:    0.065829 s     1944.424 MB/s
+65536 2048 4 BYTWO_b - -
+Seed: 1352748391
+Buffer-Const,s!=d,xor=0:    0.065844 s     1943.994 MB/s
+Buffer-Const,s!=d,xor=1:    0.065374 s     1957.968 MB/s
+131072 1024 4 BYTWO_b - -
+Seed: 1352748392
+Buffer-Const,s!=d,xor=0:    0.062168 s     2058.949 MB/s
+Buffer-Const,s!=d,xor=1:    0.068710 s     1862.906 MB/s
+262144 512 4 BYTWO_b - -
+Seed: 1352748393
+Buffer-Const,s!=d,xor=0:    0.062623 s     2043.984 MB/s
+Buffer-Const,s!=d,xor=1:    0.066550 s     1923.379 MB/s
+524288 256 4 BYTWO_b - -
+Seed: 1352748394
+Buffer-Const,s!=d,xor=0:    0.064571 s     1982.317 MB/s
+Buffer-Const,s!=d,xor=1:    0.061325 s     2087.246 MB/s
+1048576 128 4 BYTWO_b - -
+Seed: 1352748395
+Buffer-Const,s!=d,xor=0:    0.070771 s     1808.657 MB/s
+Buffer-Const,s!=d,xor=1:    0.072981 s     1753.878 MB/s
+2097152 64 4 BYTWO_b - -
+Seed: 1352748396
+Buffer-Const,s!=d,xor=0:    0.078018 s     1640.643 MB/s
+Buffer-Const,s!=d,xor=1:    0.072307 s     1770.227 MB/s
+4194304 32 4 BYTWO_b - -
+Seed: 1352748397
+Buffer-Const,s!=d,xor=0:    0.079478 s     1610.508 MB/s
+Buffer-Const,s!=d,xor=1:    0.073757 s     1735.424 MB/s
+8388608 16 4 BYTWO_b - -
+Seed: 1352748398
+Buffer-Const,s!=d,xor=0:    0.085826 s     1491.383 MB/s
+Buffer-Const,s!=d,xor=1:    0.087615 s     1460.945 MB/s
+16777216 8 4 BYTWO_b - -
+Seed: 1352748399
+Buffer-Const,s!=d,xor=0:    0.081822 s     1564.373 MB/s
+Buffer-Const,s!=d,xor=1:    0.083410 s     1534.583 MB/s
+33554432 4 4 BYTWO_b - -
+Seed: 1352748400
+Buffer-Const,s!=d,xor=0:    0.101873 s     1256.467 MB/s
+Buffer-Const,s!=d,xor=1:    0.074412 s     1720.150 MB/s
+67108864 2 4 BYTWO_b - -
+Seed: 1352748401
+Buffer-Const,s!=d,xor=0:    0.188405 s      679.387 MB/s
+Buffer-Const,s!=d,xor=1:    0.053904 s     2374.589 MB/s
+134217728 1 4 BYTWO_b - -
+Seed: 1352748403
+Buffer-Const,s!=d,xor=0:    0.092518 s     1383.520 MB/s
+Buffer-Const,s!=d,xor=1:    0.097347 s     1314.877 MB/s
+1024 131072 4 BYTWO_p SSE -
+Seed: 1352748404
+Buffer-Const,s!=d,xor=0:    0.086226 s     1484.463 MB/s
+Buffer-Const,s!=d,xor=1:    0.092092 s     1389.910 MB/s
+2048 65536 4 BYTWO_p SSE -
+Seed: 1352748405
+Buffer-Const,s!=d,xor=0:    0.082721 s     1547.370 MB/s
+Buffer-Const,s!=d,xor=1:    0.088092 s     1453.025 MB/s
+4096 32768 4 BYTWO_p SSE -
+Seed: 1352748406
+Buffer-Const,s!=d,xor=0:    0.081612 s     1568.395 MB/s
+Buffer-Const,s!=d,xor=1:    0.086144 s     1485.885 MB/s
+8192 16384 4 BYTWO_p SSE -
+Seed: 1352748407
+Buffer-Const,s!=d,xor=0:    0.080819 s     1583.783 MB/s
+Buffer-Const,s!=d,xor=1:    0.085448 s     1497.982 MB/s
+16384 8192 4 BYTWO_p SSE -
+Seed: 1352748408
+Buffer-Const,s!=d,xor=0:    0.080971 s     1580.804 MB/s
+Buffer-Const,s!=d,xor=1:    0.086504 s     1479.709 MB/s
+32768 4096 4 BYTWO_p SSE -
+Seed: 1352748409
+Buffer-Const,s!=d,xor=0:    0.080746 s     1585.214 MB/s
+Buffer-Const,s!=d,xor=1:    0.085679 s     1493.943 MB/s
+65536 2048 4 BYTWO_p SSE -
+Seed: 1352748410
+Buffer-Const,s!=d,xor=0:    0.081038 s     1579.511 MB/s
+Buffer-Const,s!=d,xor=1:    0.086381 s     1481.804 MB/s
+131072 1024 4 BYTWO_p SSE -
+Seed: 1352748411
+Buffer-Const,s!=d,xor=0:    0.079807 s     1603.873 MB/s
+Buffer-Const,s!=d,xor=1:    0.085420 s     1498.484 MB/s
+262144 512 4 BYTWO_p SSE -
+Seed: 1352748412
+Buffer-Const,s!=d,xor=0:    0.080044 s     1599.115 MB/s
+Buffer-Const,s!=d,xor=1:    0.083843 s     1526.654 MB/s
+524288 256 4 BYTWO_p SSE -
+Seed: 1352748413
+Buffer-Const,s!=d,xor=0:    0.082954 s     1543.016 MB/s
+Buffer-Const,s!=d,xor=1:    0.086807 s     1474.535 MB/s
+1048576 128 4 BYTWO_p SSE -
+Seed: 1352748414
+Buffer-Const,s!=d,xor=0:    0.090553 s     1413.536 MB/s
+Buffer-Const,s!=d,xor=1:    0.092115 s     1389.565 MB/s
+2097152 64 4 BYTWO_p SSE -
+Seed: 1352748415
+Buffer-Const,s!=d,xor=0:    0.087072 s     1470.054 MB/s
+Buffer-Const,s!=d,xor=1:    0.093465 s     1369.492 MB/s
+4194304 32 4 BYTWO_p SSE -
+Seed: 1352748416
+Buffer-Const,s!=d,xor=0:    0.097724 s     1309.812 MB/s
+Buffer-Const,s!=d,xor=1:    0.090922 s     1407.795 MB/s
+8388608 16 4 BYTWO_p SSE -
+Seed: 1352748417
+Buffer-Const,s!=d,xor=0:    0.104649 s     1223.136 MB/s
+Buffer-Const,s!=d,xor=1:    0.084963 s     1506.532 MB/s
+16777216 8 4 BYTWO_p SSE -
+Seed: 1352748418
+Buffer-Const,s!=d,xor=0:    0.112079 s     1142.050 MB/s
+Buffer-Const,s!=d,xor=1:    0.096727 s     1323.313 MB/s
+33554432 4 4 BYTWO_p SSE -
+Seed: 1352748419
+Buffer-Const,s!=d,xor=0:    0.136256 s      939.408 MB/s
+Buffer-Const,s!=d,xor=1:    0.103244 s     1239.781 MB/s
+67108864 2 4 BYTWO_p SSE -
+Seed: 1352748420
+Buffer-Const,s!=d,xor=0:    0.181231 s      706.281 MB/s
+Buffer-Const,s!=d,xor=1:    0.092887 s     1378.016 MB/s
+134217728 1 4 BYTWO_p SSE -
+Seed: 1352748422
+Buffer-Const,s!=d,xor=0:    0.107760 s     1187.825 MB/s
+Buffer-Const,s!=d,xor=1:    0.065748 s     1946.828 MB/s
+1024 131072 4 BYTWO_b SSE -
+Seed: 1352748423
+Buffer-Const,s!=d,xor=0:    0.104705 s     1222.484 MB/s
+Buffer-Const,s!=d,xor=1:    0.058541 s     2186.508 MB/s
+2048 65536 4 BYTWO_b SSE -
+Seed: 1352748424
+Buffer-Const,s!=d,xor=0:    0.098082 s     1305.026 MB/s
+Buffer-Const,s!=d,xor=1:    0.053539 s     2390.768 MB/s
+4096 32768 4 BYTWO_b SSE -
+Seed: 1352748425
+Buffer-Const,s!=d,xor=0:    0.094147 s     1359.576 MB/s
+Buffer-Const,s!=d,xor=1:    0.051867 s     2467.839 MB/s
+8192 16384 4 BYTWO_b SSE -
+Seed: 1352748426
+Buffer-Const,s!=d,xor=0:    0.092755 s     1379.975 MB/s
+Buffer-Const,s!=d,xor=1:    0.049600 s     2580.651 MB/s
+16384 8192 4 BYTWO_b SSE -
+Seed: 1352748427
+Buffer-Const,s!=d,xor=0:    0.093161 s     1373.971 MB/s
+Buffer-Const,s!=d,xor=1:    0.048734 s     2626.480 MB/s
+32768 4096 4 BYTWO_b SSE -
+Seed: 1352748428
+Buffer-Const,s!=d,xor=0:    0.092071 s     1390.227 MB/s
+Buffer-Const,s!=d,xor=1:    0.048645 s     2631.282 MB/s
+65536 2048 4 BYTWO_b SSE -
+Seed: 1352748429
+Buffer-Const,s!=d,xor=0:    0.093282 s     1372.191 MB/s
+Buffer-Const,s!=d,xor=1:    0.047374 s     2701.903 MB/s
+131072 1024 4 BYTWO_b SSE -
+Seed: 1352748430
+Buffer-Const,s!=d,xor=0:    0.094085 s     1360.479 MB/s
+Buffer-Const,s!=d,xor=1:    0.050752 s     2522.072 MB/s
+262144 512 4 BYTWO_b SSE -
+Seed: 1352748431
+Buffer-Const,s!=d,xor=0:    0.099099 s     1291.639 MB/s
+Buffer-Const,s!=d,xor=1:    0.046550 s     2749.729 MB/s
+524288 256 4 BYTWO_b SSE -
+Seed: 1352748431
+Buffer-Const,s!=d,xor=0:    0.093943 s     1362.530 MB/s
+Buffer-Const,s!=d,xor=1:    0.050178 s     2550.940 MB/s
+1048576 128 4 BYTWO_b SSE -
+Seed: 1352748432
+Buffer-Const,s!=d,xor=0:    0.121096 s     1057.011 MB/s
+Buffer-Const,s!=d,xor=1:    0.055513 s     2305.770 MB/s
+2097152 64 4 BYTWO_b SSE -
+Seed: 1352748433
+Buffer-Const,s!=d,xor=0:    0.109734 s     1166.456 MB/s
+Buffer-Const,s!=d,xor=1:    0.057743 s     2216.716 MB/s
+4194304 32 4 BYTWO_b SSE -
+Seed: 1352748434
+Buffer-Const,s!=d,xor=0:    0.117161 s     1092.513 MB/s
+Buffer-Const,s!=d,xor=1:    0.057568 s     2223.464 MB/s
+8388608 16 4 BYTWO_b SSE -
+Seed: 1352748436
+Buffer-Const,s!=d,xor=0:    0.102332 s     1250.832 MB/s
+Buffer-Const,s!=d,xor=1:    0.061185 s     2092.004 MB/s
+16777216 8 4 BYTWO_b SSE -
+Seed: 1352748437
+Buffer-Const,s!=d,xor=0:    0.173641 s      737.153 MB/s
+Buffer-Const,s!=d,xor=1:    0.054822 s     2334.830 MB/s
+33554432 4 4 BYTWO_b SSE -
+Seed: 1352748438
+Buffer-Const,s!=d,xor=0:    0.130181 s      983.246 MB/s
+Buffer-Const,s!=d,xor=1:    0.051398 s     2490.367 MB/s
+67108864 2 4 BYTWO_b SSE -
+Seed: 1352748439
+Buffer-Const,s!=d,xor=0:    0.150805 s      848.778 MB/s
+Buffer-Const,s!=d,xor=1:    0.000005 s     2330.524 MB/s
+134217728 1 4 BYTWO_b SSE -

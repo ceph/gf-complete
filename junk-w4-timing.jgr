@@ -1,0 +1,11 @@
+newgraph
+xaxis size 4 min 0 no_auto_hash_labels
+  hash_labels hjl vjc rotate -90 fontsize 11
+
+shell : junk-pick-best-output < junk-w4-timing-out.txt | sort -nr | sed 's/.............//' | awk '{ print "hash_label at ", ++l, ":", $0 }'
+
+yaxis size 1 min 0 label : MB/s
+
+newcurve marktype xbar cfill 1 1 0 marksize 1 pts
+shell : junk-pick-best-output < junk-w4-timing-out.txt | sort -nr | awk '{ print $1 }' | cat -n
+

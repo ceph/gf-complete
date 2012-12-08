@@ -1,0 +1,6 @@
+newgraph
+xaxis size 4 min 0 no_auto_hash_labels
+  hash_labels hjl vjc rotate -90 fontsize 11
+yaxis size 1 min 0 label : MB/s
+
+shell : awk -f junk-proc.awk < junk-w4-out.txt
