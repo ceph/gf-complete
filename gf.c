@@ -268,6 +268,7 @@ static void gf_slow_multiply_region(gf_region_data *rd, void *src, void *dest, v
   uint8_t *s8, *d8;
   uint16_t *s16, *d16;
   uint32_t *s32, *d32;
+  uint64_t *s64, *d64;
   gf_internal_t *h;
   int wb;
   uint32_t p, a;
@@ -304,6 +305,12 @@ static void gf_slow_multiply_region(gf_region_data *rd, void *src, void *dest, v
       d32 = (uint32_t *) dest;
       *d32 = (rd->xor) ? (*d32 ^ rd->gf->multiply.w32(rd->gf, rd->val, *s32)) : 
                       rd->gf->multiply.w32(rd->gf, rd->val, *s32);
+      break;
+    case 64:
+      s64 = (uint64_t *) src;
+      d64 = (uint64_t *) dest;
+      *d64 = (rd->xor) ? (*d64 ^ rd->gf->multiply.w64(rd->gf, rd->val, *s64)) : 
+                      rd->gf->multiply.w64(rd->gf, rd->val, *s64);
       break;
     default:
       fprintf(stderr, "Error: gf_slow_multiply_region: w=%d not implemented.\n", h->w);

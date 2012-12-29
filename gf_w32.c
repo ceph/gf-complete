@@ -1949,7 +1949,7 @@ gf_w32_composite_multiply_recursive(gf_t *gf, uint32_t a, uint32_t b)
 
   a1b1 = base_gf->multiply.w32(base_gf, a1, b1);
 
-   rv = ((base_gf->multiply.w32(base_gf, a0, b0) ^ a1b1) | ((base_gf->multiply.w32(base_gf, a1, b0) ^ base_gf->multiply.w32(base_gf, a0, b1) ^ base_gf->multiply.w32(base_gf, a1b1, GF_S_GF_16_2)) << 16)); 
+  rv = ((base_gf->multiply.w32(base_gf, a0, b0) ^ a1b1) | ((base_gf->multiply.w32(base_gf, a1, b0) ^ base_gf->multiply.w32(base_gf, a0, b1) ^ base_gf->multiply.w32(base_gf, a1b1, GF_S_GF_16_2)) << 16)); 
   return rv;
 }
 
@@ -2138,7 +2138,7 @@ gf_w32_composite_multiply_region_alt(gf_t *gf, void *src, void *dest, uint32_t v
   gf_region_data rd;
   int sub_reg_size;
   uint8_t *slow, *shigh;
-  uint8_t *dlow, *dhigh, *top;;
+  uint8_t *dlow, *dhigh, *top;
 
   /* JSP: I want the two pointers aligned wrt each other on 16 byte
      boundaries.  So I'm going to make sure that the area on

@@ -214,7 +214,7 @@ void gf_general_do_region_check(gf_t *gf, gf_general_t *a, void *orig_a, void *o
       ot.w64 = gf->extract_word.w64(gf, orig_target, bytes, i);
       ft.w64 = gf->extract_word.w64(gf, final_target, bytes, i);
       sb.w64 = gf->multiply.w64(gf, a->w64, oa.w64);
-      if (xor) sb.w64 ^= ot.w32;
+      if (xor) sb.w64 ^= ot.w64;
     } else {
       gf->extract_word.w128(gf, orig_a, bytes, i, oa.w128);
       gf->extract_word.w128(gf, orig_target, bytes, i, ot.w128);
