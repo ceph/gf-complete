@@ -330,7 +330,7 @@ void gf_set_region_data(gf_region_data *rd,
   void *src,
   void *dest,
   int bytes,
-  uint32_t val,
+  uint64_t val,
   int xor,
   int align)
 {

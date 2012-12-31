@@ -67,7 +67,7 @@ typedef struct {
   void *src;
   void *dest;
   int bytes;
-  uint32_t val;
+  uint64_t val;
   int xor;
   int align;           /* The number of bytes to which to align. */
   void *s_start;       /* The start and the top of the aligned region. */
@@ -83,7 +83,7 @@ void gf_set_region_data(gf_region_data *rd,
                         void *src,
                         void *dest,
                         int bytes,
-                        uint32_t val,
+                        uint64_t val,
                         int xor,
                         int align);
 
