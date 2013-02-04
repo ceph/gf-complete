@@ -9,10 +9,10 @@
 #include <stdlib.h>
 
 #define GF_FIELD_WIDTH (64)
-#define GF_FIRST_BIT (1 << 63)
+#define GF_FIRST_BIT (1L << 63)
 
 #define GF_BASE_FIELD_WIDTH (32)
-#define GF_BASE_FIELD_SIZE       (1 << GF_BASE_FIELD_WIDTH)
+#define GF_BASE_FIELD_SIZE       (1L << GF_BASE_FIELD_WIDTH)
 #define GF_BASE_FIELD_GROUP_SIZE  GF_BASE_FIELD_SIZE-1
 
 // 10000587 is a valid s for 2^16^2
@@ -24,8 +24,26 @@
 struct gf_w64_group_data {
     uint64_t *reduce;
     uint64_t *shift;
-    int      tshift;
     uint64_t *memory;
+};
+
+struct gf_split_4_64_lazy_data {
+    uint64_t      tables[16][16];
+    uint64_t      last_value;
+};
+
+struct gf_split_8_64_lazy_data {
+    uint64_t      tables[8][(1<<8)];
+    uint64_t      last_value;
+};
+
+struct gf_split_16_64_lazy_data {
+    uint64_t      tables[4][(1<<16)];
+    uint64_t      last_value;
+};
+
+struct gf_split_8_8_data {
+    uint64_t      tables[15][256][256];
 };
 
 typedef struct w64_composite_int_s {
@@ -165,6 +183,193 @@ gf_w64_shift_multiply (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
     ppl >>= 1;
   }
   return pr;
+}
+
+void
+gf_w64_split_4_64_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
+{
+  gf_internal_t *h;
+  struct gf_split_4_64_lazy_data *ld;
+  int i, j, k;
+  uint64_t pp, v, s, *s64, *d64, *top;
+  gf_region_data rd;
+
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+
+  h = (gf_internal_t *) gf->scratch;
+  pp = h->prim_poly;
+
+  ld = (struct gf_split_4_64_lazy_data *) h->private;
+
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 4);
+  gf_do_initial_region_alignment(&rd);
+
+  if (ld->last_value != val) {
+    v = val;
+    for (i = 0; i < 16; i++) {
+      ld->tables[i][0] = 0;
+      for (j = 1; j < 16; j <<= 1) {
+        for (k = 0; k < j; k++) {
+          ld->tables[i][k^j] = (v ^ ld->tables[i][k]);
+        }
+        v = (v & GF_FIRST_BIT) ? ((v << 1) ^ pp) : (v << 1);
+      }
+    }
+  }
+  ld->last_value = val;
+
+  s64 = (uint64_t *) rd.s_start;
+  d64 = (uint64_t *) rd.d_start;
+  top = (uint64_t *) rd.d_top;
+
+  while (d64 != top) {
+    v = (xor) ? *d64 : 0;
+    s = *s64;
+    i = 0;
+    while (s != 0) {
+      v ^= ld->tables[i][s&0xf];
+      s >>= 4;
+      i++;
+    }
+    *d64 = v;
+    d64++;
+    s64++;
+  }
+  gf_do_final_region_alignment(&rd);
+}
+
+static
+inline
+uint64_t
+gf_w64_split_8_8_multiply (gf_t *gf, uint64_t a64, uint64_t b64)
+{
+  uint64_t product, i, j, mask, tb;
+  gf_internal_t *h;
+  struct gf_split_8_8_data *d8;
+ 
+  h = (gf_internal_t *) gf->scratch;
+  d8 = (struct gf_split_8_8_data *) h->private;
+  product = 0;
+  mask = 0xff;
+
+  for (i = 0; a64 != 0; i++) {
+    tb = b64;
+    for (j = 0; tb != 0; j++) {
+      product ^= d8->tables[i+j][a64&mask][tb&mask];
+      tb >>= 8;
+    }
+    a64 >>= 8;
+  }
+  return product;
+}
+
+void
+gf_w64_split_8_64_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
+{
+  gf_internal_t *h;
+  struct gf_split_8_64_lazy_data *ld;
+  int i, j, k;
+  uint64_t pp, v, s, *s64, *d64, *top;
+  gf_region_data rd;
+
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+
+  h = (gf_internal_t *) gf->scratch;
+  pp = h->prim_poly;
+
+  ld = (struct gf_split_8_64_lazy_data *) h->private;
+
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 4);
+  gf_do_initial_region_alignment(&rd);
+
+  if (ld->last_value != val) {
+    v = val;
+    for (i = 0; i < 8; i++) {
+      ld->tables[i][0] = 0;
+      for (j = 1; j < 256; j <<= 1) {
+        for (k = 0; k < j; k++) {
+          ld->tables[i][k^j] = (v ^ ld->tables[i][k]);
+        }
+        v = (v & GF_FIRST_BIT) ? ((v << 1) ^ pp) : (v << 1);
+      }
+    }
+  }
+  ld->last_value = val;
+
+  s64 = (uint64_t *) rd.s_start;
+  d64 = (uint64_t *) rd.d_start;
+  top = (uint64_t *) rd.d_top;
+
+  while (d64 != top) {
+    v = (xor) ? *d64 : 0;
+    s = *s64;
+    i = 0;
+    while (s != 0) {
+      v ^= ld->tables[i][s&0xff];
+      s >>= 8;
+      i++;
+    }
+    *d64 = v;
+    d64++;
+    s64++;
+  }
+  gf_do_final_region_alignment(&rd);
+}
+
+void
+gf_w64_split_16_64_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
+{
+  gf_internal_t *h;
+  struct gf_split_16_64_lazy_data *ld;
+  int i, j, k;
+  uint64_t pp, v, s, *s64, *d64, *top;
+  gf_region_data rd;
+
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+
+  h = (gf_internal_t *) gf->scratch;
+  pp = h->prim_poly;
+
+  ld = (struct gf_split_16_64_lazy_data *) h->private;
+
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 4);
+  gf_do_initial_region_alignment(&rd);
+
+  if (ld->last_value != val) {
+    v = val;
+    for (i = 0; i < 4; i++) {
+      ld->tables[i][0] = 0;
+      for (j = 1; j < (1<<16); j <<= 1) {
+        for (k = 0; k < j; k++) {
+          ld->tables[i][k^j] = (v ^ ld->tables[i][k]);
+        }
+        v = (v & GF_FIRST_BIT) ? ((v << 1) ^ pp) : (v << 1);
+      }
+    }
+  }
+  ld->last_value = val;
+
+  s64 = (uint64_t *) rd.s_start;
+  d64 = (uint64_t *) rd.d_start;
+  top = (uint64_t *) rd.d_top;
+
+  while (d64 != top) {
+    v = (xor) ? *d64 : 0;
+    s = *s64;
+    i = 0;
+    while (s != 0) {
+      v ^= ld->tables[i][s&0xffff];
+      s >>= 16;
+      i++;
+    }
+    *d64 = v;
+    d64++;
+    s64++;
+  }
+  gf_do_final_region_alignment(&rd);
 }
 
 static 
@@ -436,11 +641,6 @@ int gf_w64_group_init(gf_t *gf)
   gd = (struct gf_w64_group_data *) h->private;
   gd->shift = (uint64_t *) (&(gd->memory));
   gd->reduce = gd->shift + (1 << h->arg1);
-
-  gd->tshift = 64 % g_s;
-  if (gd->tshift == 0) gd->tshift = g_s;
-  gd->tshift = (64 - gd->tshift);
-  gd->tshift = ((gd->tshift-1)/g_r) * g_r;
 
   gd->reduce[0] = 0;
   for (i = 0; i < (1 << h->arg2); i++) {
@@ -1035,6 +1235,74 @@ int gf_w64_composite_init(gf_t *gf)
   return 1;
 }
 
+#define GF_MULTBY_TWO(p) (((p) & GF_FIRST_BIT) ? (((p) << 1) ^ h->prim_poly) : (p) << 1);
+
+static
+int gf_w64_split_init(gf_t *gf)
+{
+  gf_internal_t *h;
+  struct gf_split_4_64_lazy_data *d4;
+  struct gf_split_8_64_lazy_data *d8;
+  struct gf_split_8_8_data *d88;
+  struct gf_split_16_64_lazy_data *d16;
+  uint64_t p, basep;
+  int exp, i, j;
+
+  h = (gf_internal_t *) gf->scratch;
+
+  /* Defaults */
+  gf->multiply_region.w64 = gf_w64_multiply_region_from_single;
+  gf->multiply.w64 = gf_w64_shift_multiply;
+  gf->inverse.w64 = gf_w64_euclid;
+
+  if ((h->arg1 == 4 && h->arg2 == 64) || (h->arg1 == 64 && h->arg2 == 4)) {
+    d4 = (struct gf_split_4_64_lazy_data *) h->private;
+    d4->last_value = 0;
+    gf->multiply_region.w64 = gf_w64_split_4_64_lazy_multiply_region;
+  }
+  if ((h->arg1 == 8 && h->arg2 == 64) || (h->arg1 == 64 && h->arg2 == 8)) {
+    d8 = (struct gf_split_8_64_lazy_data *) h->private;
+    d8->last_value = 0;
+    gf->multiply_region.w64 = gf_w64_split_8_64_lazy_multiply_region;
+  }
+  if ((h->arg1 == 16 && h->arg2 == 64) || (h->arg1 == 64 && h->arg2 == 16)) {
+    d16 = (struct gf_split_16_64_lazy_data *) h->private;
+    d16->last_value = 0;
+    gf->multiply_region.w64 = gf_w64_split_16_64_lazy_multiply_region;
+  }
+  if ((h->arg1 == 8 && h->arg2 == 8)) {
+    d88 = (struct gf_split_8_8_data *) h->private;
+    gf->multiply.w64 = gf_w64_split_8_8_multiply;
+    /* The performance of this guy sucks, so don't bother with a region op */
+    basep = 1;
+    for (exp = 0; exp < 15; exp++) {
+      for (j = 0; j < 256; j++) d88->tables[exp][0][j] = 0;
+      for (i = 0; i < 256; i++) d88->tables[exp][i][0] = 0;
+      d88->tables[exp][1][1] = basep;
+      for (i = 2; i < 256; i++) {
+        if (i&1) {
+          p = d88->tables[exp][i^1][1];
+          d88->tables[exp][i][1] = p ^ basep;
+        } else {
+          p = d88->tables[exp][i>>1][1];
+          d88->tables[exp][i][1] = GF_MULTBY_TWO(p);
+        }
+      }
+      for (i = 1; i < 256; i++) {
+        p = d88->tables[exp][i][1];
+        for (j = 1; j < 256; j++) {
+          if (j&1) {
+            d88->tables[exp][i][j] = d88->tables[exp][i][j^1] ^ p;
+          } else {
+            d88->tables[exp][i][j] = GF_MULTBY_TWO(d88->tables[exp][i][j>>1]);
+          }
+        }
+      }
+      for (i = 0; i < 8; i++) basep = GF_MULTBY_TWO(basep);
+    }
+  }
+  return -1;
+}
 
 int gf_w64_scratch_size(int mult_type, int region_type, int divide_type, int arg1, int arg2)
 {
@@ -1059,6 +1327,40 @@ int gf_w64_scratch_size(int mult_type, int region_type, int divide_type, int arg
       }
       return sizeof(gf_internal_t);
       break;
+
+    case GF_MULT_SPLIT_TABLE:
+        if (arg1 == 8 && arg2 == 8) {
+          region_type &= (~GF_REGION_LAZY);
+          if (region_type != GF_REGION_DEFAULT) return -1;
+          return sizeof(gf_internal_t) + sizeof(struct gf_split_8_8_data) + 64;
+        }
+        if ((arg1 == 16 && arg2 == 64) || (arg2 == 16 && arg1 == 64)) {
+          region_type &= (~GF_REGION_LAZY);
+          if (region_type != GF_REGION_DEFAULT) return -1;
+          return sizeof(gf_internal_t) + sizeof(struct gf_split_16_64_lazy_data) + 64;
+        }
+        if ((arg1 == 8 && arg2 == 64) || (arg2 == 8 && arg1 == 64)) {
+          region_type &= (~GF_REGION_LAZY);
+          if (region_type != GF_REGION_DEFAULT) return -1;
+          return sizeof(gf_internal_t) + sizeof(struct gf_split_8_64_lazy_data) + 64;
+        }
+
+        if ((arg1 == 64 && arg2 == 4) || (arg1 == 4 && arg2 == 64)){
+          region_type &= (~GF_REGION_LAZY);
+          if ((region_type & ss) == ss) return -1;
+          if ((region_type & sa) == sa) return -1;
+          if (region_type & (~(ss|sa))) return -1;
+          if (region_type & GF_REGION_SSE) {
+/*            return sizeof(gf_internal_t) + sizeof(struct gf_split_4_64) + 64; */
+          } else if (region_type & GF_REGION_ALTMAP) {
+            return -1;
+          } else {
+            return sizeof(gf_internal_t) + sizeof(struct gf_split_4_64_lazy_data) + 64;
+          }
+        }
+        printf("WTF!\n");
+        return -1;
+
     case GF_MULT_GROUP:
       if (arg1 <= 0 || arg2 <= 0) return -1;
       if (region_type != GF_REGION_DEFAULT && region_type != GF_REGION_CAUCHY) return -1;
@@ -1095,7 +1397,7 @@ int gf_w64_init(gf_t *gf)
     case GF_MULT_DEFAULT: 
     case GF_MULT_SHIFT:     if (gf_w64_shift_init(gf) == 0) return 0; break;
     case GF_MULT_COMPOSITE: if (gf_w64_composite_init(gf) == 0) return 0; break;
-/*    case GF_MULT_SPLIT_TABLE: if (gf_w64_split_init(gf) == 0) return 0; break; */
+    case GF_MULT_SPLIT_TABLE: if (gf_w64_split_init(gf) == 0) return 0; break; 
     case GF_MULT_GROUP:       if (gf_w64_group_init(gf) == 0) return 0; break; 
     case GF_MULT_BYTWO_p:
     case GF_MULT_BYTWO_b:     if (gf_w64_bytwo_init(gf) == 0) return 0; break;

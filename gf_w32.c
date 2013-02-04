@@ -46,7 +46,12 @@ struct gf_w32_group_data {
     uint32_t *memory;
 };
 
-struct gf_split_32_8_lazy_data {
+struct gf_split_16_32_lazy_data {
+    uint32_t      tables[2][(1<<16)];
+    uint32_t      last_value;
+};
+
+struct gf_split_8_32_lazy_data {
     uint32_t      tables[4][256];
     uint32_t      last_value;
 };
@@ -1087,11 +1092,11 @@ gf_w32_split_8_8_multiply (gf_t *gf, uint32_t a32, uint32_t b32)
 static
 inline
 void
-gf_w32_split_32_8_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
+gf_w32_split_8_32_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
   gf_internal_t *h;
   uint32_t *s32, *d32, *top, p, a, v;
-  struct gf_split_32_8_lazy_data *d8;
+  struct gf_split_8_32_lazy_data *d8;
   struct gf_split_8_8_data *d88;
   uint32_t *t[4];
   int i, j, k, change;
@@ -1103,7 +1108,7 @@ gf_w32_split_32_8_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint32_t
 
   h = (gf_internal_t *) gf->scratch;
   if (h->arg1 == 32 || h->arg2 == 32) {
-    d8 = (struct gf_split_32_8_lazy_data *) h->private;
+    d8 = (struct gf_split_8_32_lazy_data *) h->private;
     for (i = 0; i < 4; i++) t[i] = d8->tables[i];
     change = (val != d8->last_value);
     if (change) d8->last_value = val;
@@ -1143,6 +1148,67 @@ gf_w32_split_32_8_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint32_t
       v = (a & 0xff);
       p ^= t[i][v];
       a >>= 8;
+      i++;
+    }
+    *d32 = p;
+    d32++;
+    s32++;
+  }
+  gf_do_final_region_alignment(&rd);
+}
+
+static
+inline
+void
+gf_w32_split_16_32_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
+{
+  gf_internal_t *h;
+  uint32_t *s32, *d32, *top, p, a, v;
+  struct gf_split_16_32_lazy_data *d16;
+  uint32_t *t[2];
+  int i, j, k, change;
+  uint32_t pp;
+  gf_region_data rd;
+  
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+
+  h = (gf_internal_t *) gf->scratch;
+  d16 = (struct gf_split_16_32_lazy_data *) h->private;
+  for (i = 0; i < 2; i++) t[i] = d16->tables[i];
+  change = (val != d16->last_value);
+  if (change) d16->last_value = val;
+
+  pp = h->prim_poly;
+
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 4);
+  gf_do_initial_region_alignment(&rd);
+
+  s32 = (uint32_t *) rd.s_start;
+  d32 = (uint32_t *) rd.d_start;
+  top = (uint32_t *) rd.d_top;
+  
+  if (change) {
+    v = val;
+    for (i = 0; i < 2; i++) {
+      t[i][0] = 0;
+      for (j = 1; j < (1 << 16); j <<= 1) {
+        for (k = 0; k < j; k++) {
+          t[i][k^j] = (v ^ t[i][k]);
+        }
+        v = (v & GF_FIRST_BIT) ? ((v << 1) ^ pp) : (v << 1);
+      }
+    }
+  } 
+
+  while (d32 < top) {
+    p = (xor) ? *d32 : 0;
+    a = *s32;
+    i = 0;
+    while (a != 0) {
+      v = (a & 0xffff);
+      p ^= t[i][v];
+      a >>= 16;
       i++;
     }
     *d32 = p;
@@ -1821,7 +1887,8 @@ int gf_w32_split_init(gf_t *gf)
   struct gf_split_2_32_lazy_data *ld2;
   struct gf_split_4_32_lazy_data *ld4;
   struct gf_split_8_8_data *d8;
-  struct gf_split_32_8_lazy_data *d32;
+  struct gf_split_8_32_lazy_data *d32;
+  struct gf_split_16_32_lazy_data *d16;
   uint32_t p, basep;
   int i, j, exp;
 
@@ -1832,15 +1899,21 @@ int gf_w32_split_init(gf_t *gf)
   gf->multiply.w32 = gf_w32_shift_multiply;
   gf->inverse.w32 = gf_w32_euclid;
 
+  if ((h->arg1 == 16 && h->arg2 == 32) || (h->arg1 == 32 && h->arg2 == 16)) {
+    d16 = (struct gf_split_16_32_lazy_data *) h->private;
+    d16->last_value = 0;
+    gf->multiply_region.w32 = gf_w32_split_16_32_lazy_multiply_region;
+  }
+
   if ((h->arg1 == 8 && h->arg2 == 32) || (h->arg1 == 32 && h->arg2 == 8)) {
-    d32 = (struct gf_split_32_8_lazy_data *) h->private;
+    d32 = (struct gf_split_8_32_lazy_data *) h->private;
     d32->last_value = 0;
-    gf->multiply_region.w32 = gf_w32_split_32_8_lazy_multiply_region;
+    gf->multiply_region.w32 = gf_w32_split_8_32_lazy_multiply_region;
   }
 
   if (h->arg1 == 8 && h->arg2 == 8) {
     gf->multiply.w32 = gf_w32_split_8_8_multiply;
-    gf->multiply_region.w32 = gf_w32_split_32_8_lazy_multiply_region;
+    gf->multiply_region.w32 = gf_w32_split_8_32_lazy_multiply_region;
     d8 = (struct gf_split_8_8_data *) h->private;
     d8->last_value = 0;
     basep = 1;
@@ -2251,10 +2324,15 @@ int gf_w32_scratch_size(int mult_type, int region_type, int divide_type, int arg
           if (region_type != GF_REGION_DEFAULT && region_type != GF_REGION_CAUCHY) return -1;
           return sizeof(gf_internal_t) + sizeof(struct gf_split_8_8_data) + 64;
         }
+        if ((arg1 == 16 && arg2 == 32) || (arg2 == 16 && arg1 == 32)) {
+          region_type &= (~GF_REGION_LAZY);
+          if (region_type != GF_REGION_DEFAULT) return -1;
+          return sizeof(gf_internal_t) + sizeof(struct gf_split_16_32_lazy_data) + 64;
+        }
         if ((arg1 == 8 && arg2 == 32) || (arg2 == 8 && arg1 == 32)) {
           region_type &= (~GF_REGION_LAZY);
           if (region_type != GF_REGION_DEFAULT) return -1;
-          return sizeof(gf_internal_t) + sizeof(struct gf_split_32_8_lazy_data) + 64;
+          return sizeof(gf_internal_t) + sizeof(struct gf_split_8_32_lazy_data) + 64;
         }
         if ((arg1 == 2 && arg2 == 32) || (arg2 == 2 && arg1 == 32)) {
           region_type &= (~GF_REGION_LAZY);
