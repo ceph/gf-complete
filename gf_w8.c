@@ -528,8 +528,8 @@ int gf_w8_table_init(gf_t *gf)
 
   h = (gf_internal_t *) gf->scratch;
 
-  if (h->region_type == 0 || (h->region_type | GF_REGION_CAUCHY) || 
-                             (h->region_type | GF_REGION_SINGLE_TABLE)) {
+  if (h->region_type == 0 || (h->region_type & GF_REGION_CAUCHY) || 
+                             (h->region_type & GF_REGION_SINGLE_TABLE)) {
     ftd = (struct gf_w8_single_table_data *)h->private;
     bzero(ftd->divtable, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
     bzero(ftd->multtable, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);

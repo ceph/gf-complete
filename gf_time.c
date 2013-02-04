@@ -58,7 +58,7 @@ void usage(char *s)
   fprintf(stderr, "       M: Single: Multiplications\n");
   fprintf(stderr, "       D: Single: Divisions\n");
   fprintf(stderr, "       I: Single: Inverses\n");
-  fprintf(stderr, "       B: Region: Buffer-Constant Multiplication\n");
+  fprintf(stderr, "       G: Region: Buffer-Constant Multiplication\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "Use -1 for time(0) as a seed.\n");
   fprintf(stderr, "\n");
