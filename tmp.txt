@@ -1,294 +1,162 @@
-1024 1048576 4 LOG - - Seed: 1347471838 Buffer-Const,s!=d,xor=0: 4.824089 s 212.268 MB/s Buffer-Const,s!=d,xor=1: 5.341791 s 191.696 MB/s Buffer-Const,s==d,xor=0: 4.816530 s 212.601 MB/s Buffer-Const,s==d,xor=1: 5.333377 s 191.998 MB/s
-2048 524288 4 LOG - - Seed: 1347471864 Buffer-Const,s!=d,xor=0: 4.796388 s 213.494 MB/s Buffer-Const,s!=d,xor=1: 5.355381 s 191.210 MB/s Buffer-Const,s==d,xor=0: 4.790053 s 213.776 MB/s Buffer-Const,s==d,xor=1: 5.342280 s 191.678 MB/s
-4096 262144 4 LOG - - Seed: 1347471890 Buffer-Const,s!=d,xor=0: 4.785699 s 213.971 MB/s Buffer-Const,s!=d,xor=1: 5.272175 s 194.227 MB/s Buffer-Const,s==d,xor=0: 4.760163 s 215.119 MB/s Buffer-Const,s==d,xor=1: 5.285017 s 193.755 MB/s
-8192 131072 4 LOG - - Seed: 1347471915 Buffer-Const,s!=d,xor=0: 4.772734 s 214.552 MB/s Buffer-Const,s!=d,xor=1: 5.301345 s 193.159 MB/s Buffer-Const,s==d,xor=0: 4.782723 s 214.104 MB/s Buffer-Const,s==d,xor=1: 5.294336 s 193.414 MB/s
-16384 65536 4 LOG - - Seed: 1347471940 Buffer-Const,s!=d,xor=0: 4.779516 s 214.248 MB/s Buffer-Const,s!=d,xor=1: 5.311189 s 192.801 MB/s Buffer-Const,s==d,xor=0: 4.771980 s 214.586 MB/s Buffer-Const,s==d,xor=1: 5.294589 s 193.405 MB/s
-32768 32768 4 LOG - - Seed: 1347471966 Buffer-Const,s!=d,xor=0: 4.745805 s 215.769 MB/s Buffer-Const,s!=d,xor=1: 5.289698 s 193.584 MB/s Buffer-Const,s==d,xor=0: 4.788919 s 213.827 MB/s Buffer-Const,s==d,xor=1: 5.323099 s 192.369 MB/s
-65536 16384 4 LOG - - Seed: 1347471991 Buffer-Const,s!=d,xor=0: 4.782660 s 214.107 MB/s Buffer-Const,s!=d,xor=1: 5.279925 s 193.942 MB/s Buffer-Const,s==d,xor=0: 4.807014 s 213.022 MB/s Buffer-Const,s==d,xor=1: 5.296893 s 193.321 MB/s
-131072 8192 4 LOG - - Seed: 1347472017 Buffer-Const,s!=d,xor=0: 4.792920 s 213.648 MB/s Buffer-Const,s!=d,xor=1: 5.460566 s 187.526 MB/s Buffer-Const,s==d,xor=0: 4.749562 s 215.599 MB/s Buffer-Const,s==d,xor=1: 5.267351 s 194.405 MB/s
-262144 4096 4 LOG - - Seed: 1347472042 Buffer-Const,s!=d,xor=0: 4.785846 s 213.964 MB/s Buffer-Const,s!=d,xor=1: 5.336344 s 191.892 MB/s Buffer-Const,s==d,xor=0: 4.730902 s 216.449 MB/s Buffer-Const,s==d,xor=1: 5.312972 s 192.736 MB/s
-524288 2048 4 LOG - - Seed: 1347472068 Buffer-Const,s!=d,xor=0: 4.768488 s 214.743 MB/s Buffer-Const,s!=d,xor=1: 5.302696 s 193.109 MB/s Buffer-Const,s==d,xor=0: 4.769302 s 214.706 MB/s Buffer-Const,s==d,xor=1: 5.322016 s 192.408 MB/s
-1048576 1024 4 LOG - - Seed: 1347472093 Buffer-Const,s!=d,xor=0: 4.795875 s 213.517 MB/s Buffer-Const,s!=d,xor=1: 5.345346 s 191.569 MB/s Buffer-Const,s==d,xor=0: 4.810602 s 212.863 MB/s Buffer-Const,s==d,xor=1: 5.223796 s 196.026 MB/s
-2097152 512 4 LOG - - Seed: 1347472118 Buffer-Const,s!=d,xor=0: 4.809727 s 212.902 MB/s Buffer-Const,s!=d,xor=1: 5.255259 s 194.852 MB/s Buffer-Const,s==d,xor=0: 4.853752 s 210.971 MB/s Buffer-Const,s==d,xor=1: 5.401798 s 189.567 MB/s
-4194304 256 4 LOG - - Seed: 1347472144 Buffer-Const,s!=d,xor=0: 4.888658 s 209.464 MB/s Buffer-Const,s!=d,xor=1: 5.275764 s 194.095 MB/s Buffer-Const,s==d,xor=0: 4.880836 s 209.800 MB/s Buffer-Const,s==d,xor=1: 5.202162 s 196.841 MB/s
-8388608 128 4 LOG - - Seed: 1347472170 Buffer-Const,s!=d,xor=0: 4.693878 s 218.156 MB/s Buffer-Const,s!=d,xor=1: 5.467869 s 187.276 MB/s Buffer-Const,s==d,xor=0: 4.752496 s 215.466 MB/s Buffer-Const,s==d,xor=1: 5.441666 s 188.178 MB/s
-16777216 64 4 LOG - - Seed: 1347472195 Buffer-Const,s!=d,xor=0: 4.743789 s 215.861 MB/s Buffer-Const,s!=d,xor=1: 5.284770 s 193.764 MB/s Buffer-Const,s==d,xor=0: 4.864533 s 210.503 MB/s Buffer-Const,s==d,xor=1: 5.531778 s 185.112 MB/s
-33554432 32 4 LOG - - Seed: 1347472221 Buffer-Const,s!=d,xor=0: 5.058158 s 202.445 MB/s Buffer-Const,s!=d,xor=1: 5.388520 s 190.034 MB/s Buffer-Const,s==d,xor=0: 5.017543 s 204.084 MB/s Buffer-Const,s==d,xor=1: 5.550337 s 184.493 MB/s
-67108864 16 4 LOG - - Seed: 1347472247 Buffer-Const,s!=d,xor=0: 4.273755 s 239.602 MB/s Buffer-Const,s!=d,xor=1: 5.356849 s 191.157 MB/s Buffer-Const,s==d,xor=0: 4.884432 s 209.646 MB/s Buffer-Const,s==d,xor=1: 5.328478 s 192.175 MB/s
-134217728 8 4 LOG - - Seed: 1347472272 Buffer-Const,s!=d,xor=0: 4.608675 s 222.190 MB/s Buffer-Const,s!=d,xor=1: 5.757140 s 177.866 MB/s Buffer-Const,s==d,xor=0: 4.494134 s 227.853 MB/s Buffer-Const,s==d,xor=1: 5.725754 s 178.841 MB/s
-268435456 4 4 LOG - - Seed: 1347472298 Buffer-Const,s!=d,xor=0: 5.326828 s 192.234 MB/s Buffer-Const,s!=d,xor=1: 5.749257 s 178.110 MB/s Buffer-Const,s==d,xor=0: 3.930798 s 260.507 MB/s Buffer-Const,s==d,xor=1: 5.769782 s 177.476 MB/s
-536870912 2 4 LOG - - Seed: 1347472325 Buffer-Const,s!=d,xor=0: 5.506971 s 185.946 MB/s Buffer-Const,s!=d,xor=1: 5.820843 s 175.920 MB/s Buffer-Const,s==d,xor=0: 5.151835 s 198.764 MB/s Buffer-Const,s==d,xor=1: 2.846869 s 359.693 MB/s
-1073741824 1 4 LOG - - Seed: 1347472350 Buffer-Const,s!=d,xor=0: 5.887568 s 173.926 MB/s Buffer-Const,s!=d,xor=1: 5.696556 s 179.758 MB/s Buffer-Const,s==d,xor=0: 5.188843 s 197.346 MB/s Buffer-Const,s==d,xor=1: 5.662299 s 180.845 MB/s
-1024 1048576 4 TABLE - - Seed: 1347472378 Buffer-Const,s!=d,xor=0: 2.090874 s 489.747 MB/s Buffer-Const,s!=d,xor=1: 2.333704 s 438.787 MB/s Buffer-Const,s==d,xor=0: 2.076584 s 493.117 MB/s Buffer-Const,s==d,xor=1: 2.341999 s 437.233 MB/s
-2048 524288 4 TABLE - - Seed: 1347472393 Buffer-Const,s!=d,xor=0: 2.100408 s 487.524 MB/s Buffer-Const,s!=d,xor=1: 2.312246 s 442.859 MB/s Buffer-Const,s==d,xor=0: 2.095576 s 488.649 MB/s Buffer-Const,s==d,xor=1: 2.278695 s 449.380 MB/s
-4096 262144 4 TABLE - - Seed: 1347472407 Buffer-Const,s!=d,xor=0: 2.051966 s 499.034 MB/s Buffer-Const,s!=d,xor=1: 2.292821 s 446.611 MB/s Buffer-Const,s==d,xor=0: 2.064646 s 495.969 MB/s Buffer-Const,s==d,xor=1: 2.306956 s 443.875 MB/s
-8192 131072 4 TABLE - - Seed: 1347472421 Buffer-Const,s!=d,xor=0: 2.074299 s 493.661 MB/s Buffer-Const,s!=d,xor=1: 2.298558 s 445.497 MB/s Buffer-Const,s==d,xor=0: 2.066750 s 495.464 MB/s Buffer-Const,s==d,xor=1: 2.287467 s 447.657 MB/s
-16384 65536 4 TABLE - - Seed: 1347472435 Buffer-Const,s!=d,xor=0: 2.152980 s 475.620 MB/s Buffer-Const,s!=d,xor=1: 2.282884 s 448.555 MB/s Buffer-Const,s==d,xor=0: 2.058036 s 497.562 MB/s Buffer-Const,s==d,xor=1: 2.298184 s 445.569 MB/s
-32768 32768 4 TABLE - - Seed: 1347472449 Buffer-Const,s!=d,xor=0: 2.213344 s 462.648 MB/s Buffer-Const,s!=d,xor=1: 2.320572 s 441.271 MB/s Buffer-Const,s==d,xor=0: 2.206635 s 464.055 MB/s Buffer-Const,s==d,xor=1: 2.306156 s 444.029 MB/s
-65536 16384 4 TABLE - - Seed: 1347472463 Buffer-Const,s!=d,xor=0: 2.201297 s 465.180 MB/s Buffer-Const,s!=d,xor=1: 2.309327 s 443.419 MB/s Buffer-Const,s==d,xor=0: 2.184618 s 468.732 MB/s Buffer-Const,s==d,xor=1: 2.301818 s 444.866 MB/s
-131072 8192 4 TABLE - - Seed: 1347472477 Buffer-Const,s!=d,xor=0: 2.141175 s 478.242 MB/s Buffer-Const,s!=d,xor=1: 2.316740 s 442.000 MB/s Buffer-Const,s==d,xor=0: 2.187070 s 468.206 MB/s Buffer-Const,s==d,xor=1: 2.306461 s 443.970 MB/s
-262144 4096 4 TABLE - - Seed: 1347472492 Buffer-Const,s!=d,xor=0: 2.166170 s 472.724 MB/s Buffer-Const,s!=d,xor=1: 2.306049 s 444.050 MB/s Buffer-Const,s==d,xor=0: 2.147129 s 476.916 MB/s Buffer-Const,s==d,xor=1: 2.309562 s 443.374 MB/s
-524288 2048 4 TABLE - - Seed: 1347472506 Buffer-Const,s!=d,xor=0: 2.156061 s 474.940 MB/s Buffer-Const,s!=d,xor=1: 2.304203 s 444.405 MB/s Buffer-Const,s==d,xor=0: 2.155717 s 475.016 MB/s Buffer-Const,s==d,xor=1: 2.321065 s 441.177 MB/s
-1048576 1024 4 TABLE - - Seed: 1347472520 Buffer-Const,s!=d,xor=0: 2.152224 s 475.787 MB/s Buffer-Const,s!=d,xor=1: 2.310472 s 443.199 MB/s Buffer-Const,s==d,xor=0: 2.151816 s 475.877 MB/s Buffer-Const,s==d,xor=1: 2.312655 s 442.781 MB/s
-2097152 512 4 TABLE - - Seed: 1347472534 Buffer-Const,s!=d,xor=0: 2.170889 s 471.696 MB/s Buffer-Const,s!=d,xor=1: 2.361295 s 433.660 MB/s Buffer-Const,s==d,xor=0: 2.139913 s 478.524 MB/s Buffer-Const,s==d,xor=1: 2.316579 s 442.031 MB/s
-4194304 256 4 TABLE - - Seed: 1347472548 Buffer-Const,s!=d,xor=0: 2.187952 s 468.018 MB/s Buffer-Const,s!=d,xor=1: 2.354228 s 434.962 MB/s Buffer-Const,s==d,xor=0: 2.193449 s 466.845 MB/s Buffer-Const,s==d,xor=1: 2.344275 s 436.809 MB/s
-8388608 128 4 TABLE - - Seed: 1347472563 Buffer-Const,s!=d,xor=0: 2.211300 s 463.076 MB/s Buffer-Const,s!=d,xor=1: 2.382068 s 429.879 MB/s Buffer-Const,s==d,xor=0: 2.206019 s 464.185 MB/s Buffer-Const,s==d,xor=1: 2.333248 s 438.873 MB/s
-16777216 64 4 TABLE - - Seed: 1347472577 Buffer-Const,s!=d,xor=0: 2.193599 s 466.813 MB/s Buffer-Const,s!=d,xor=1: 2.373979 s 431.343 MB/s Buffer-Const,s==d,xor=0: 2.181715 s 469.355 MB/s Buffer-Const,s==d,xor=1: 2.363553 s 433.246 MB/s
-33554432 32 4 TABLE - - Seed: 1347472592 Buffer-Const,s!=d,xor=0: 2.205605 s 464.272 MB/s Buffer-Const,s!=d,xor=1: 2.388323 s 428.753 MB/s Buffer-Const,s==d,xor=0: 2.194591 s 466.602 MB/s Buffer-Const,s==d,xor=1: 2.352825 s 435.221 MB/s
-67108864 16 4 TABLE - - Seed: 1347472606 Buffer-Const,s!=d,xor=0: 2.252406 s 454.625 MB/s Buffer-Const,s!=d,xor=1: 2.350086 s 435.729 MB/s Buffer-Const,s==d,xor=0: 2.186626 s 468.301 MB/s Buffer-Const,s==d,xor=1: 2.357336 s 434.389 MB/s
-134217728 8 4 TABLE - - Seed: 1347472621 Buffer-Const,s!=d,xor=0: 2.312211 s 442.866 MB/s Buffer-Const,s!=d,xor=1: 2.397869 s 427.046 MB/s Buffer-Const,s==d,xor=0: 2.195088 s 466.496 MB/s Buffer-Const,s==d,xor=1: 2.354865 s 434.844 MB/s
-268435456 4 4 TABLE - - Seed: 1347472635 Buffer-Const,s!=d,xor=0: 2.409825 s 424.927 MB/s Buffer-Const,s!=d,xor=1: 2.388709 s 428.683 MB/s Buffer-Const,s==d,xor=0: 2.217935 s 461.691 MB/s Buffer-Const,s==d,xor=1: 2.427467 s 421.839 MB/s
-536870912 2 4 TABLE - - Seed: 1347472650 Buffer-Const,s!=d,xor=0: 2.572154 s 398.110 MB/s Buffer-Const,s!=d,xor=1: 2.357918 s 434.281 MB/s Buffer-Const,s==d,xor=0: 2.180809 s 469.551 MB/s Buffer-Const,s==d,xor=1: 2.330464 s 439.397 MB/s
-1073741824 1 4 TABLE - - Seed: 1347472665 Buffer-Const,s!=d,xor=0: 2.942518 s 348.001 MB/s Buffer-Const,s!=d,xor=1: 2.349215 s 435.890 MB/s Buffer-Const,s==d,xor=0: 2.209902 s 463.369 MB/s Buffer-Const,s==d,xor=1: 2.368640 s 432.316 MB/s
-1024 1048576 4 TABLE SINGLE,SSE - Seed: 1347472681 Buffer-Const,s!=d,xor=0: 0.160061 s 6397.547 MB/s Buffer-Const,s!=d,xor=1: 0.169124 s 6054.742 MB/s Buffer-Const,s==d,xor=0: 0.160015 s 6399.396 MB/s Buffer-Const,s==d,xor=1: 0.170060 s 6021.416 MB/s
-2048 524288 4 TABLE SINGLE,SSE - Seed: 1347472688 Buffer-Const,s!=d,xor=0: 0.144030 s 7109.637 MB/s Buffer-Const,s!=d,xor=1: 0.149962 s 6828.377 MB/s Buffer-Const,s==d,xor=0: 0.143702 s 7125.880 MB/s Buffer-Const,s==d,xor=1: 0.149732 s 6838.902 MB/s
-4096 262144 4 TABLE SINGLE,SSE - Seed: 1347472693 Buffer-Const,s!=d,xor=0: 0.129829 s 7887.273 MB/s Buffer-Const,s!=d,xor=1: 0.134809 s 7595.958 MB/s Buffer-Const,s==d,xor=0: 0.131632 s 7779.258 MB/s Buffer-Const,s==d,xor=1: 0.135138 s 7577.437 MB/s
-8192 131072 4 TABLE SINGLE,SSE - Seed: 1347472699 Buffer-Const,s!=d,xor=0: 0.124071 s 8253.315 MB/s Buffer-Const,s!=d,xor=1: 0.127894 s 8006.605 MB/s Buffer-Const,s==d,xor=0: 0.124068 s 8253.505 MB/s Buffer-Const,s==d,xor=1: 0.127882 s 8007.382 MB/s
-16384 65536 4 TABLE SINGLE,SSE - Seed: 1347472705 Buffer-Const,s!=d,xor=0: 0.120162 s 8521.845 MB/s Buffer-Const,s!=d,xor=1: 0.124806 s 8204.723 MB/s Buffer-Const,s==d,xor=0: 0.119825 s 8545.821 MB/s Buffer-Const,s==d,xor=1: 0.124612 s 8217.517 MB/s
-32768 32768 4 TABLE SINGLE,SSE - Seed: 1347472711 Buffer-Const,s!=d,xor=0: 0.123173 s 8313.478 MB/s Buffer-Const,s!=d,xor=1: 0.129224 s 7924.250 MB/s Buffer-Const,s==d,xor=0: 0.118994 s 8605.476 MB/s Buffer-Const,s==d,xor=1: 0.123591 s 8285.397 MB/s
-65536 16384 4 TABLE SINGLE,SSE - Seed: 1347472717 Buffer-Const,s!=d,xor=0: 0.120111 s 8525.465 MB/s Buffer-Const,s!=d,xor=1: 0.130905 s 7822.443 MB/s Buffer-Const,s==d,xor=0: 0.118989 s 8605.838 MB/s Buffer-Const,s==d,xor=1: 0.122049 s 8390.066 MB/s
-131072 8192 4 TABLE SINGLE,SSE - Seed: 1347472722 Buffer-Const,s!=d,xor=0: 0.120384 s 8506.115 MB/s Buffer-Const,s!=d,xor=1: 0.131319 s 7797.817 MB/s Buffer-Const,s==d,xor=0: 0.118782 s 8620.849 MB/s Buffer-Const,s==d,xor=1: 0.124635 s 8215.976 MB/s
-262144 4096 4 TABLE SINGLE,SSE - Seed: 1347472728 Buffer-Const,s!=d,xor=0: 0.151247 s 6770.381 MB/s Buffer-Const,s!=d,xor=1: 0.163074 s 6279.339 MB/s Buffer-Const,s==d,xor=0: 0.118564 s 8636.659 MB/s Buffer-Const,s==d,xor=1: 0.122733 s 8343.290 MB/s
-524288 2048 4 TABLE SINGLE,SSE - Seed: 1347472734 Buffer-Const,s!=d,xor=0: 0.148822 s 6880.722 MB/s Buffer-Const,s!=d,xor=1: 0.160966 s 6361.595 MB/s Buffer-Const,s==d,xor=0: 0.129449 s 7910.429 MB/s Buffer-Const,s==d,xor=1: 0.129116 s 7930.864 MB/s
-1048576 1024 4 TABLE SINGLE,SSE - Seed: 1347472740 Buffer-Const,s!=d,xor=0: 0.147404 s 6946.896 MB/s Buffer-Const,s!=d,xor=1: 0.159756 s 6409.758 MB/s Buffer-Const,s==d,xor=0: 0.128379 s 7976.391 MB/s Buffer-Const,s==d,xor=1: 0.128835 s 7948.168 MB/s
-2097152 512 4 TABLE SINGLE,SSE - Seed: 1347472746 Buffer-Const,s!=d,xor=0: 0.236475 s 4330.268 MB/s Buffer-Const,s!=d,xor=1: 0.246601 s 4152.451 MB/s Buffer-Const,s==d,xor=0: 0.128898 s 7944.287 MB/s Buffer-Const,s==d,xor=1: 0.133252 s 7684.693 MB/s
-4194304 256 4 TABLE SINGLE,SSE - Seed: 1347472752 Buffer-Const,s!=d,xor=0: 0.365861 s 2798.874 MB/s Buffer-Const,s!=d,xor=1: 0.361812 s 2830.198 MB/s Buffer-Const,s==d,xor=0: 0.209003 s 4899.441 MB/s Buffer-Const,s==d,xor=1: 0.202078 s 5067.354 MB/s
-8388608 128 4 TABLE SINGLE,SSE - Seed: 1347472758 Buffer-Const,s!=d,xor=0: 0.369510 s 2771.238 MB/s Buffer-Const,s!=d,xor=1: 0.347091 s 2950.235 MB/s Buffer-Const,s==d,xor=0: 0.227157 s 4507.888 MB/s Buffer-Const,s==d,xor=1: 0.232318 s 4407.757 MB/s
-16777216 64 4 TABLE SINGLE,SSE - Seed: 1347472764 Buffer-Const,s!=d,xor=0: 0.368891 s 2775.890 MB/s Buffer-Const,s!=d,xor=1: 0.356381 s 2873.326 MB/s Buffer-Const,s==d,xor=0: 0.226912 s 4512.772 MB/s Buffer-Const,s==d,xor=1: 0.219236 s 4670.758 MB/s
-33554432 32 4 TABLE SINGLE,SSE - Seed: 1347472771 Buffer-Const,s!=d,xor=0: 0.379371 s 2699.205 MB/s Buffer-Const,s!=d,xor=1: 0.341562 s 2997.993 MB/s Buffer-Const,s==d,xor=0: 0.231817 s 4417.282 MB/s Buffer-Const,s==d,xor=1: 0.217154 s 4715.547 MB/s
-67108864 16 4 TABLE SINGLE,SSE - Seed: 1347472777 Buffer-Const,s!=d,xor=0: 0.403540 s 2537.545 MB/s Buffer-Const,s!=d,xor=1: 0.360238 s 2842.563 MB/s Buffer-Const,s==d,xor=0: 0.230866 s 4435.479 MB/s Buffer-Const,s==d,xor=1: 0.180604 s 5669.879 MB/s
-134217728 8 4 TABLE SINGLE,SSE - Seed: 1347472784 Buffer-Const,s!=d,xor=0: 0.441703 s 2318.301 MB/s Buffer-Const,s!=d,xor=1: 0.386278 s 2650.943 MB/s Buffer-Const,s==d,xor=0: 0.229751 s 4457.002 MB/s Buffer-Const,s==d,xor=1: 0.180658 s 5668.158 MB/s
-268435456 4 4 TABLE SINGLE,SSE - Seed: 1347472791 Buffer-Const,s!=d,xor=0: 0.471682 s 2170.955 MB/s Buffer-Const,s!=d,xor=1: 0.383233 s 2672.005 MB/s Buffer-Const,s==d,xor=0: 0.236378 s 4332.041 MB/s Buffer-Const,s==d,xor=1: 0.243849 s 4199.315 MB/s
-536870912 2 4 TABLE SINGLE,SSE - Seed: 1347472797 Buffer-Const,s!=d,xor=0: 0.666553 s 1536.262 MB/s Buffer-Const,s!=d,xor=1: 0.374508 s 2734.255 MB/s Buffer-Const,s==d,xor=0: 0.228591 s 4479.617 MB/s Buffer-Const,s==d,xor=1: 0.247453 s 4138.156 MB/s
-1073741824 1 4 TABLE SINGLE,SSE - Seed: 1347472805 Buffer-Const,s!=d,xor=0: 0.739952 s 1383.873 MB/s Buffer-Const,s!=d,xor=1: 0.376333 s 2720.994 MB/s Buffer-Const,s==d,xor=0: 0.229283 s 4466.099 MB/s Buffer-Const,s==d,xor=1: 0.242894 s 4215.832 MB/s
-1024 1048576 8 LOG - - Seed: 1347472813 Buffer-Const,s!=d,xor=0: 1.621880 s 631.366 MB/s Buffer-Const,s!=d,xor=1: 1.972670 s 519.093 MB/s Buffer-Const,s==d,xor=0: 1.703537 s 601.102 MB/s Buffer-Const,s==d,xor=1: 1.965952 s 520.867 MB/s
-2048 524288 8 LOG - - Seed: 1347472825 Buffer-Const,s!=d,xor=0: 1.580008 s 648.098 MB/s Buffer-Const,s!=d,xor=1: 1.922355 s 532.680 MB/s Buffer-Const,s==d,xor=0: 1.619760 s 632.193 MB/s Buffer-Const,s==d,xor=1: 1.935444 s 529.078 MB/s
-4096 262144 8 LOG - - Seed: 1347472838 Buffer-Const,s!=d,xor=0: 1.612208 s 635.154 MB/s Buffer-Const,s!=d,xor=1: 1.935781 s 528.985 MB/s Buffer-Const,s==d,xor=0: 1.619466 s 632.307 MB/s Buffer-Const,s==d,xor=1: 1.963975 s 521.391 MB/s
-8192 131072 8 LOG - - Seed: 1347472850 Buffer-Const,s!=d,xor=0: 1.618882 s 632.535 MB/s Buffer-Const,s!=d,xor=1: 1.917912 s 533.914 MB/s Buffer-Const,s==d,xor=0: 1.604389 s 638.249 MB/s Buffer-Const,s==d,xor=1: 1.908338 s 536.593 MB/s
-16384 65536 8 LOG - - Seed: 1347472863 Buffer-Const,s!=d,xor=0: 1.594616 s 642.161 MB/s Buffer-Const,s!=d,xor=1: 1.910674 s 535.936 MB/s Buffer-Const,s==d,xor=0: 1.609434 s 636.249 MB/s Buffer-Const,s==d,xor=1: 1.912407 s 535.451 MB/s
-32768 32768 8 LOG - - Seed: 1347472875 Buffer-Const,s!=d,xor=0: 1.624596 s 630.311 MB/s Buffer-Const,s!=d,xor=1: 2.144199 s 477.568 MB/s Buffer-Const,s==d,xor=0: 1.588486 s 644.639 MB/s Buffer-Const,s==d,xor=1: 1.909198 s 536.351 MB/s
-65536 16384 8 LOG - - Seed: 1347472887 Buffer-Const,s!=d,xor=0: 1.662282 s 616.020 MB/s Buffer-Const,s!=d,xor=1: 1.919168 s 533.565 MB/s Buffer-Const,s==d,xor=0: 1.591656 s 643.355 MB/s Buffer-Const,s==d,xor=1: 1.926590 s 531.509 MB/s
-131072 8192 8 LOG - - Seed: 1347472900 Buffer-Const,s!=d,xor=0: 1.594085 s 642.375 MB/s Buffer-Const,s!=d,xor=1: 1.937719 s 528.456 MB/s Buffer-Const,s==d,xor=0: 1.648678 s 621.104 MB/s Buffer-Const,s==d,xor=1: 1.924335 s 532.132 MB/s
-262144 4096 8 LOG - - Seed: 1347472912 Buffer-Const,s!=d,xor=0: 1.595497 s 641.806 MB/s Buffer-Const,s!=d,xor=1: 1.936042 s 528.914 MB/s Buffer-Const,s==d,xor=0: 1.608699 s 636.539 MB/s Buffer-Const,s==d,xor=1: 1.958862 s 522.752 MB/s
-524288 2048 8 LOG - - Seed: 1347472925 Buffer-Const,s!=d,xor=0: 1.646453 s 621.943 MB/s Buffer-Const,s!=d,xor=1: 1.942311 s 527.207 MB/s Buffer-Const,s==d,xor=0: 1.621521 s 631.506 MB/s Buffer-Const,s==d,xor=1: 1.968560 s 520.177 MB/s
-1048576 1024 8 LOG - - Seed: 1347472937 Buffer-Const,s!=d,xor=0: 1.627189 s 629.306 MB/s Buffer-Const,s!=d,xor=1: 1.938396 s 528.272 MB/s Buffer-Const,s==d,xor=0: 1.609066 s 636.394 MB/s Buffer-Const,s==d,xor=1: 1.940828 s 527.610 MB/s
-2097152 512 8 LOG - - Seed: 1347472949 Buffer-Const,s!=d,xor=0: 1.654112 s 619.063 MB/s Buffer-Const,s!=d,xor=1: 1.977605 s 517.798 MB/s Buffer-Const,s==d,xor=0: 1.625274 s 630.048 MB/s Buffer-Const,s==d,xor=1: 1.957592 s 523.092 MB/s
-4194304 256 8 LOG - - Seed: 1347472962 Buffer-Const,s!=d,xor=0: 1.637634 s 625.293 MB/s Buffer-Const,s!=d,xor=1: 1.960637 s 522.279 MB/s Buffer-Const,s==d,xor=0: 1.643415 s 623.093 MB/s Buffer-Const,s==d,xor=1: 1.968736 s 520.131 MB/s
-8388608 128 8 LOG - - Seed: 1347472974 Buffer-Const,s!=d,xor=0: 1.642961 s 623.265 MB/s Buffer-Const,s!=d,xor=1: 1.997125 s 512.737 MB/s Buffer-Const,s==d,xor=0: 1.647587 s 621.515 MB/s Buffer-Const,s==d,xor=1: 1.982742 s 516.456 MB/s
-16777216 64 8 LOG - - Seed: 1347472987 Buffer-Const,s!=d,xor=0: 1.628143 s 628.937 MB/s Buffer-Const,s!=d,xor=1: 1.988719 s 514.904 MB/s Buffer-Const,s==d,xor=0: 1.697431 s 603.265 MB/s Buffer-Const,s==d,xor=1: 1.982398 s 516.546 MB/s
-33554432 32 8 LOG - - Seed: 1347472999 Buffer-Const,s!=d,xor=0: 1.655345 s 618.602 MB/s Buffer-Const,s!=d,xor=1: 1.987288 s 515.275 MB/s Buffer-Const,s==d,xor=0: 1.631150 s 627.778 MB/s Buffer-Const,s==d,xor=1: 1.988191 s 515.041 MB/s
-67108864 16 8 LOG - - Seed: 1347473012 Buffer-Const,s!=d,xor=0: 1.716783 s 596.464 MB/s Buffer-Const,s!=d,xor=1: 2.007143 s 510.178 MB/s Buffer-Const,s==d,xor=0: 1.644218 s 622.789 MB/s Buffer-Const,s==d,xor=1: 1.981492 s 516.782 MB/s
-134217728 8 8 LOG - - Seed: 1347473025 Buffer-Const,s!=d,xor=0: 1.744457 s 587.002 MB/s Buffer-Const,s!=d,xor=1: 2.015515 s 508.059 MB/s Buffer-Const,s==d,xor=0: 1.656633 s 618.121 MB/s Buffer-Const,s==d,xor=1: 1.984652 s 515.959 MB/s
-268435456 4 8 LOG - - Seed: 1347473038 Buffer-Const,s!=d,xor=0: 1.943453 s 526.897 MB/s Buffer-Const,s!=d,xor=1: 1.982043 s 516.639 MB/s Buffer-Const,s==d,xor=0: 1.627782 s 629.077 MB/s Buffer-Const,s==d,xor=1: 1.963902 s 521.411 MB/s
-536870912 2 8 LOG - - Seed: 1347473051 Buffer-Const,s!=d,xor=0: 1.984840 s 515.911 MB/s Buffer-Const,s!=d,xor=1: 1.999844 s 512.040 MB/s Buffer-Const,s==d,xor=0: 1.636470 s 625.737 MB/s Buffer-Const,s==d,xor=1: 1.961609 s 522.020 MB/s
-1073741824 1 8 LOG - - Seed: 1347473064 Buffer-Const,s!=d,xor=0: 2.326284 s 440.187 MB/s Buffer-Const,s!=d,xor=1: 1.971229 s 519.473 MB/s Buffer-Const,s==d,xor=0: 1.628148 s 628.935 MB/s Buffer-Const,s==d,xor=1: 2.123621 s 482.195 MB/s
-1024 1048576 8 TABLE - - Seed: 1347473078 Buffer-Const,s!=d,xor=0: 1.302151 s 786.391 MB/s Buffer-Const,s!=d,xor=1: 1.609089 s 636.385 MB/s Buffer-Const,s==d,xor=0: 1.298172 s 788.802 MB/s Buffer-Const,s==d,xor=1: 1.592942 s 642.836 MB/s
-2048 524288 8 TABLE - - Seed: 1347473089 Buffer-Const,s!=d,xor=0: 1.270636 s 805.896 MB/s Buffer-Const,s!=d,xor=1: 1.564955 s 654.332 MB/s Buffer-Const,s==d,xor=0: 1.264134 s 810.040 MB/s Buffer-Const,s==d,xor=1: 1.553215 s 659.278 MB/s
-4096 262144 8 TABLE - - Seed: 1347473100 Buffer-Const,s!=d,xor=0: 1.252112 s 817.818 MB/s Buffer-Const,s!=d,xor=1: 1.543294 s 663.516 MB/s Buffer-Const,s==d,xor=0: 1.248986 s 819.865 MB/s Buffer-Const,s==d,xor=1: 1.539075 s 665.335 MB/s
-8192 131072 8 TABLE - - Seed: 1347473111 Buffer-Const,s!=d,xor=0: 1.254336 s 816.368 MB/s Buffer-Const,s!=d,xor=1: 1.556689 s 657.806 MB/s Buffer-Const,s==d,xor=0: 1.245368 s 822.247 MB/s Buffer-Const,s==d,xor=1: 1.556819 s 657.752 MB/s
-16384 65536 8 TABLE - - Seed: 1347473122 Buffer-Const,s!=d,xor=0: 1.311951 s 780.517 MB/s Buffer-Const,s!=d,xor=1: 1.537484 s 666.023 MB/s Buffer-Const,s==d,xor=0: 1.236025 s 828.462 MB/s Buffer-Const,s==d,xor=1: 1.533817 s 667.615 MB/s
-32768 32768 8 TABLE - - Seed: 1347473133 Buffer-Const,s!=d,xor=0: 1.185127 s 864.043 MB/s Buffer-Const,s!=d,xor=1: 1.560520 s 656.192 MB/s Buffer-Const,s==d,xor=0: 1.167446 s 877.128 MB/s Buffer-Const,s==d,xor=1: 1.548851 s 661.135 MB/s
-65536 16384 8 TABLE - - Seed: 1347473144 Buffer-Const,s!=d,xor=0: 1.178377 s 868.992 MB/s Buffer-Const,s!=d,xor=1: 1.538837 s 665.438 MB/s Buffer-Const,s==d,xor=0: 1.174308 s 872.003 MB/s Buffer-Const,s==d,xor=1: 1.544995 s 662.785 MB/s
-131072 8192 8 TABLE - - Seed: 1347473154 Buffer-Const,s!=d,xor=0: 1.209799 s 846.422 MB/s Buffer-Const,s!=d,xor=1: 1.556000 s 658.098 MB/s Buffer-Const,s==d,xor=0: 1.182813 s 865.733 MB/s Buffer-Const,s==d,xor=1: 1.532919 s 668.007 MB/s
-262144 4096 8 TABLE - - Seed: 1347473165 Buffer-Const,s!=d,xor=0: 1.220862 s 838.751 MB/s Buffer-Const,s!=d,xor=1: 1.564978 s 654.322 MB/s Buffer-Const,s==d,xor=0: 1.212298 s 844.677 MB/s Buffer-Const,s==d,xor=1: 1.551679 s 659.930 MB/s
-524288 2048 8 TABLE - - Seed: 1347473176 Buffer-Const,s!=d,xor=0: 1.293642 s 791.563 MB/s Buffer-Const,s!=d,xor=1: 1.576479 s 649.549 MB/s Buffer-Const,s==d,xor=0: 1.278135 s 801.167 MB/s Buffer-Const,s==d,xor=1: 1.551030 s 660.206 MB/s
-1048576 1024 8 TABLE - - Seed: 1347473187 Buffer-Const,s!=d,xor=0: 1.255426 s 815.659 MB/s Buffer-Const,s!=d,xor=1: 1.552257 s 659.685 MB/s Buffer-Const,s==d,xor=0: 1.222667 s 837.513 MB/s Buffer-Const,s==d,xor=1: 1.537151 s 666.167 MB/s
-2097152 512 8 TABLE - - Seed: 1347473198 Buffer-Const,s!=d,xor=0: 1.215521 s 842.437 MB/s Buffer-Const,s!=d,xor=1: 1.595463 s 641.820 MB/s Buffer-Const,s==d,xor=0: 1.183346 s 865.343 MB/s Buffer-Const,s==d,xor=1: 1.562343 s 655.426 MB/s
-4194304 256 8 TABLE - - Seed: 1347473209 Buffer-Const,s!=d,xor=0: 1.253935 s 816.629 MB/s Buffer-Const,s!=d,xor=1: 1.607460 s 637.030 MB/s Buffer-Const,s==d,xor=0: 1.231988 s 831.177 MB/s Buffer-Const,s==d,xor=1: 1.585267 s 645.948 MB/s
-8388608 128 8 TABLE - - Seed: 1347473220 Buffer-Const,s!=d,xor=0: 1.242970 s 823.833 MB/s Buffer-Const,s!=d,xor=1: 1.610712 s 635.744 MB/s Buffer-Const,s==d,xor=0: 1.217175 s 841.292 MB/s Buffer-Const,s==d,xor=1: 1.596637 s 641.348 MB/s
-16777216 64 8 TABLE - - Seed: 1347473230 Buffer-Const,s!=d,xor=0: 1.250264 s 819.027 MB/s Buffer-Const,s!=d,xor=1: 1.613457 s 634.662 MB/s Buffer-Const,s==d,xor=0: 1.218879 s 840.116 MB/s Buffer-Const,s==d,xor=1: 1.610589 s 635.792 MB/s
-33554432 32 8 TABLE - - Seed: 1347473241 Buffer-Const,s!=d,xor=0: 1.255215 s 815.797 MB/s Buffer-Const,s!=d,xor=1: 1.608961 s 636.436 MB/s Buffer-Const,s==d,xor=0: 1.288840 s 794.513 MB/s Buffer-Const,s==d,xor=1: 1.566385 s 653.735 MB/s
-67108864 16 8 TABLE - - Seed: 1347473253 Buffer-Const,s!=d,xor=0: 1.266899 s 808.273 MB/s Buffer-Const,s!=d,xor=1: 1.589339 s 644.293 MB/s Buffer-Const,s==d,xor=0: 1.208477 s 847.347 MB/s Buffer-Const,s==d,xor=1: 1.563937 s 654.758 MB/s
-134217728 8 8 TABLE - - Seed: 1347473264 Buffer-Const,s!=d,xor=0: 1.305275 s 784.509 MB/s Buffer-Const,s!=d,xor=1: 1.601313 s 639.475 MB/s Buffer-Const,s==d,xor=0: 1.205009 s 849.786 MB/s Buffer-Const,s==d,xor=1: 1.562011 s 655.565 MB/s
-268435456 4 8 TABLE - - Seed: 1347473275 Buffer-Const,s!=d,xor=0: 1.393569 s 734.804 MB/s Buffer-Const,s!=d,xor=1: 1.588149 s 644.776 MB/s Buffer-Const,s==d,xor=0: 1.208391 s 847.408 MB/s Buffer-Const,s==d,xor=1: 1.568612 s 652.806 MB/s
-536870912 2 8 TABLE - - Seed: 1347473286 Buffer-Const,s!=d,xor=0: 1.597872 s 640.852 MB/s Buffer-Const,s!=d,xor=1: 1.630728 s 627.940 MB/s Buffer-Const,s==d,xor=0: 1.222109 s 837.896 MB/s Buffer-Const,s==d,xor=1: 1.581507 s 647.484 MB/s
-1073741824 1 8 TABLE - - Seed: 1347473298 Buffer-Const,s!=d,xor=0: 1.988823 s 514.877 MB/s Buffer-Const,s!=d,xor=1: 1.611288 s 635.516 MB/s Buffer-Const,s==d,xor=0: 1.222772 s 837.442 MB/s Buffer-Const,s==d,xor=1: 1.613392 s 634.688 MB/s
-1024 1048576 8 SPLIT 8 4 SSE - Seed: 1347473310 Buffer-Const,s!=d,xor=0: 0.172217 s 5945.999 MB/s Buffer-Const,s!=d,xor=1: 0.175352 s 5839.687 MB/s Buffer-Const,s==d,xor=0: 0.163135 s 6277.026 MB/s Buffer-Const,s==d,xor=1: 0.177949 s 5754.459 MB/s
-2048 524288 8 SPLIT 8 4 SSE - Seed: 1347473316 Buffer-Const,s!=d,xor=0: 0.154401 s 6632.099 MB/s Buffer-Const,s!=d,xor=1: 0.158355 s 6466.493 MB/s Buffer-Const,s==d,xor=0: 0.151740 s 6748.403 MB/s Buffer-Const,s==d,xor=1: 0.159225 s 6431.142 MB/s
-4096 262144 8 SPLIT 8 4 SSE - Seed: 1347473322 Buffer-Const,s!=d,xor=0: 0.138276 s 7405.486 MB/s Buffer-Const,s!=d,xor=1: 0.152603 s 6710.226 MB/s Buffer-Const,s==d,xor=0: 0.136469 s 7503.516 MB/s Buffer-Const,s==d,xor=1: 0.142757 s 7173.019 MB/s
-8192 131072 8 SPLIT 8 4 SSE - Seed: 1347473328 Buffer-Const,s!=d,xor=0: 0.129117 s 7930.820 MB/s Buffer-Const,s!=d,xor=1: 0.136170 s 7520.030 MB/s Buffer-Const,s==d,xor=0: 0.129542 s 7904.751 MB/s Buffer-Const,s==d,xor=1: 0.135069 s 7581.303 MB/s
-16384 65536 8 SPLIT 8 4 SSE - Seed: 1347473334 Buffer-Const,s!=d,xor=0: 0.125494 s 8159.768 MB/s Buffer-Const,s!=d,xor=1: 0.133779 s 7654.412 MB/s Buffer-Const,s==d,xor=0: 0.126920 s 8068.075 MB/s Buffer-Const,s==d,xor=1: 0.131795 s 7769.618 MB/s
-32768 32768 8 SPLIT 8 4 SSE - Seed: 1347473340 Buffer-Const,s!=d,xor=0: 0.128076 s 7995.233 MB/s Buffer-Const,s!=d,xor=1: 0.137454 s 7449.750 MB/s Buffer-Const,s==d,xor=0: 0.122883 s 8333.141 MB/s Buffer-Const,s==d,xor=1: 0.131206 s 7804.505 MB/s
-65536 16384 8 SPLIT 8 4 SSE - Seed: 1347473346 Buffer-Const,s!=d,xor=0: 0.127193 s 8050.759 MB/s Buffer-Const,s!=d,xor=1: 0.137505 s 7447.025 MB/s Buffer-Const,s==d,xor=0: 0.123262 s 8307.496 MB/s Buffer-Const,s==d,xor=1: 0.130225 s 7863.331 MB/s
-131072 8192 8 SPLIT 8 4 SSE - Seed: 1347473351 Buffer-Const,s!=d,xor=0: 0.138416 s 7398.011 MB/s Buffer-Const,s!=d,xor=1: 0.140051 s 7311.628 MB/s Buffer-Const,s==d,xor=0: 0.123666 s 8280.397 MB/s Buffer-Const,s==d,xor=1: 0.131191 s 7805.384 MB/s
-262144 4096 8 SPLIT 8 4 SSE - Seed: 1347473357 Buffer-Const,s!=d,xor=0: 0.158679 s 6453.299 MB/s Buffer-Const,s!=d,xor=1: 0.174885 s 5855.291 MB/s Buffer-Const,s==d,xor=0: 0.126400 s 8101.297 MB/s Buffer-Const,s==d,xor=1: 0.131082 s 7811.901 MB/s
-524288 2048 8 SPLIT 8 4 SSE - Seed: 1347473363 Buffer-Const,s!=d,xor=0: 0.153464 s 6672.571 MB/s Buffer-Const,s!=d,xor=1: 0.168238 s 6086.609 MB/s Buffer-Const,s==d,xor=0: 0.132881 s 7706.120 MB/s Buffer-Const,s==d,xor=1: 0.138437 s 7396.852 MB/s
-1048576 1024 8 SPLIT 8 4 SSE - Seed: 1347473369 Buffer-Const,s!=d,xor=0: 0.153720 s 6661.456 MB/s Buffer-Const,s!=d,xor=1: 0.167944 s 6097.272 MB/s Buffer-Const,s==d,xor=0: 0.132126 s 7750.172 MB/s Buffer-Const,s==d,xor=1: 0.137430 s 7451.081 MB/s
-2097152 512 8 SPLIT 8 4 SSE - Seed: 1347473375 Buffer-Const,s!=d,xor=0: 0.235302 s 4351.859 MB/s Buffer-Const,s!=d,xor=1: 0.252596 s 4053.902 MB/s Buffer-Const,s==d,xor=0: 0.141343 s 7244.769 MB/s Buffer-Const,s==d,xor=1: 0.142658 s 7177.994 MB/s
-4194304 256 8 SPLIT 8 4 SSE - Seed: 1347473381 Buffer-Const,s!=d,xor=0: 0.380941 s 2688.078 MB/s Buffer-Const,s!=d,xor=1: 0.380621 s 2690.341 MB/s Buffer-Const,s==d,xor=0: 0.208288 s 4916.260 MB/s Buffer-Const,s==d,xor=1: 0.214539 s 4773.029 MB/s
-8388608 128 8 SPLIT 8 4 SSE - Seed: 1347473387 Buffer-Const,s!=d,xor=0: 0.374304 s 2735.747 MB/s Buffer-Const,s!=d,xor=1: 0.371563 s 2755.926 MB/s Buffer-Const,s==d,xor=0: 0.228778 s 4475.957 MB/s Buffer-Const,s==d,xor=1: 0.232901 s 4396.716 MB/s
-16777216 64 8 SPLIT 8 4 SSE - Seed: 1347473394 Buffer-Const,s!=d,xor=0: 0.378027 s 2708.800 MB/s Buffer-Const,s!=d,xor=1: 0.371758 s 2754.482 MB/s Buffer-Const,s==d,xor=0: 0.227618 s 4498.761 MB/s Buffer-Const,s==d,xor=1: 0.236930 s 4321.945 MB/s
-33554432 32 8 SPLIT 8 4 SSE - Seed: 1347473400 Buffer-Const,s!=d,xor=0: 0.389149 s 2631.383 MB/s Buffer-Const,s!=d,xor=1: 0.373076 s 2744.748 MB/s Buffer-Const,s==d,xor=0: 0.227429 s 4502.496 MB/s Buffer-Const,s==d,xor=1: 0.232095 s 4411.986 MB/s
-67108864 16 8 SPLIT 8 4 SSE - Seed: 1347473407 Buffer-Const,s!=d,xor=0: 0.404405 s 2532.117 MB/s Buffer-Const,s!=d,xor=1: 0.375439 s 2727.471 MB/s Buffer-Const,s==d,xor=0: 0.232084 s 4412.195 MB/s Buffer-Const,s==d,xor=1: 0.234886 s 4359.567 MB/s
-134217728 8 8 SPLIT 8 4 SSE - Seed: 1347473413 Buffer-Const,s!=d,xor=0: 0.439466 s 2330.102 MB/s Buffer-Const,s!=d,xor=1: 0.373526 s 2741.445 MB/s Buffer-Const,s==d,xor=0: 0.238485 s 4293.774 MB/s Buffer-Const,s==d,xor=1: 0.242573 s 4221.405 MB/s
-268435456 4 8 SPLIT 8 4 SSE - Seed: 1347473420 Buffer-Const,s!=d,xor=0: 0.522256 s 1960.723 MB/s Buffer-Const,s!=d,xor=1: 0.369594 s 2770.609 MB/s Buffer-Const,s==d,xor=0: 0.230843 s 4435.914 MB/s Buffer-Const,s==d,xor=1: 0.233838 s 4379.099 MB/s
-536870912 2 8 SPLIT 8 4 SSE - Seed: 1347473427 Buffer-Const,s!=d,xor=0: 0.664837 s 1540.227 MB/s Buffer-Const,s!=d,xor=1: 0.374827 s 2731.926 MB/s Buffer-Const,s==d,xor=0: 0.234757 s 4361.958 MB/s Buffer-Const,s==d,xor=1: 0.244709 s 4184.566 MB/s
-1073741824 1 8 SPLIT 8 4 SSE - Seed: 1347473434 Buffer-Const,s!=d,xor=0: 0.945331 s 1083.218 MB/s Buffer-Const,s!=d,xor=1: 0.378121 s 2708.129 MB/s Buffer-Const,s==d,xor=0: 0.232104 s 4411.819 MB/s Buffer-Const,s==d,xor=1: 0.236791 s 4324.491 MB/s
-1024 1048576 16 LOG - - Seed: 1347473442 Buffer-Const,s!=d,xor=0: 2.210890 s 463.162 MB/s Buffer-Const,s!=d,xor=1: 2.500565 s 409.508 MB/s Buffer-Const,s==d,xor=0: 2.229298 s 459.337 MB/s Buffer-Const,s==d,xor=1: 2.488949 s 411.419 MB/s
-2048 524288 16 LOG - - Seed: 1347473457 Buffer-Const,s!=d,xor=0: 2.183274 s 469.020 MB/s Buffer-Const,s!=d,xor=1: 2.471336 s 414.351 MB/s Buffer-Const,s==d,xor=0: 2.161852 s 473.668 MB/s Buffer-Const,s==d,xor=1: 2.537259 s 403.585 MB/s
-4096 262144 16 LOG - - Seed: 1347473472 Buffer-Const,s!=d,xor=0: 2.158893 s 474.317 MB/s Buffer-Const,s!=d,xor=1: 2.430101 s 421.382 MB/s Buffer-Const,s==d,xor=0: 2.174221 s 470.973 MB/s Buffer-Const,s==d,xor=1: 2.417720 s 423.540 MB/s
-8192 131072 16 LOG - - Seed: 1347473486 Buffer-Const,s!=d,xor=0: 2.139556 s 478.604 MB/s Buffer-Const,s!=d,xor=1: 2.411590 s 424.616 MB/s Buffer-Const,s==d,xor=0: 2.106997 s 486.000 MB/s Buffer-Const,s==d,xor=1: 2.374905 s 431.175 MB/s
-16384 65536 16 LOG - - Seed: 1347473501 Buffer-Const,s!=d,xor=0: 2.131013 s 480.523 MB/s Buffer-Const,s!=d,xor=1: 2.424752 s 422.311 MB/s Buffer-Const,s==d,xor=0: 2.159855 s 474.106 MB/s Buffer-Const,s==d,xor=1: 2.340712 s 437.474 MB/s
-32768 32768 16 LOG - - Seed: 1347473515 Buffer-Const,s!=d,xor=0: 2.080020 s 492.303 MB/s Buffer-Const,s!=d,xor=1: 2.353990 s 435.006 MB/s Buffer-Const,s==d,xor=0: 2.065719 s 495.711 MB/s Buffer-Const,s==d,xor=1: 2.348487 s 436.025 MB/s
-65536 16384 16 LOG - - Seed: 1347473529 Buffer-Const,s!=d,xor=0: 2.083769 s 491.417 MB/s Buffer-Const,s!=d,xor=1: 2.401774 s 426.351 MB/s Buffer-Const,s==d,xor=0: 2.074343 s 493.650 MB/s Buffer-Const,s==d,xor=1: 2.341650 s 437.299 MB/s
-131072 8192 16 LOG - - Seed: 1347473543 Buffer-Const,s!=d,xor=0: 2.191856 s 467.184 MB/s Buffer-Const,s!=d,xor=1: 2.369453 s 432.167 MB/s Buffer-Const,s==d,xor=0: 2.034702 s 503.268 MB/s Buffer-Const,s==d,xor=1: 2.307625 s 443.746 MB/s
-262144 4096 16 LOG - - Seed: 1347473558 Buffer-Const,s!=d,xor=0: 2.084992 s 491.129 MB/s Buffer-Const,s!=d,xor=1: 2.385670 s 429.230 MB/s Buffer-Const,s==d,xor=0: 2.054360 s 498.452 MB/s Buffer-Const,s==d,xor=1: 2.374879 s 431.180 MB/s
-524288 2048 16 LOG - - Seed: 1347473572 Buffer-Const,s!=d,xor=0: 2.107185 s 485.956 MB/s Buffer-Const,s!=d,xor=1: 2.368054 s 432.423 MB/s Buffer-Const,s==d,xor=0: 2.053791 s 498.590 MB/s Buffer-Const,s==d,xor=1: 2.313108 s 442.694 MB/s
-1048576 1024 16 LOG - - Seed: 1347473586 Buffer-Const,s!=d,xor=0: 2.105079 s 486.443 MB/s Buffer-Const,s!=d,xor=1: 2.444869 s 418.836 MB/s Buffer-Const,s==d,xor=0: 2.271658 s 450.772 MB/s Buffer-Const,s==d,xor=1: 2.413470 s 424.285 MB/s
-2097152 512 16 LOG - - Seed: 1347473600 Buffer-Const,s!=d,xor=0: 2.159018 s 474.290 MB/s Buffer-Const,s!=d,xor=1: 2.419327 s 423.258 MB/s Buffer-Const,s==d,xor=0: 2.031202 s 504.135 MB/s Buffer-Const,s==d,xor=1: 2.301943 s 444.842 MB/s
-4194304 256 16 LOG - - Seed: 1347473615 Buffer-Const,s!=d,xor=0: 2.194868 s 466.543 MB/s Buffer-Const,s!=d,xor=1: 2.460607 s 416.158 MB/s Buffer-Const,s==d,xor=0: 2.142866 s 477.865 MB/s Buffer-Const,s==d,xor=1: 2.387212 s 428.952 MB/s
-8388608 128 16 LOG - - Seed: 1347473629 Buffer-Const,s!=d,xor=0: 2.178997 s 469.941 MB/s Buffer-Const,s!=d,xor=1: 2.467580 s 414.982 MB/s Buffer-Const,s==d,xor=0: 2.240649 s 457.010 MB/s Buffer-Const,s==d,xor=1: 2.394828 s 427.588 MB/s
-16777216 64 16 LOG - - Seed: 1347473644 Buffer-Const,s!=d,xor=0: 2.185086 s 468.632 MB/s Buffer-Const,s!=d,xor=1: 2.635728 s 388.508 MB/s Buffer-Const,s==d,xor=0: 2.144898 s 477.412 MB/s Buffer-Const,s==d,xor=1: 2.402648 s 426.196 MB/s
-33554432 32 16 LOG - - Seed: 1347473658 Buffer-Const,s!=d,xor=0: 2.209707 s 463.410 MB/s Buffer-Const,s!=d,xor=1: 2.969263 s 344.867 MB/s Buffer-Const,s==d,xor=0: 2.144736 s 477.448 MB/s Buffer-Const,s==d,xor=1: 2.394575 s 427.633 MB/s
-67108864 16 16 LOG - - Seed: 1347473673 Buffer-Const,s!=d,xor=0: 2.281165 s 448.893 MB/s Buffer-Const,s!=d,xor=1: 2.929988 s 349.489 MB/s Buffer-Const,s==d,xor=0: 2.160325 s 474.003 MB/s Buffer-Const,s==d,xor=1: 2.481787 s 412.606 MB/s
-134217728 8 16 LOG - - Seed: 1347473689 Buffer-Const,s!=d,xor=0: 2.272319 s 450.641 MB/s Buffer-Const,s!=d,xor=1: 2.957651 s 346.221 MB/s Buffer-Const,s==d,xor=0: 2.097608 s 488.175 MB/s Buffer-Const,s==d,xor=1: 2.352378 s 435.304 MB/s
-268435456 4 16 LOG - - Seed: 1347473704 Buffer-Const,s!=d,xor=0: 2.354143 s 434.978 MB/s Buffer-Const,s!=d,xor=1: 2.481760 s 412.610 MB/s Buffer-Const,s==d,xor=0: 2.108223 s 485.717 MB/s Buffer-Const,s==d,xor=1: 2.357849 s 434.294 MB/s
-536870912 2 16 LOG - - Seed: 1347473719 Buffer-Const,s!=d,xor=0: 2.545543 s 402.272 MB/s Buffer-Const,s!=d,xor=1: 2.441404 s 419.431 MB/s Buffer-Const,s==d,xor=0: 2.135140 s 479.594 MB/s Buffer-Const,s==d,xor=1: 2.359027 s 434.077 MB/s
-1073741824 1 16 LOG - - Seed: 1347473734 Buffer-Const,s!=d,xor=0: 2.985415 s 343.001 MB/s Buffer-Const,s!=d,xor=1: 2.422259 s 422.746 MB/s Buffer-Const,s==d,xor=0: 2.104547 s 486.566 MB/s Buffer-Const,s==d,xor=1: 2.372315 s 431.646 MB/s
-1024 1048576 16 SPLIT 16 4 NOSSE - Seed: 1347473750 Buffer-Const,s!=d,xor=0: 1.606844 s 637.274 MB/s Buffer-Const,s!=d,xor=1: 1.804383 s 567.507 MB/s Buffer-Const,s==d,xor=0: 1.615952 s 633.682 MB/s Buffer-Const,s==d,xor=1: 1.797352 s 569.727 MB/s
-2048 524288 16 SPLIT 16 4 NOSSE - Seed: 1347473762 Buffer-Const,s!=d,xor=0: 1.541486 s 664.294 MB/s Buffer-Const,s!=d,xor=1: 1.685396 s 607.572 MB/s Buffer-Const,s==d,xor=0: 1.503978 s 680.861 MB/s Buffer-Const,s==d,xor=1: 1.684867 s 607.763 MB/s
-4096 262144 16 SPLIT 16 4 NOSSE - Seed: 1347473774 Buffer-Const,s!=d,xor=0: 1.458985 s 701.858 MB/s Buffer-Const,s!=d,xor=1: 1.642648 s 623.384 MB/s Buffer-Const,s==d,xor=0: 1.459893 s 701.421 MB/s Buffer-Const,s==d,xor=1: 1.647799 s 621.435 MB/s
-8192 131072 16 SPLIT 16 4 NOSSE - Seed: 1347473785 Buffer-Const,s!=d,xor=0: 1.443518 s 709.378 MB/s Buffer-Const,s!=d,xor=1: 1.632999 s 627.067 MB/s Buffer-Const,s==d,xor=0: 1.445864 s 708.227 MB/s Buffer-Const,s==d,xor=1: 1.640243 s 624.298 MB/s
-16384 65536 16 SPLIT 16 4 NOSSE - Seed: 1347473797 Buffer-Const,s!=d,xor=0: 1.440485 s 710.872 MB/s Buffer-Const,s!=d,xor=1: 1.610468 s 635.840 MB/s Buffer-Const,s==d,xor=0: 1.423815 s 719.194 MB/s Buffer-Const,s==d,xor=1: 1.616802 s 633.349 MB/s
-32768 32768 16 SPLIT 16 4 NOSSE - Seed: 1347473808 Buffer-Const,s!=d,xor=0: 1.430503 s 715.832 MB/s Buffer-Const,s!=d,xor=1: 1.617286 s 633.159 MB/s Buffer-Const,s==d,xor=0: 1.450425 s 706.000 MB/s Buffer-Const,s==d,xor=1: 1.628290 s 628.881 MB/s
-65536 16384 16 SPLIT 16 4 NOSSE - Seed: 1347473819 Buffer-Const,s!=d,xor=0: 1.431340 s 715.414 MB/s Buffer-Const,s!=d,xor=1: 1.603276 s 638.692 MB/s Buffer-Const,s==d,xor=0: 1.484436 s 689.824 MB/s Buffer-Const,s==d,xor=1: 1.626883 s 629.424 MB/s
-131072 8192 16 SPLIT 16 4 NOSSE - Seed: 1347473831 Buffer-Const,s!=d,xor=0: 1.435691 s 713.245 MB/s Buffer-Const,s!=d,xor=1: 1.618436 s 632.710 MB/s Buffer-Const,s==d,xor=0: 1.450719 s 705.857 MB/s Buffer-Const,s==d,xor=1: 1.604518 s 638.198 MB/s
-262144 4096 16 SPLIT 16 4 NOSSE - Seed: 1347473842 Buffer-Const,s!=d,xor=0: 1.434818 s 713.679 MB/s Buffer-Const,s!=d,xor=1: 1.685219 s 607.636 MB/s Buffer-Const,s==d,xor=0: 1.412647 s 724.880 MB/s Buffer-Const,s==d,xor=1: 1.606347 s 637.471 MB/s
-524288 2048 16 SPLIT 16 4 NOSSE - Seed: 1347473854 Buffer-Const,s!=d,xor=0: 1.437057 s 712.568 MB/s Buffer-Const,s!=d,xor=1: 1.605284 s 637.893 MB/s Buffer-Const,s==d,xor=0: 1.424157 s 719.022 MB/s Buffer-Const,s==d,xor=1: 1.616495 s 633.469 MB/s
-1048576 1024 16 SPLIT 16 4 NOSSE - Seed: 1347473865 Buffer-Const,s!=d,xor=0: 1.417949 s 722.170 MB/s Buffer-Const,s!=d,xor=1: 1.636933 s 625.560 MB/s Buffer-Const,s==d,xor=0: 1.413730 s 724.325 MB/s Buffer-Const,s==d,xor=1: 1.619097 s 632.451 MB/s
-2097152 512 16 SPLIT 16 4 NOSSE - Seed: 1347473876 Buffer-Const,s!=d,xor=0: 1.449239 s 706.577 MB/s Buffer-Const,s!=d,xor=1: 1.642027 s 623.619 MB/s Buffer-Const,s==d,xor=0: 1.482682 s 690.640 MB/s Buffer-Const,s==d,xor=1: 1.606026 s 637.599 MB/s
-4194304 256 16 SPLIT 16 4 NOSSE - Seed: 1347473888 Buffer-Const,s!=d,xor=0: 1.466069 s 698.467 MB/s Buffer-Const,s!=d,xor=1: 1.642522 s 623.431 MB/s Buffer-Const,s==d,xor=0: 1.439317 s 711.449 MB/s Buffer-Const,s==d,xor=1: 1.631946 s 627.472 MB/s
-8388608 128 16 SPLIT 16 4 NOSSE - Seed: 1347473899 Buffer-Const,s!=d,xor=0: 1.454558 s 703.994 MB/s Buffer-Const,s!=d,xor=1: 1.650872 s 620.278 MB/s Buffer-Const,s==d,xor=0: 1.445065 s 708.619 MB/s Buffer-Const,s==d,xor=1: 1.628372 s 628.849 MB/s
-16777216 64 16 SPLIT 16 4 NOSSE - Seed: 1347473911 Buffer-Const,s!=d,xor=0: 1.459724 s 701.503 MB/s Buffer-Const,s!=d,xor=1: 1.650864 s 620.281 MB/s Buffer-Const,s==d,xor=0: 1.440828 s 710.702 MB/s Buffer-Const,s==d,xor=1: 1.634402 s 626.529 MB/s
-33554432 32 16 SPLIT 16 4 NOSSE - Seed: 1347473922 Buffer-Const,s!=d,xor=0: 1.466166 s 698.420 MB/s Buffer-Const,s!=d,xor=1: 1.644006 s 622.869 MB/s Buffer-Const,s==d,xor=0: 1.439810 s 711.205 MB/s Buffer-Const,s==d,xor=1: 1.644597 s 622.645 MB/s
-67108864 16 16 SPLIT 16 4 NOSSE - Seed: 1347473934 Buffer-Const,s!=d,xor=0: 1.509510 s 678.366 MB/s Buffer-Const,s!=d,xor=1: 1.680938 s 609.184 MB/s Buffer-Const,s==d,xor=0: 1.465974 s 698.512 MB/s Buffer-Const,s==d,xor=1: 1.645416 s 622.335 MB/s
-134217728 8 16 SPLIT 16 4 NOSSE - Seed: 1347473945 Buffer-Const,s!=d,xor=0: 1.553459 s 659.174 MB/s Buffer-Const,s!=d,xor=1: 1.670615 s 612.948 MB/s Buffer-Const,s==d,xor=0: 1.468984 s 697.080 MB/s Buffer-Const,s==d,xor=1: 1.640758 s 624.102 MB/s
-268435456 4 16 SPLIT 16 4 NOSSE - Seed: 1347473957 Buffer-Const,s!=d,xor=0: 1.656677 s 618.105 MB/s Buffer-Const,s!=d,xor=1: 1.669660 s 613.299 MB/s Buffer-Const,s==d,xor=0: 1.457518 s 702.564 MB/s Buffer-Const,s==d,xor=1: 1.656764 s 618.072 MB/s
-536870912 2 16 SPLIT 16 4 NOSSE - Seed: 1347473969 Buffer-Const,s!=d,xor=0: 1.828201 s 560.113 MB/s Buffer-Const,s!=d,xor=1: 1.649980 s 620.614 MB/s Buffer-Const,s==d,xor=0: 1.450785 s 705.825 MB/s Buffer-Const,s==d,xor=1: 1.643633 s 623.010 MB/s
-1073741824 1 16 SPLIT 16 4 NOSSE - Seed: 1347473981 Buffer-Const,s!=d,xor=0: 2.171743 s 471.511 MB/s Buffer-Const,s!=d,xor=1: 1.651953 s 619.872 MB/s Buffer-Const,s==d,xor=0: 1.466839 s 698.100 MB/s Buffer-Const,s==d,xor=1: 1.650641 s 620.365 MB/s
-1024 1048576 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347473994 Buffer-Const,s!=d,xor=0: 0.440479 s 2324.740 MB/s Buffer-Const,s!=d,xor=1: 0.442003 s 2316.728 MB/s Buffer-Const,s==d,xor=0: 0.434042 s 2359.220 MB/s Buffer-Const,s==d,xor=1: 0.438626 s 2334.561 MB/s
-2048 524288 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474002 Buffer-Const,s!=d,xor=0: 0.316802 s 3232.303 MB/s Buffer-Const,s!=d,xor=1: 0.331473 s 3089.240 MB/s Buffer-Const,s==d,xor=0: 0.317398 s 3226.233 MB/s Buffer-Const,s==d,xor=1: 0.330775 s 3095.758 MB/s
-4096 262144 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474008 Buffer-Const,s!=d,xor=0: 0.264277 s 3874.730 MB/s Buffer-Const,s!=d,xor=1: 0.274880 s 3725.263 MB/s Buffer-Const,s==d,xor=0: 0.262972 s 3893.956 MB/s Buffer-Const,s==d,xor=1: 0.275358 s 3718.789 MB/s
-8192 131072 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474015 Buffer-Const,s!=d,xor=0: 0.232929 s 4396.190 MB/s Buffer-Const,s!=d,xor=1: 0.245429 s 4172.294 MB/s Buffer-Const,s==d,xor=0: 0.231047 s 4432.005 MB/s Buffer-Const,s==d,xor=1: 0.243273 s 4209.263 MB/s
-16384 65536 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474021 Buffer-Const,s!=d,xor=0: 0.220903 s 4635.515 MB/s Buffer-Const,s!=d,xor=1: 0.232513 s 4404.047 MB/s Buffer-Const,s==d,xor=0: 0.217276 s 4712.908 MB/s Buffer-Const,s==d,xor=1: 0.235140 s 4354.860 MB/s
-32768 32768 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474027 Buffer-Const,s!=d,xor=0: 0.209507 s 4887.660 MB/s Buffer-Const,s!=d,xor=1: 0.225435 s 4542.324 MB/s Buffer-Const,s==d,xor=0: 0.211855 s 4833.491 MB/s Buffer-Const,s==d,xor=1: 0.222550 s 4601.205 MB/s
-65536 16384 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474033 Buffer-Const,s!=d,xor=0: 0.206457 s 4959.867 MB/s Buffer-Const,s!=d,xor=1: 0.226325 s 4524.466 MB/s Buffer-Const,s==d,xor=0: 0.209159 s 4895.805 MB/s Buffer-Const,s==d,xor=1: 0.222746 s 4597.167 MB/s
-131072 8192 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474039 Buffer-Const,s!=d,xor=0: 0.211171 s 4849.147 MB/s Buffer-Const,s!=d,xor=1: 0.226647 s 4518.032 MB/s Buffer-Const,s==d,xor=0: 0.205702 s 4978.085 MB/s Buffer-Const,s==d,xor=1: 0.218717 s 4681.842 MB/s
-262144 4096 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474046 Buffer-Const,s!=d,xor=0: 0.217228 s 4713.948 MB/s Buffer-Const,s!=d,xor=1: 0.228891 s 4473.752 MB/s Buffer-Const,s==d,xor=0: 0.208708 s 4906.375 MB/s Buffer-Const,s==d,xor=1: 0.218286 s 4691.098 MB/s
-524288 2048 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474052 Buffer-Const,s!=d,xor=0: 0.213187 s 4803.301 MB/s Buffer-Const,s!=d,xor=1: 0.224506 s 4561.132 MB/s Buffer-Const,s==d,xor=0: 0.205507 s 4982.792 MB/s Buffer-Const,s==d,xor=1: 0.218068 s 4695.780 MB/s
-1048576 1024 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474058 Buffer-Const,s!=d,xor=0: 0.212405 s 4820.980 MB/s Buffer-Const,s!=d,xor=1: 0.224411 s 4563.056 MB/s Buffer-Const,s==d,xor=0: 0.204215 s 5014.334 MB/s Buffer-Const,s==d,xor=1: 0.216172 s 4736.964 MB/s
-2097152 512 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474064 Buffer-Const,s!=d,xor=0: 0.261045 s 3922.692 MB/s Buffer-Const,s!=d,xor=1: 0.282378 s 3626.339 MB/s Buffer-Const,s==d,xor=0: 0.206318 s 4963.209 MB/s Buffer-Const,s==d,xor=1: 0.223613 s 4579.335 MB/s
-4194304 256 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474070 Buffer-Const,s!=d,xor=0: 0.404333 s 2532.567 MB/s Buffer-Const,s!=d,xor=1: 0.395253 s 2590.748 MB/s Buffer-Const,s==d,xor=0: 0.254806 s 4018.747 MB/s Buffer-Const,s==d,xor=1: 0.268242 s 3817.453 MB/s
-8388608 128 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474077 Buffer-Const,s!=d,xor=0: 0.396502 s 2582.583 MB/s Buffer-Const,s!=d,xor=1: 0.384216 s 2665.169 MB/s Buffer-Const,s==d,xor=0: 0.259012 s 3953.481 MB/s Buffer-Const,s==d,xor=1: 0.268045 s 3820.258 MB/s
-16777216 64 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474083 Buffer-Const,s!=d,xor=0: 0.398601 s 2568.986 MB/s Buffer-Const,s!=d,xor=1: 0.389561 s 2628.599 MB/s Buffer-Const,s==d,xor=0: 0.262993 s 3893.642 MB/s Buffer-Const,s==d,xor=1: 0.270538 s 3785.046 MB/s
-33554432 32 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474090 Buffer-Const,s!=d,xor=0: 0.404290 s 2532.837 MB/s Buffer-Const,s!=d,xor=1: 0.377139 s 2715.179 MB/s Buffer-Const,s==d,xor=0: 0.263448 s 3886.919 MB/s Buffer-Const,s==d,xor=1: 0.271300 s 3774.415 MB/s
-67108864 16 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474096 Buffer-Const,s!=d,xor=0: 0.422952 s 2421.079 MB/s Buffer-Const,s!=d,xor=1: 0.373653 s 2740.513 MB/s Buffer-Const,s==d,xor=0: 0.257768 s 3972.566 MB/s Buffer-Const,s==d,xor=1: 0.273398 s 3745.460 MB/s
-134217728 8 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474103 Buffer-Const,s!=d,xor=0: 0.461641 s 2218.174 MB/s Buffer-Const,s!=d,xor=1: 0.383588 s 2669.532 MB/s Buffer-Const,s==d,xor=0: 0.269459 s 3800.207 MB/s Buffer-Const,s==d,xor=1: 0.270140 s 3790.625 MB/s
-268435456 4 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474110 Buffer-Const,s!=d,xor=0: 0.530862 s 1928.940 MB/s Buffer-Const,s!=d,xor=1: 0.373995 s 2738.004 MB/s Buffer-Const,s==d,xor=0: 0.258169 s 3966.391 MB/s Buffer-Const,s==d,xor=1: 0.277354 s 3692.036 MB/s
-536870912 2 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474117 Buffer-Const,s!=d,xor=0: 0.695551 s 1472.214 MB/s Buffer-Const,s!=d,xor=1: 0.374834 s 2731.876 MB/s Buffer-Const,s==d,xor=0: 0.259944 s 3939.311 MB/s Buffer-Const,s==d,xor=1: 0.278206 s 3680.724 MB/s
-1073741824 1 16 SPLIT 16 4 SSE,STDMAP - Seed: 1347474124 Buffer-Const,s!=d,xor=0: 1.020324 s 1003.603 MB/s Buffer-Const,s!=d,xor=1: 0.379288 s 2699.796 MB/s Buffer-Const,s==d,xor=0: 0.257958 s 3969.639 MB/s Buffer-Const,s==d,xor=1: 0.269507 s 3799.531 MB/s
-1024 1048576 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474132 Buffer-Const,s!=d,xor=0: 0.374943 s 2731.083 MB/s Buffer-Const,s!=d,xor=1: 0.381695 s 2682.773 MB/s Buffer-Const,s==d,xor=0: 0.360327 s 2841.861 MB/s Buffer-Const,s==d,xor=1: 0.388995 s 2632.423 MB/s
-2048 524288 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474139 Buffer-Const,s!=d,xor=0: 0.257053 s 3983.608 MB/s Buffer-Const,s!=d,xor=1: 0.274414 s 3731.587 MB/s Buffer-Const,s==d,xor=0: 0.250040 s 4095.352 MB/s Buffer-Const,s==d,xor=1: 0.271855 s 3766.712 MB/s
-4096 262144 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474146 Buffer-Const,s!=d,xor=0: 0.204864 s 4998.432 MB/s Buffer-Const,s!=d,xor=1: 0.218739 s 4681.388 MB/s Buffer-Const,s==d,xor=0: 0.198597 s 5156.172 MB/s Buffer-Const,s==d,xor=1: 0.220060 s 4653.274 MB/s
-8192 131072 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474152 Buffer-Const,s!=d,xor=0: 0.170398 s 6009.469 MB/s Buffer-Const,s!=d,xor=1: 0.189123 s 5414.468 MB/s Buffer-Const,s==d,xor=0: 0.170900 s 5991.821 MB/s Buffer-Const,s==d,xor=1: 0.185934 s 5507.322 MB/s
-16384 65536 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474158 Buffer-Const,s!=d,xor=0: 0.158379 s 6465.520 MB/s Buffer-Const,s!=d,xor=1: 0.173688 s 5895.623 MB/s Buffer-Const,s==d,xor=0: 0.153663 s 6663.916 MB/s Buffer-Const,s==d,xor=1: 0.169384 s 6045.427 MB/s
-32768 32768 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474164 Buffer-Const,s!=d,xor=0: 0.151898 s 6741.381 MB/s Buffer-Const,s!=d,xor=1: 0.179828 s 5694.332 MB/s Buffer-Const,s==d,xor=0: 0.152833 s 6700.114 MB/s Buffer-Const,s==d,xor=1: 0.170787 s 5995.761 MB/s
-65536 16384 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474170 Buffer-Const,s!=d,xor=0: 0.149569 s 6846.337 MB/s Buffer-Const,s!=d,xor=1: 0.170012 s 6023.104 MB/s Buffer-Const,s==d,xor=0: 0.147070 s 6962.685 MB/s Buffer-Const,s==d,xor=1: 0.164932 s 6208.628 MB/s
-131072 8192 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474176 Buffer-Const,s!=d,xor=0: 0.147436 s 6945.391 MB/s Buffer-Const,s!=d,xor=1: 0.177689 s 5762.875 MB/s Buffer-Const,s==d,xor=0: 0.141681 s 7227.494 MB/s Buffer-Const,s==d,xor=1: 0.159149 s 6434.234 MB/s
-262144 4096 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474181 Buffer-Const,s!=d,xor=0: 0.176476 s 5802.489 MB/s Buffer-Const,s!=d,xor=1: 0.190235 s 5382.819 MB/s Buffer-Const,s==d,xor=0: 0.145066 s 7058.832 MB/s Buffer-Const,s==d,xor=1: 0.161759 s 6330.400 MB/s
-524288 2048 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474187 Buffer-Const,s!=d,xor=0: 0.170859 s 5993.259 MB/s Buffer-Const,s!=d,xor=1: 0.184301 s 5556.124 MB/s Buffer-Const,s==d,xor=0: 0.146564 s 6986.709 MB/s Buffer-Const,s==d,xor=1: 0.163810 s 6251.162 MB/s
-1048576 1024 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474193 Buffer-Const,s!=d,xor=0: 0.173408 s 5905.164 MB/s Buffer-Const,s!=d,xor=1: 0.186853 s 5480.246 MB/s Buffer-Const,s==d,xor=0: 0.145153 s 7054.646 MB/s Buffer-Const,s==d,xor=1: 0.161184 s 6352.994 MB/s
-2097152 512 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474199 Buffer-Const,s!=d,xor=0: 0.253428 s 4040.592 MB/s Buffer-Const,s!=d,xor=1: 0.282650 s 3622.849 MB/s Buffer-Const,s==d,xor=0: 0.151634 s 6753.114 MB/s Buffer-Const,s==d,xor=1: 0.162269 s 6310.523 MB/s
-4194304 256 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474205 Buffer-Const,s!=d,xor=0: 0.392085 s 2611.678 MB/s Buffer-Const,s!=d,xor=1: 0.390785 s 2620.365 MB/s Buffer-Const,s==d,xor=0: 0.225171 s 4547.663 MB/s Buffer-Const,s==d,xor=1: 0.229246 s 4466.819 MB/s
-8388608 128 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474212 Buffer-Const,s!=d,xor=0: 0.385162 s 2658.624 MB/s Buffer-Const,s!=d,xor=1: 0.384540 s 2662.920 MB/s Buffer-Const,s==d,xor=0: 0.236824 s 4323.885 MB/s Buffer-Const,s==d,xor=1: 0.242623 s 4220.542 MB/s
-16777216 64 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474218 Buffer-Const,s!=d,xor=0: 0.390857 s 2619.887 MB/s Buffer-Const,s!=d,xor=1: 0.377723 s 2710.983 MB/s Buffer-Const,s==d,xor=0: 0.235221 s 4353.346 MB/s Buffer-Const,s==d,xor=1: 0.240751 s 4253.365 MB/s
-33554432 32 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474225 Buffer-Const,s!=d,xor=0: 0.401487 s 2550.516 MB/s Buffer-Const,s!=d,xor=1: 0.375969 s 2723.626 MB/s Buffer-Const,s==d,xor=0: 0.235533 s 4347.591 MB/s Buffer-Const,s==d,xor=1: 0.238075 s 4301.161 MB/s
-67108864 16 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474231 Buffer-Const,s!=d,xor=0: 0.412280 s 2483.751 MB/s Buffer-Const,s!=d,xor=1: 0.371134 s 2759.109 MB/s Buffer-Const,s==d,xor=0: 0.233195 s 4391.178 MB/s Buffer-Const,s==d,xor=1: 0.236408 s 4331.504 MB/s
-134217728 8 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474238 Buffer-Const,s!=d,xor=0: 0.448526 s 2283.034 MB/s Buffer-Const,s!=d,xor=1: 0.370282 s 2765.460 MB/s Buffer-Const,s==d,xor=0: 0.233473 s 4385.940 MB/s Buffer-Const,s==d,xor=1: 0.240682 s 4254.570 MB/s
-268435456 4 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474245 Buffer-Const,s!=d,xor=0: 0.524038 s 1954.058 MB/s Buffer-Const,s!=d,xor=1: 0.375533 s 2726.792 MB/s Buffer-Const,s==d,xor=0: 0.242939 s 4215.050 MB/s Buffer-Const,s==d,xor=1: 0.244587 s 4186.650 MB/s
-536870912 2 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474251 Buffer-Const,s!=d,xor=0: 0.669426 s 1529.669 MB/s Buffer-Const,s!=d,xor=1: 0.376380 s 2720.655 MB/s Buffer-Const,s==d,xor=0: 0.238366 s 4295.912 MB/s Buffer-Const,s==d,xor=1: 0.246535 s 4153.567 MB/s
-1073741824 1 16 SPLIT 16 4 SSE,ALTMAP - Seed: 1347474259 Buffer-Const,s!=d,xor=0: 0.980024 s 1044.872 MB/s Buffer-Const,s!=d,xor=1: 0.373039 s 2745.021 MB/s Buffer-Const,s==d,xor=0: 0.257666 s 3974.139 MB/s Buffer-Const,s==d,xor=1: 0.236541 s 4329.059 MB/s
-1024 1048576 32 SPLIT 8 8 - - Seed: 1347474267 Buffer-Const,s!=d,xor=0: 4.078636 s 251.064 MB/s Buffer-Const,s!=d,xor=1: 4.030305 s 254.075 MB/s Buffer-Const,s==d,xor=0: 3.999870 s 256.008 MB/s Buffer-Const,s==d,xor=1: 4.004111 s 255.737 MB/s
-2048 524288 32 SPLIT 8 8 - - Seed: 1347474288 Buffer-Const,s!=d,xor=0: 3.907939 s 262.031 MB/s Buffer-Const,s!=d,xor=1: 3.925473 s 260.860 MB/s Buffer-Const,s==d,xor=0: 3.923752 s 260.975 MB/s Buffer-Const,s==d,xor=1: 3.880185 s 263.905 MB/s
-4096 262144 32 SPLIT 8 8 - - Seed: 1347474309 Buffer-Const,s!=d,xor=0: 3.841739 s 266.546 MB/s Buffer-Const,s!=d,xor=1: 3.807040 s 268.975 MB/s Buffer-Const,s==d,xor=0: 3.757250 s 272.540 MB/s Buffer-Const,s==d,xor=1: 3.823483 s 267.819 MB/s
-8192 131072 32 SPLIT 8 8 - - Seed: 1347474330 Buffer-Const,s!=d,xor=0: 3.847896 s 266.119 MB/s Buffer-Const,s!=d,xor=1: 3.804132 s 269.181 MB/s Buffer-Const,s==d,xor=0: 3.718211 s 275.401 MB/s Buffer-Const,s==d,xor=1: 3.918893 s 261.298 MB/s
-16384 65536 32 SPLIT 8 8 - - Seed: 1347474351 Buffer-Const,s!=d,xor=0: 3.864461 s 264.979 MB/s Buffer-Const,s!=d,xor=1: 3.730061 s 274.526 MB/s Buffer-Const,s==d,xor=0: 3.765701 s 271.928 MB/s Buffer-Const,s==d,xor=1: 3.654276 s 280.220 MB/s
-32768 32768 32 SPLIT 8 8 - - Seed: 1347474371 Buffer-Const,s!=d,xor=0: 3.685288 s 277.862 MB/s Buffer-Const,s!=d,xor=1: 3.737605 s 273.972 MB/s Buffer-Const,s==d,xor=0: 3.696803 s 276.996 MB/s Buffer-Const,s==d,xor=1: 3.687180 s 277.719 MB/s
-65536 16384 32 SPLIT 8 8 - - Seed: 1347474391 Buffer-Const,s!=d,xor=0: 3.750255 s 273.048 MB/s Buffer-Const,s!=d,xor=1: 3.722842 s 275.059 MB/s Buffer-Const,s==d,xor=0: 3.639989 s 281.320 MB/s Buffer-Const,s==d,xor=1: 3.657695 s 279.958 MB/s
-131072 8192 32 SPLIT 8 8 - - Seed: 1347474411 Buffer-Const,s!=d,xor=0: 3.727132 s 274.742 MB/s Buffer-Const,s!=d,xor=1: 3.719290 s 275.321 MB/s Buffer-Const,s==d,xor=0: 3.658669 s 279.883 MB/s Buffer-Const,s==d,xor=1: 3.639225 s 281.379 MB/s
-262144 4096 32 SPLIT 8 8 - - Seed: 1347474431 Buffer-Const,s!=d,xor=0: 3.699968 s 276.759 MB/s Buffer-Const,s!=d,xor=1: 3.708224 s 276.143 MB/s Buffer-Const,s==d,xor=0: 3.636058 s 281.624 MB/s Buffer-Const,s==d,xor=1: 3.663831 s 279.489 MB/s
-524288 2048 32 SPLIT 8 8 - - Seed: 1347474451 Buffer-Const,s!=d,xor=0: 3.715168 s 275.627 MB/s Buffer-Const,s!=d,xor=1: 3.716467 s 275.531 MB/s Buffer-Const,s==d,xor=0: 3.642050 s 281.160 MB/s Buffer-Const,s==d,xor=1: 3.650928 s 280.477 MB/s
-1048576 1024 32 SPLIT 8 8 - - Seed: 1347474471 Buffer-Const,s!=d,xor=0: 3.748222 s 273.196 MB/s Buffer-Const,s!=d,xor=1: 3.707973 s 276.162 MB/s Buffer-Const,s==d,xor=0: 3.633509 s 281.821 MB/s Buffer-Const,s==d,xor=1: 3.606194 s 283.956 MB/s
-2097152 512 32 SPLIT 8 8 - - Seed: 1347474491 Buffer-Const,s!=d,xor=0: 3.772647 s 271.427 MB/s Buffer-Const,s!=d,xor=1: 3.751378 s 272.966 MB/s Buffer-Const,s==d,xor=0: 3.627191 s 282.312 MB/s Buffer-Const,s==d,xor=1: 3.683802 s 277.974 MB/s
-4194304 256 32 SPLIT 8 8 - - Seed: 1347474511 Buffer-Const,s!=d,xor=0: 3.710802 s 275.951 MB/s Buffer-Const,s!=d,xor=1: 3.754683 s 272.726 MB/s Buffer-Const,s==d,xor=0: 3.725703 s 274.847 MB/s Buffer-Const,s==d,xor=1: 3.741130 s 273.714 MB/s
-8388608 128 32 SPLIT 8 8 - - Seed: 1347474531 Buffer-Const,s!=d,xor=0: 3.725367 s 274.872 MB/s Buffer-Const,s!=d,xor=1: 3.786313 s 270.448 MB/s Buffer-Const,s==d,xor=0: 3.661536 s 279.664 MB/s Buffer-Const,s==d,xor=1: 3.663013 s 279.551 MB/s
-16777216 64 32 SPLIT 8 8 - - Seed: 1347474551 Buffer-Const,s!=d,xor=0: 3.733772 s 274.254 MB/s Buffer-Const,s!=d,xor=1: 3.834374 s 267.058 MB/s Buffer-Const,s==d,xor=0: 3.682088 s 278.103 MB/s Buffer-Const,s==d,xor=1: 3.664883 s 279.409 MB/s
-33554432 32 32 SPLIT 8 8 - - Seed: 1347474572 Buffer-Const,s!=d,xor=0: 3.788104 s 270.320 MB/s Buffer-Const,s!=d,xor=1: 3.787767 s 270.344 MB/s Buffer-Const,s==d,xor=0: 3.767594 s 271.792 MB/s Buffer-Const,s==d,xor=1: 3.785537 s 270.503 MB/s
-67108864 16 32 SPLIT 8 8 - - Seed: 1347474592 Buffer-Const,s!=d,xor=0: 3.902282 s 262.411 MB/s Buffer-Const,s!=d,xor=1: 3.781487 s 270.793 MB/s Buffer-Const,s==d,xor=0: 3.793007 s 269.970 MB/s Buffer-Const,s==d,xor=1: 3.694762 s 277.149 MB/s
-134217728 8 32 SPLIT 8 8 - - Seed: 1347474613 Buffer-Const,s!=d,xor=0: 3.803999 s 269.190 MB/s Buffer-Const,s!=d,xor=1: 4.004633 s 255.704 MB/s Buffer-Const,s==d,xor=0: 3.789479 s 270.222 MB/s Buffer-Const,s==d,xor=1: 3.750047 s 273.063 MB/s
-268435456 4 32 SPLIT 8 8 - - Seed: 1347474633 Buffer-Const,s!=d,xor=0: 3.924148 s 260.948 MB/s Buffer-Const,s!=d,xor=1: 3.670553 s 278.977 MB/s Buffer-Const,s==d,xor=0: 3.616194 s 283.171 MB/s Buffer-Const,s==d,xor=1: 3.472242 s 294.910 MB/s
-536870912 2 32 SPLIT 8 8 - - Seed: 1347474654 Buffer-Const,s!=d,xor=0: 3.879471 s 263.954 MB/s Buffer-Const,s!=d,xor=1: 3.399143 s 301.252 MB/s Buffer-Const,s==d,xor=0: 3.431460 s 298.415 MB/s Buffer-Const,s==d,xor=1: 3.755244 s 272.685 MB/s
-1073741824 1 32 SPLIT 8 8 - - Seed: 1347474674 Buffer-Const,s!=d,xor=0: 4.345123 s 235.667 MB/s Buffer-Const,s!=d,xor=1: 3.869906 s 264.606 MB/s Buffer-Const,s==d,xor=0: 3.230677 s 316.961 MB/s Buffer-Const,s==d,xor=1: 3.296187 s 310.662 MB/s
-1024 1048576 32 SPLIT 32 4 NOSSE - Seed: 1347474695 Buffer-Const,s!=d,xor=0: 3.426757 s 298.825 MB/s Buffer-Const,s!=d,xor=1: 3.431886 s 298.378 MB/s Buffer-Const,s==d,xor=0: 3.434533 s 298.148 MB/s Buffer-Const,s==d,xor=1: 3.427667 s 298.745 MB/s
-2048 524288 32 SPLIT 32 4 NOSSE - Seed: 1347474714 Buffer-Const,s!=d,xor=0: 3.157299 s 324.328 MB/s Buffer-Const,s!=d,xor=1: 3.174731 s 322.547 MB/s Buffer-Const,s==d,xor=0: 3.147733 s 325.313 MB/s Buffer-Const,s==d,xor=1: 3.124081 s 327.776 MB/s
-4096 262144 32 SPLIT 32 4 NOSSE - Seed: 1347474732 Buffer-Const,s!=d,xor=0: 2.994873 s 341.918 MB/s Buffer-Const,s!=d,xor=1: 2.995221 s 341.878 MB/s Buffer-Const,s==d,xor=0: 2.977546 s 343.907 MB/s Buffer-Const,s==d,xor=1: 3.072379 s 333.292 MB/s
-8192 131072 32 SPLIT 32 4 NOSSE - Seed: 1347474749 Buffer-Const,s!=d,xor=0: 2.942536 s 347.999 MB/s Buffer-Const,s!=d,xor=1: 3.084363 s 331.997 MB/s Buffer-Const,s==d,xor=0: 3.405338 s 300.704 MB/s Buffer-Const,s==d,xor=1: 2.927504 s 349.786 MB/s
-16384 65536 32 SPLIT 32 4 NOSSE - Seed: 1347474767 Buffer-Const,s!=d,xor=0: 2.898155 s 353.328 MB/s Buffer-Const,s!=d,xor=1: 2.916746 s 351.076 MB/s Buffer-Const,s==d,xor=0: 2.890006 s 354.325 MB/s Buffer-Const,s==d,xor=1: 2.884264 s 355.030 MB/s
-32768 32768 32 SPLIT 32 4 NOSSE - Seed: 1347474784 Buffer-Const,s!=d,xor=0: 2.931310 s 349.332 MB/s Buffer-Const,s!=d,xor=1: 3.416450 s 299.726 MB/s Buffer-Const,s==d,xor=0: 2.887018 s 354.691 MB/s Buffer-Const,s==d,xor=1: 2.879376 s 355.633 MB/s
-65536 16384 32 SPLIT 32 4 NOSSE - Seed: 1347474802 Buffer-Const,s!=d,xor=0: 2.836922 s 360.955 MB/s Buffer-Const,s!=d,xor=1: 2.840663 s 360.479 MB/s Buffer-Const,s==d,xor=0: 2.844574 s 359.984 MB/s Buffer-Const,s==d,xor=1: 2.861463 s 357.859 MB/s
-131072 8192 32 SPLIT 32 4 NOSSE - Seed: 1347474818 Buffer-Const,s!=d,xor=0: 2.847367 s 359.630 MB/s Buffer-Const,s!=d,xor=1: 2.891688 s 354.118 MB/s Buffer-Const,s==d,xor=0: 2.893903 s 353.847 MB/s Buffer-Const,s==d,xor=1: 2.853056 s 358.913 MB/s
-262144 4096 32 SPLIT 32 4 NOSSE - Seed: 1347474835 Buffer-Const,s!=d,xor=0: 2.845535 s 359.862 MB/s Buffer-Const,s!=d,xor=1: 2.883235 s 355.157 MB/s Buffer-Const,s==d,xor=0: 2.825692 s 362.389 MB/s Buffer-Const,s==d,xor=1: 2.824296 s 362.568 MB/s
-524288 2048 32 SPLIT 32 4 NOSSE - Seed: 1347474852 Buffer-Const,s!=d,xor=0: 2.830584 s 361.763 MB/s Buffer-Const,s!=d,xor=1: 2.842232 s 360.280 MB/s Buffer-Const,s==d,xor=0: 2.855167 s 358.648 MB/s Buffer-Const,s==d,xor=1: 2.844668 s 359.972 MB/s
-1048576 1024 32 SPLIT 32 4 NOSSE - Seed: 1347474868 Buffer-Const,s!=d,xor=0: 2.866585 s 357.220 MB/s Buffer-Const,s!=d,xor=1: 2.903829 s 352.638 MB/s Buffer-Const,s==d,xor=0: 2.842242 s 360.279 MB/s Buffer-Const,s==d,xor=1: 2.842065 s 360.301 MB/s
-2097152 512 32 SPLIT 32 4 NOSSE - Seed: 1347474885 Buffer-Const,s!=d,xor=0: 2.881829 s 355.330 MB/s Buffer-Const,s!=d,xor=1: 2.869698 s 356.832 MB/s Buffer-Const,s==d,xor=0: 2.844980 s 359.932 MB/s Buffer-Const,s==d,xor=1: 2.879891 s 355.569 MB/s
-4194304 256 32 SPLIT 32 4 NOSSE - Seed: 1347474902 Buffer-Const,s!=d,xor=0: 2.904719 s 352.530 MB/s Buffer-Const,s!=d,xor=1: 2.957000 s 346.297 MB/s Buffer-Const,s==d,xor=0: 2.897870 s 353.363 MB/s Buffer-Const,s==d,xor=1: 2.860694 s 357.955 MB/s
-8388608 128 32 SPLIT 32 4 NOSSE - Seed: 1347474919 Buffer-Const,s!=d,xor=0: 2.891168 s 354.182 MB/s Buffer-Const,s!=d,xor=1: 2.912499 s 351.588 MB/s Buffer-Const,s==d,xor=0: 2.905373 s 352.450 MB/s Buffer-Const,s==d,xor=1: 2.877376 s 355.880 MB/s
-16777216 64 32 SPLIT 32 4 NOSSE - Seed: 1347474936 Buffer-Const,s!=d,xor=0: 2.874882 s 356.188 MB/s Buffer-Const,s!=d,xor=1: 2.891762 s 354.109 MB/s Buffer-Const,s==d,xor=0: 2.882928 s 355.194 MB/s Buffer-Const,s==d,xor=1: 2.899087 s 353.215 MB/s
-33554432 32 32 SPLIT 32 4 NOSSE - Seed: 1347474952 Buffer-Const,s!=d,xor=0: 2.927485 s 349.788 MB/s Buffer-Const,s!=d,xor=1: 2.908132 s 352.116 MB/s Buffer-Const,s==d,xor=0: 2.885413 s 354.889 MB/s Buffer-Const,s==d,xor=1: 2.878262 s 355.770 MB/s
-67108864 16 32 SPLIT 32 4 NOSSE - Seed: 1347474969 Buffer-Const,s!=d,xor=0: 2.936867 s 348.671 MB/s Buffer-Const,s!=d,xor=1: 2.918213 s 350.900 MB/s Buffer-Const,s==d,xor=0: 2.860039 s 358.037 MB/s Buffer-Const,s==d,xor=1: 2.914023 s 351.404 MB/s
-134217728 8 32 SPLIT 32 4 NOSSE - Seed: 1347474986 Buffer-Const,s!=d,xor=0: 3.004242 s 340.851 MB/s Buffer-Const,s!=d,xor=1: 2.907473 s 352.196 MB/s Buffer-Const,s==d,xor=0: 2.870576 s 356.723 MB/s Buffer-Const,s==d,xor=1: 2.869254 s 356.887 MB/s
-268435456 4 32 SPLIT 32 4 NOSSE - Seed: 1347475003 Buffer-Const,s!=d,xor=0: 3.086275 s 331.792 MB/s Buffer-Const,s!=d,xor=1: 2.917016 s 351.044 MB/s Buffer-Const,s==d,xor=0: 2.872529 s 356.480 MB/s Buffer-Const,s==d,xor=1: 2.876983 s 355.928 MB/s
-536870912 2 32 SPLIT 32 4 NOSSE - Seed: 1347475021 Buffer-Const,s!=d,xor=0: 3.246244 s 315.441 MB/s Buffer-Const,s!=d,xor=1: 2.880565 s 355.486 MB/s Buffer-Const,s==d,xor=0: 2.875096 s 356.162 MB/s Buffer-Const,s==d,xor=1: 2.880929 s 355.441 MB/s
-1073741824 1 32 SPLIT 32 4 NOSSE - Seed: 1347475038 Buffer-Const,s!=d,xor=0: 3.564328 s 287.291 MB/s Buffer-Const,s!=d,xor=1: 2.865621 s 357.340 MB/s Buffer-Const,s==d,xor=0: 2.851534 s 359.105 MB/s Buffer-Const,s==d,xor=1: 2.894613 s 353.761 MB/s
-1024 1048576 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475056 Buffer-Const,s!=d,xor=0: 1.386263 s 738.677 MB/s Buffer-Const,s!=d,xor=1: 1.388797 s 737.329 MB/s Buffer-Const,s==d,xor=0: 1.389924 s 736.731 MB/s Buffer-Const,s==d,xor=1: 1.397714 s 732.625 MB/s
-2048 524288 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475068 Buffer-Const,s!=d,xor=0: 0.861808 s 1188.200 MB/s Buffer-Const,s!=d,xor=1: 0.862678 s 1187.002 MB/s Buffer-Const,s==d,xor=0: 0.858774 s 1192.397 MB/s Buffer-Const,s==d,xor=1: 0.877707 s 1166.676 MB/s
-4096 262144 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475076 Buffer-Const,s!=d,xor=0: 0.599774 s 1707.309 MB/s Buffer-Const,s!=d,xor=1: 0.605536 s 1691.064 MB/s Buffer-Const,s==d,xor=0: 0.594488 s 1722.490 MB/s Buffer-Const,s==d,xor=1: 0.598080 s 1712.145 MB/s
-8192 131072 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475084 Buffer-Const,s!=d,xor=0: 0.463454 s 2209.496 MB/s Buffer-Const,s!=d,xor=1: 0.476521 s 2148.911 MB/s Buffer-Const,s==d,xor=0: 0.463254 s 2210.451 MB/s Buffer-Const,s==d,xor=1: 0.475028 s 2155.663 MB/s
-16384 65536 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475091 Buffer-Const,s!=d,xor=0: 0.403863 s 2535.512 MB/s Buffer-Const,s!=d,xor=1: 0.406392 s 2519.733 MB/s Buffer-Const,s==d,xor=0: 0.398511 s 2569.567 MB/s Buffer-Const,s==d,xor=1: 0.403220 s 2539.558 MB/s
-32768 32768 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475098 Buffer-Const,s!=d,xor=0: 0.366185 s 2796.399 MB/s Buffer-Const,s!=d,xor=1: 0.371948 s 2753.077 MB/s Buffer-Const,s==d,xor=0: 0.365726 s 2799.912 MB/s Buffer-Const,s==d,xor=1: 0.373114 s 2744.470 MB/s
-65536 16384 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475105 Buffer-Const,s!=d,xor=0: 0.355393 s 2881.320 MB/s Buffer-Const,s!=d,xor=1: 0.361260 s 2834.520 MB/s Buffer-Const,s==d,xor=0: 0.352397 s 2905.810 MB/s Buffer-Const,s==d,xor=1: 0.359221 s 2850.615 MB/s
-131072 8192 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475111 Buffer-Const,s!=d,xor=0: 0.345755 s 2961.634 MB/s Buffer-Const,s!=d,xor=1: 0.349291 s 2931.656 MB/s Buffer-Const,s==d,xor=0: 0.349212 s 2932.317 MB/s Buffer-Const,s==d,xor=1: 0.346459 s 2955.613 MB/s
-262144 4096 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475118 Buffer-Const,s!=d,xor=0: 0.339918 s 3012.490 MB/s Buffer-Const,s!=d,xor=1: 0.348600 s 2937.467 MB/s Buffer-Const,s==d,xor=0: 0.337834 s 3031.078 MB/s Buffer-Const,s==d,xor=1: 0.345001 s 2968.103 MB/s
-524288 2048 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475125 Buffer-Const,s!=d,xor=0: 0.341756 s 2996.291 MB/s Buffer-Const,s!=d,xor=1: 0.350183 s 2924.183 MB/s Buffer-Const,s==d,xor=0: 0.339499 s 3016.213 MB/s Buffer-Const,s==d,xor=1: 0.344557 s 2971.934 MB/s
-1048576 1024 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475131 Buffer-Const,s!=d,xor=0: 0.341502 s 2998.519 MB/s Buffer-Const,s!=d,xor=1: 0.346550 s 2954.845 MB/s Buffer-Const,s==d,xor=0: 0.335763 s 3049.766 MB/s Buffer-Const,s==d,xor=1: 0.341348 s 2999.872 MB/s
-2097152 512 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475138 Buffer-Const,s!=d,xor=0: 0.359277 s 2850.168 MB/s Buffer-Const,s!=d,xor=1: 0.400653 s 2555.825 MB/s Buffer-Const,s==d,xor=0: 0.341248 s 3000.750 MB/s Buffer-Const,s==d,xor=1: 0.342671 s 2988.290 MB/s
-4194304 256 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475145 Buffer-Const,s!=d,xor=0: 0.417889 s 2450.411 MB/s Buffer-Const,s!=d,xor=1: 0.473958 s 2160.527 MB/s Buffer-Const,s==d,xor=0: 0.376402 s 2720.496 MB/s Buffer-Const,s==d,xor=1: 0.382395 s 2677.859 MB/s
-8388608 128 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475152 Buffer-Const,s!=d,xor=0: 0.438709 s 2334.120 MB/s Buffer-Const,s!=d,xor=1: 0.458300 s 2234.343 MB/s Buffer-Const,s==d,xor=0: 0.372593 s 2748.306 MB/s Buffer-Const,s==d,xor=1: 0.377737 s 2710.881 MB/s
-16777216 64 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475158 Buffer-Const,s!=d,xor=0: 0.430602 s 2378.066 MB/s Buffer-Const,s!=d,xor=1: 0.457316 s 2239.150 MB/s Buffer-Const,s==d,xor=0: 0.380552 s 2690.828 MB/s Buffer-Const,s==d,xor=1: 0.377189 s 2714.818 MB/s
-33554432 32 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475165 Buffer-Const,s!=d,xor=0: 0.435465 s 2351.507 MB/s Buffer-Const,s!=d,xor=1: 0.463290 s 2210.280 MB/s Buffer-Const,s==d,xor=0: 0.377565 s 2712.118 MB/s Buffer-Const,s==d,xor=1: 0.379561 s 2697.854 MB/s
-67108864 16 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475172 Buffer-Const,s!=d,xor=0: 0.469558 s 2180.775 MB/s Buffer-Const,s!=d,xor=1: 0.454985 s 2250.625 MB/s Buffer-Const,s==d,xor=0: 0.375220 s 2729.069 MB/s Buffer-Const,s==d,xor=1: 0.378372 s 2706.333 MB/s
-134217728 8 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475179 Buffer-Const,s!=d,xor=0: 0.500927 s 2044.211 MB/s Buffer-Const,s!=d,xor=1: 0.461080 s 2220.875 MB/s Buffer-Const,s==d,xor=0: 0.378093 s 2708.328 MB/s Buffer-Const,s==d,xor=1: 0.380782 s 2689.205 MB/s
-268435456 4 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475187 Buffer-Const,s!=d,xor=0: 0.583161 s 1755.947 MB/s Buffer-Const,s!=d,xor=1: 0.454891 s 2251.089 MB/s Buffer-Const,s==d,xor=0: 0.370498 s 2763.848 MB/s Buffer-Const,s==d,xor=1: 0.380160 s 2693.602 MB/s
-536870912 2 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475194 Buffer-Const,s!=d,xor=0: 0.773630 s 1323.630 MB/s Buffer-Const,s!=d,xor=1: 0.449662 s 2277.266 MB/s Buffer-Const,s==d,xor=0: 0.378359 s 2706.425 MB/s Buffer-Const,s==d,xor=1: 0.381460 s 2684.423 MB/s
-1073741824 1 32 SPLIT 32 4 SSE,STDMAP - Seed: 1347475202 Buffer-Const,s!=d,xor=0: 1.140212 s 898.079 MB/s Buffer-Const,s!=d,xor=1: 0.448195 s 2284.720 MB/s Buffer-Const,s==d,xor=0: 0.371347 s 2757.529 MB/s Buffer-Const,s==d,xor=1: 0.383728 s 2668.557 MB/s
-1024 1048576 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475210 Buffer-Const,s!=d,xor=0: 1.306085 s 784.023 MB/s Buffer-Const,s!=d,xor=1: 1.316872 s 777.600 MB/s Buffer-Const,s==d,xor=0: 1.312451 s 780.220 MB/s Buffer-Const,s==d,xor=1: 1.336282 s 766.305 MB/s
-2048 524288 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475221 Buffer-Const,s!=d,xor=0: 0.780763 s 1311.537 MB/s Buffer-Const,s!=d,xor=1: 0.788499 s 1298.670 MB/s Buffer-Const,s==d,xor=0: 0.774973 s 1321.336 MB/s Buffer-Const,s==d,xor=1: 0.787734 s 1299.931 MB/s
-4096 262144 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475229 Buffer-Const,s!=d,xor=0: 0.509444 s 2010.036 MB/s Buffer-Const,s!=d,xor=1: 0.528554 s 1937.360 MB/s Buffer-Const,s==d,xor=0: 0.515298 s 1987.198 MB/s Buffer-Const,s==d,xor=1: 0.533344 s 1919.963 MB/s
-8192 131072 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475237 Buffer-Const,s!=d,xor=0: 0.385064 s 2659.301 MB/s Buffer-Const,s!=d,xor=1: 0.389860 s 2626.586 MB/s Buffer-Const,s==d,xor=0: 0.377777 s 2710.597 MB/s Buffer-Const,s==d,xor=1: 0.389788 s 2627.068 MB/s
-16384 65536 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475244 Buffer-Const,s!=d,xor=0: 0.316446 s 3235.938 MB/s Buffer-Const,s!=d,xor=1: 0.327997 s 3121.980 MB/s Buffer-Const,s==d,xor=0: 0.313605 s 3265.256 MB/s Buffer-Const,s==d,xor=1: 0.323668 s 3163.736 MB/s
-32768 32768 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475250 Buffer-Const,s!=d,xor=0: 0.280216 s 3654.318 MB/s Buffer-Const,s!=d,xor=1: 0.293557 s 3488.244 MB/s Buffer-Const,s==d,xor=0: 0.278453 s 3677.463 MB/s Buffer-Const,s==d,xor=1: 0.296944 s 3448.460 MB/s
-65536 16384 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475256 Buffer-Const,s!=d,xor=0: 0.302436 s 3385.842 MB/s Buffer-Const,s!=d,xor=1: 0.277890 s 3684.909 MB/s Buffer-Const,s==d,xor=0: 0.262908 s 3894.892 MB/s Buffer-Const,s==d,xor=1: 0.272852 s 3752.951 MB/s
-131072 8192 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475263 Buffer-Const,s!=d,xor=0: 0.253372 s 4041.493 MB/s Buffer-Const,s!=d,xor=1: 0.265148 s 3861.999 MB/s Buffer-Const,s==d,xor=0: 0.253380 s 4041.364 MB/s Buffer-Const,s==d,xor=1: 0.264949 s 3864.897 MB/s
-262144 4096 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475269 Buffer-Const,s!=d,xor=0: 0.252645 s 4053.125 MB/s Buffer-Const,s!=d,xor=1: 0.265852 s 3851.771 MB/s Buffer-Const,s==d,xor=0: 0.252493 s 4055.552 MB/s Buffer-Const,s==d,xor=1: 0.261079 s 3922.183 MB/s
-524288 2048 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475276 Buffer-Const,s!=d,xor=0: 0.250466 s 4088.377 MB/s Buffer-Const,s!=d,xor=1: 0.262400 s 3902.444 MB/s Buffer-Const,s==d,xor=0: 0.250604 s 4086.133 MB/s Buffer-Const,s==d,xor=1: 0.266080 s 3848.461 MB/s
-1048576 1024 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475282 Buffer-Const,s!=d,xor=0: 0.261790 s 3911.528 MB/s Buffer-Const,s!=d,xor=1: 0.270695 s 3782.856 MB/s Buffer-Const,s==d,xor=0: 0.251318 s 4074.523 MB/s Buffer-Const,s==d,xor=1: 0.262138 s 3906.337 MB/s
-2097152 512 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475288 Buffer-Const,s!=d,xor=0: 0.307526 s 3329.799 MB/s Buffer-Const,s!=d,xor=1: 0.335713 s 3050.225 MB/s Buffer-Const,s==d,xor=0: 0.251394 s 4073.291 MB/s Buffer-Const,s==d,xor=1: 0.261434 s 3916.854 MB/s
-4194304 256 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475295 Buffer-Const,s!=d,xor=0: 0.392351 s 2609.907 MB/s Buffer-Const,s!=d,xor=1: 0.407979 s 2509.932 MB/s Buffer-Const,s==d,xor=0: 0.298268 s 3433.150 MB/s Buffer-Const,s==d,xor=1: 0.307510 s 3329.977 MB/s
-8388608 128 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475301 Buffer-Const,s!=d,xor=0: 0.382194 s 2679.271 MB/s Buffer-Const,s!=d,xor=1: 0.401781 s 2548.653 MB/s Buffer-Const,s==d,xor=0: 0.299551 s 3418.447 MB/s Buffer-Const,s==d,xor=1: 0.310157 s 3301.553 MB/s
-16777216 64 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475308 Buffer-Const,s!=d,xor=0: 0.380721 s 2689.631 MB/s Buffer-Const,s!=d,xor=1: 0.407525 s 2512.729 MB/s Buffer-Const,s==d,xor=0: 0.312348 s 3278.393 MB/s Buffer-Const,s==d,xor=1: 0.315135 s 3249.401 MB/s
-33554432 32 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475315 Buffer-Const,s!=d,xor=0: 0.417304 s 2453.845 MB/s Buffer-Const,s!=d,xor=1: 0.399624 s 2562.406 MB/s Buffer-Const,s==d,xor=0: 0.301665 s 3394.496 MB/s Buffer-Const,s==d,xor=1: 0.308625 s 3317.940 MB/s
-67108864 16 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475322 Buffer-Const,s!=d,xor=0: 0.409972 s 2497.732 MB/s Buffer-Const,s!=d,xor=1: 0.390287 s 2623.712 MB/s Buffer-Const,s==d,xor=0: 0.300863 s 3403.539 MB/s Buffer-Const,s==d,xor=1: 0.310340 s 3299.610 MB/s
-134217728 8 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475328 Buffer-Const,s!=d,xor=0: 0.462659 s 2213.291 MB/s Buffer-Const,s!=d,xor=1: 0.394245 s 2597.369 MB/s Buffer-Const,s==d,xor=0: 0.304025 s 3368.140 MB/s Buffer-Const,s==d,xor=1: 0.305459 s 3352.329 MB/s
-268435456 4 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475335 Buffer-Const,s!=d,xor=0: 0.535408 s 1912.560 MB/s Buffer-Const,s!=d,xor=1: 0.389819 s 2626.859 MB/s Buffer-Const,s==d,xor=0: 0.300778 s 3404.505 MB/s Buffer-Const,s==d,xor=1: 0.309189 s 3311.892 MB/s
-536870912 2 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475342 Buffer-Const,s!=d,xor=0: 0.697741 s 1467.594 MB/s Buffer-Const,s!=d,xor=1: 0.391113 s 2618.169 MB/s Buffer-Const,s==d,xor=0: 0.297088 s 3446.786 MB/s Buffer-Const,s==d,xor=1: 0.312841 s 3273.229 MB/s
-1073741824 1 32 SPLIT 32 4 SSE,ALTMAP - Seed: 1347475350 Buffer-Const,s!=d,xor=0: 1.069489 s 957.467 MB/s Buffer-Const,s!=d,xor=1: 0.396330 s 2583.705 MB/s Buffer-Const,s==d,xor=0: 0.315887 s 3241.666 MB/s Buffer-Const,s==d,xor=1: 0.307323 s 3331.999 MB/s
+Tables[0] = 0000000000000000 3b60e7ccf8f4454e 76c1cf99f1e88a9c 4da12855091ccfd2 ed839f33e3d11538 d6e378ff1b255076 9b4250aa12399fa4 a022b766eacddaea db073e67c7a22a6b e067d9ab3f566f25 adc6f1fe364aa0f7 96a61632cebee5b9 3684a15424733f53 0de44698dc877a1d 40456ecdd59bb5cf 7b2589012d6ff081
+Tij            81 cf 1d 53   b9 f7 25 6b   ea a4 76 38   d2 9c 4e 00
+Tij            f0 b5 7a 3f   e5 a0 6f 2a   da 9f 50 15   cf 8a 45 00
+Tij            6f 9b 87 73   be 4a 56 a2   cd 39 25 d1   1c e8 f4 00
+Tij            2d d5 dc 24   ce 36 3f c7   ea 12 1b e3   09 f1 f8 00
+Tij            01 cd 98 54   32 fe ab 67   66 aa ff 33   55 99 cc 00
+Tij            89 6e 46 a1   16 f1 d9 3e   b7 50 78 9f   28 cf e7 00
+Tij            25 45 e4 84   a6 c6 67 07   22 42 e3 83   a1 c1 60 00
+Tij            7b 40 0d 36   96 ad e0 db   a0 9b d6 ed   4d 76 3b 00
+Tables[1] = 0000000000000000 b60e7ccf8f4454cd 6c1cf99f1e88a981 da12855091ccfd4c d839f33e3d115302 6e378ff1b25507cf b4250aa12399fa83 022b766eacddae4e b073e67c7a22a61f 067d9ab3f566f2d2 dc6f1fe364aa0f9e 6a61632cebee5b53 684a15424733f51d de44698dc877a1d0 0456ecdd59bb5c9c b2589012d6ff0851
+Tij            51 9c d0 1d   53 9e d2 1f   4e 83 cf 02   4c 81 cd 00
+Tij            08 5c a1 f5   5b 0f f2 a6   ae fa 07 53   fd a9 54 00
+Tij            ff bb 77 33   ee aa 66 22   dd 99 55 11   cc 88 44 00
+Tij            d6 59 c8 47   eb 64 f5 7a   ac 23 b2 3d   91 1e 8f 00
+Tij            12 dd 8d 42   2c e3 b3 7c   6e a1 f1 3e   50 9f cf 00
+Tij            90 ec 69 15   63 1f 9a e6   76 0a 8f f3   85 f9 7c 00
+Tij            58 56 44 4a   61 6f 7d 73   2b 25 37 39   12 1c 0e 00
+Tij            b2 04 de 68   6a dc 06 b0   02 b4 6e d8   da 6c b6 00
+Tables[2] = 0000000000000000 60e7ccf8f4454c25 c1cf99f1e88a984a a12855091ccfd46f 839f33e3d115308f e378ff1b25507caa 4250aa12399fa8c5 22b766eacddae4e0 073e67c7a22a6105 67d9ab3f566f2d20 c6f1fe364aa0f94f a61632cebee5b56a 84a15424733f518a e44698dc877a1daf 456ecdd59bb5c9c0 2589012d6ff085e5
+Tij            e5 c0 af 8a   6a 4f 20 05   e0 c5 aa 8f   6f 4a 25 00
+Tij            85 c9 1d 51   b5 f9 2d 61   e4 a8 7c 30   d4 98 4c 00
+Tij            f0 b5 7a 3f   e5 a0 6f 2a   da 9f 50 15   cf 8a 45 00
+Tij            6f 9b 87 73   be 4a 56 a2   cd 39 25 d1   1c e8 f4 00
+Tij            2d d5 dc 24   ce 36 3f c7   ea 12 1b e3   09 f1 f8 00
+Tij            01 cd 98 54   32 fe ab 67   66 aa ff 33   55 99 cc 00
+Tij            89 6e 46 a1   16 f1 d9 3e   b7 50 78 9f   28 cf e7 00
+Tij            25 45 e4 84   a6 c6 67 07   22 42 e3 83   a1 c1 60 00
+Tables[3] = 0000000000000000 0e7ccf8f4454c20a 1cf99f1e88a98414 12855091ccfd461e 39f33e3d11530828 378ff1b25507ca22 250aa12399fa8c3c 2b766eacddae4e36 73e67c7a22a61050 7d9ab3f566f2d25a 6f1fe364aa0f9444 61632cebee5b564e 4a15424733f51878 44698dc877a1da72 56ecdd59bb5c9c6c 589012d6ff085e66
+Tij            66 6c 72 78   4e 44 5a 50   36 3c 22 28   1e 14 0a 00
+Tij            5e 9c da 18   56 94 d2 10   4e 8c ca 08   46 84 c2 00
+Tij            08 5c a1 f5   5b 0f f2 a6   ae fa 07 53   fd a9 54 00
+Tij            ff bb 77 33   ee aa 66 22   dd 99 55 11   cc 88 44 00
+Tij            d6 59 c8 47   eb 64 f5 7a   ac 23 b2 3d   91 1e 8f 00
+Tij            12 dd 8d 42   2c e3 b3 7c   6e a1 f1 3e   50 9f cf 00
+Tij            90 ec 69 15   63 1f 9a e6   76 0a 8f f3   85 f9 7c 00
+Tij            58 56 44 4a   61 6f 7d 73   2b 25 37 39   12 1c 0e 00
+Tables[4] = 0000000000000000 e7ccf8f4454c20a0 cf99f1e88a98415b 2855091ccfd461fb 9f33e3d1153082ad 78ff1b25507ca20d 50aa12399fa8c3f6 b766eacddae4e356 3e67c7a22a610541 d9ab3f566f2d25e1 f1fe364aa0f9441a 1632cebee5b564ba a15424733f5187ec 4698dc877a1da74c 6ecdd59bb5c9c6b7 89012d6ff085e617
+Tij            17 b7 4c ec   ba 1a e1 41   56 f6 0d ad   fb 5b a0 00
+Tij            e6 c6 a7 87   64 44 25 05   e3 c3 a2 82   61 41 20 00
+Tij            85 c9 1d 51   b5 f9 2d 61   e4 a8 7c 30   d4 98 4c 00
+Tij            f0 b5 7a 3f   e5 a0 6f 2a   da 9f 50 15   cf 8a 45 00
+Tij            6f 9b 87 73   be 4a 56 a2   cd 39 25 d1   1c e8 f4 00
+Tij            2d d5 dc 24   ce 36 3f c7   ea 12 1b e3   09 f1 f8 00
+Tij            01 cd 98 54   32 fe ab 67   66 aa ff 33   55 99 cc 00
+Tij            89 6e 46 a1   16 f1 d9 3e   b7 50 78 9f   28 cf e7 00
+Tables[5] = 0000000000000000 7ccf8f4454c20a82 f99f1e88a9841504 855091ccfd461f86 f33e3d1153082a13 8ff1b25507ca2091 0aa12399fa8c3f17 766eacddae4e3595 e67c7a22a610543d 9ab3f566f2d25ebf 1fe364aa0f944139 632cebee5b564bbb 15424733f5187e2e 698dc877a1da74ac ecdd59bb5c9c6b2a 9012d6ff085e61a8
+Tij            a8 2a ac 2e   bb 39 bf 3d   95 17 91 13   86 04 82 00
+Tij            61 6b 74 7e   4b 41 5e 54   35 3f 20 2a   1f 15 0a 00
+Tij            5e 9c da 18   56 94 d2 10   4e 8c ca 08   46 84 c2 00
+Tij            08 5c a1 f5   5b 0f f2 a6   ae fa 07 53   fd a9 54 00
+Tij            ff bb 77 33   ee aa 66 22   dd 99 55 11   cc 88 44 00
+Tij            d6 59 c8 47   eb 64 f5 7a   ac 23 b2 3d   91 1e 8f 00
+Tij            12 dd 8d 42   2c e3 b3 7c   6e a1 f1 3e   50 9f cf 00
+Tij            90 ec 69 15   63 1f 9a e6   76 0a 8f f3   85 f9 7c 00
+Tables[6] = 0000000000000000 ccf8f4454c20a861 99f1e88a984150d9 55091ccfd461f8b8 33e3d1153082a1a9 ff1b25507ca209c8 aa12399fa8c3f170 66eacddae4e35911 67c7a22a61054352 ab3f566f2d25eb33 fe364aa0f944138b 32cebee5b564bbea 5424733f5187e2fb 98dc877a1da74a9a cdd59bb5c9c6b222 012d6ff085e61a43
+Tij            43 22 9a fb   ea 8b 33 52   11 70 c8 a9   b8 d9 61 00
+Tij            1a b2 4a e2   bb 13 eb 43   59 f1 09 a1   f8 50 a8 00
+Tij            e6 c6 a7 87   64 44 25 05   e3 c3 a2 82   61 41 20 00
+Tij            85 c9 1d 51   b5 f9 2d 61   e4 a8 7c 30   d4 98 4c 00
+Tij            f0 b5 7a 3f   e5 a0 6f 2a   da 9f 50 15   cf 8a 45 00
+Tij            6f 9b 87 73   be 4a 56 a2   cd 39 25 d1   1c e8 f4 00
+Tij            2d d5 dc 24   ce 36 3f c7   ea 12 1b e3   09 f1 f8 00
+Tij            01 cd 98 54   32 fe ab 67   66 aa ff 33   55 99 cc 00
+Tables[7] = 0000000000000000 cf8f4454c20a86a4 9f1e88a984150d53 5091ccfd461f8bf7 3e3d1153082a1abd f1b25507ca209c19 a12399fa8c3f17ee 6eacddae4e35914a 7c7a22a61054357a b3f566f2d25eb3de e364aa0f94413829 2cebee5b564bbe8d 424733f5187e2fc7 8dc877a1da74a963 dd59bb5c9c6b2294 12d6ff085e61a430
+Tij            30 94 63 c7   8d 29 de 7a   4a ee 19 bd   f7 53 a4 00
+Tij            a4 22 a9 2f   be 38 b3 35   91 17 9c 1a   8b 0d 86 00
+Tij            61 6b 74 7e   4b 41 5e 54   35 3f 20 2a   1f 15 0a 00
+Tij            5e 9c da 18   56 94 d2 10   4e 8c ca 08   46 84 c2 00
+Tij            08 5c a1 f5   5b 0f f2 a6   ae fa 07 53   fd a9 54 00
+Tij            ff bb 77 33   ee aa 66 22   dd 99 55 11   cc 88 44 00
+Tij            d6 59 c8 47   eb 64 f5 7a   ac 23 b2 3d   91 1e 8f 00
+Tij            12 dd 8d 42   2c e3 b3 7c   6e a1 f1 3e   50 9f cf 00
+Tables[8] = 0000000000000000 f8f4454c20a86af4 f1e88a984150d5f3 091ccfd461f8bf07 e3d1153082a1abfd 1b25507ca209c109 12399fa8c3f17e0e eacddae4e35914fa c7a22a61054357e1 3f566f2d25eb3d15 364aa0f944138212 cebee5b564bbe8e6 24733f5187e2fc1c dc877a1da74a96e8 d59bb5c9c6b229ef 2d6ff085e61a431b
+Tij            1b ef e8 1c   e6 12 15 e1   fa 0e 09 fd   07 f3 f4 00
+Tij            43 29 96 fc   e8 82 3d 57   14 7e c1 ab   bf d5 6a 00
+Tij            1a b2 4a e2   bb 13 eb 43   59 f1 09 a1   f8 50 a8 00
+Tij            e6 c6 a7 87   64 44 25 05   e3 c3 a2 82   61 41 20 00
+Tij            85 c9 1d 51   b5 f9 2d 61   e4 a8 7c 30   d4 98 4c 00
+Tij            f0 b5 7a 3f   e5 a0 6f 2a   da 9f 50 15   cf 8a 45 00
+Tij            6f 9b 87 73   be 4a 56 a2   cd 39 25 d1   1c e8 f4 00
+Tij            2d d5 dc 24   ce 36 3f c7   ea 12 1b e3   09 f1 f8 00
+Tables[9] = 0000000000000000 8f4454c20a86afd9 1e88a984150d5fa9 91ccfd461f8bf070 3d1153082a1abf52 b25507ca209c108b 2399fa8c3f17e0fb acddae4e35914f22 7a22a61054357ea4 f566f2d25eb3d17d 64aa0f944138210d ebee5b564bbe8ed4 4733f5187e2fc1f6 c877a1da74a96e2f 59bb5c9c6b229e5f d6ff085e61a43186
+Tij            86 5f 2f f6   d4 0d 7d a4   22 fb 8b 52   70 a9 d9 00
+Tij            31 9e 6e c1   8e 21 d1 7e   4f e0 10 bf   f0 5f af 00
+Tij            a4 22 a9 2f   be 38 b3 35   91 17 9c 1a   8b 0d 86 00
+Tij            61 6b 74 7e   4b 41 5e 54   35 3f 20 2a   1f 15 0a 00
+Tij            5e 9c da 18   56 94 d2 10   4e 8c ca 08   46 84 c2 00
+Tij            08 5c a1 f5   5b 0f f2 a6   ae fa 07 53   fd a9 54 00
+Tij            ff bb 77 33   ee aa 66 22   dd 99 55 11   cc 88 44 00
+Tij            d6 59 c8 47   eb 64 f5 7a   ac 23 b2 3d   91 1e 8f 00
+Tables[10] = 0000000000000000 f4454c20a86afd48 e88a984150d5fa8b 1ccfd461f8bf07c3 d1153082a1abf50d 25507ca209c10845 399fa8c3f17e0f86 cddae4e35914f2ce a22a61054357ea01 566f2d25eb3d1749 4aa0f9441382108a bee5b564bbe8edc2 733f5187e2fc1f0c 877a1da74a96e244 9bb5c9c6b229e587 6ff085e61a4318cf
+Tij            cf 87 44 0c   c2 8a 49 01   ce 86 45 0d   c3 8b 48 00
+Tij            18 e5 e2 1f   ed 10 17 ea   f2 0f 08 f5   07 fa fd 00
+Tij            43 29 96 fc   e8 82 3d 57   14 7e c1 ab   bf d5 6a 00
+Tij            1a b2 4a e2   bb 13 eb 43   59 f1 09 a1   f8 50 a8 00
+Tij            e6 c6 a7 87   64 44 25 05   e3 c3 a2 82   61 41 20 00
+Tij            85 c9 1d 51   b5 f9 2d 61   e4 a8 7c 30   d4 98 4c 00
+Tij            f0 b5 7a 3f   e5 a0 6f 2a   da 9f 50 15   cf 8a 45 00
+Tij            6f 9b 87 73   be 4a 56 a2   cd 39 25 d1   1c e8 f4 00
+Tables[11] = 0000000000000000 4454c20a86afd419 88a984150d5fa832 ccfd461f8bf07c2b 1153082a1abf507f 5507ca209c108466 99fa8c3f17e0f84d ddae4e35914f2c54 22a61054357ea0fe 66f2d25eb3d174e7 aa0f9441382108cc ee5b564bbe8edcd5 33f5187e2fc1f081 77a1da74a96e2498 bb5c9c6b229e58b3 ff085e61a4318caa
+Tij            aa b3 98 81   d5 cc e7 fe   54 4d 66 7f   2b 32 19 00
+Tij            8c 58 24 f0   dc 08 74 a0   2c f8 84 50   7c a8 d4 00
+Tij            31 9e 6e c1   8e 21 d1 7e   4f e0 10 bf   f0 5f af 00
+Tij            a4 22 a9 2f   be 38 b3 35   91 17 9c 1a   8b 0d 86 00
+Tij            61 6b 74 7e   4b 41 5e 54   35 3f 20 2a   1f 15 0a 00
+Tij            5e 9c da 18   56 94 d2 10   4e 8c ca 08   46 84 c2 00
+Tij            08 5c a1 f5   5b 0f f2 a6   ae fa 07 53   fd a9 54 00
+Tij            ff bb 77 33   ee aa 66 22   dd 99 55 11   cc 88 44 00
+Tables[12] = 0000000000000000 454c20a86afd41fc 8a984150d5fa83f8 cfd461f8bf07c204 153082a1abf507eb 507ca209c1084617 9fa8c3f17e0f8413 dae4e35914f2c5ef 2a61054357ea0fd6 6f2d25eb3d174e2a a0f9441382108c2e e5b564bbe8edcdd2 3f5187e2fc1f083d 7a1da74a96e249c1 b5c9c6b229e58bc5 f085e61a4318ca39
+Tij            39 c5 c1 3d   d2 2e 2a d6   ef 13 17 eb   04 f8 fc 00
+Tij            ca 8b 49 08   cd 8c 4e 0f   c5 84 46 07   c2 83 41 00
+Tij            18 e5 e2 1f   ed 10 17 ea   f2 0f 08 f5   07 fa fd 00
+Tij            43 29 96 fc   e8 82 3d 57   14 7e c1 ab   bf d5 6a 00
+Tij            1a b2 4a e2   bb 13 eb 43   59 f1 09 a1   f8 50 a8 00
+Tij            e6 c6 a7 87   64 44 25 05   e3 c3 a2 82   61 41 20 00
+Tij            85 c9 1d 51   b5 f9 2d 61   e4 a8 7c 30   d4 98 4c 00
+Tij            f0 b5 7a 3f   e5 a0 6f 2a   da 9f 50 15   cf 8a 45 00
+Tables[13] = 0000000000000000 54c20a86afd41fac a984150d5fa83f58 fd461f8bf07c20f4 53082a1abf507eab 07ca209c10846107 fa8c3f17e0f841f3 ae4e35914f2c5e5f a61054357ea0fd56 f2d25eb3d174e2fa 0f9441382108c20e 5b564bbe8edcdda2 f5187e2fc1f083fd a1da74a96e249c51 5c9c6b229e58bca5 085e61a4318ca309
+Tij            09 a5 51 fd   a2 0e fa 56   5f f3 07 ab   f4 58 ac 00
+Tij            a3 bc 9c 83   dd c2 e2 fd   5e 41 61 7e   20 3f 1f 00
+Tij            8c 58 24 f0   dc 08 74 a0   2c f8 84 50   7c a8 d4 00
+Tij            31 9e 6e c1   8e 21 d1 7e   4f e0 10 bf   f0 5f af 00
+Tij            a4 22 a9 2f   be 38 b3 35   91 17 9c 1a   8b 0d 86 00
+Tij            61 6b 74 7e   4b 41 5e 54   35 3f 20 2a   1f 15 0a 00
+Tij            5e 9c da 18   56 94 d2 10   4e 8c ca 08   46 84 c2 00
+Tij            08 5c a1 f5   5b 0f f2 a6   ae fa 07 53   fd a9 54 00
+Tables[14] = 0000000000000000 4c20a86afd41fab7 984150d5fa83f56e d461f8bf07c20fd9 3082a1abf507eac7 7ca209c108461070 a8c3f17e0f841fa9 e4e35914f2c5e51e 61054357ea0fd58e 2d25eb3d174e2f39 f9441382108c20e0 b564bbe8edcdda57 5187e2fc1f083f49 1da74a96e249c5fe c9c6b229e58bca27 85e61a4318ca3090
+Tij            90 27 fe 49   57 e0 39 8e   1e a9 70 c7   d9 6e b7 00
+Tij            30 ca c5 3f   da 20 2f d5   e5 1f 10 ea   0f f5 fa 00
+Tij            ca 8b 49 08   cd 8c 4e 0f   c5 84 46 07   c2 83 41 00
+Tij            18 e5 e2 1f   ed 10 17 ea   f2 0f 08 f5   07 fa fd 00
+Tij            43 29 96 fc   e8 82 3d 57   14 7e c1 ab   bf d5 6a 00
+Tij            1a b2 4a e2   bb 13 eb 43   59 f1 09 a1   f8 50 a8 00
+Tij            e6 c6 a7 87   64 44 25 05   e3 c3 a2 82   61 41 20 00
+Tij            85 c9 1d 51   b5 f9 2d 61   e4 a8 7c 30   d4 98 4c 00
+Tables[15] = 0000000000000000 c20a86afd41fab1c 84150d5fa83f5623 461f8bf07c20fd3f 082a1abf507eac5d ca209c1084610741 8c3f17e0f841fa7e 4e35914f2c5e5162 1054357ea0fd58ba d25eb3d174e2f3a6 9441382108c20e99 564bbe8edcdda585 187e2fc1f083f4e7 da74a96e249c5ffb 9c6b229e58bca2c4 5e61a4318ca309d8
+Tij            d8 c4 fb e7   85 99 a6 ba   62 7e 41 5d   3f 23 1c 00
+Tij            09 a2 5f f4   a5 0e f3 58   51 fa 07 ac   fd 56 ab 00
+Tij            a3 bc 9c 83   dd c2 e2 fd   5e 41 61 7e   20 3f 1f 00
+Tij            8c 58 24 f0   dc 08 74 a0   2c f8 84 50   7c a8 d4 00
+Tij            31 9e 6e c1   8e 21 d1 7e   4f e0 10 bf   f0 5f af 00
+Tij            a4 22 a9 2f   be 38 b3 35   91 17 9c 1a   8b 0d 86 00
+Tij            61 6b 74 7e   4b 41 5e 54   35 3f 20 2a   1f 15 0a 00
+Tij            5e 9c da 18   56 94 d2 10   4e 8c ca 08   46 84 c2 00
+Val= 3b60e7ccf8f4454e
+v0             28 4f 14 e3   1b f7 ee 76   b9 31 47 0a   ba 8b 70 fc
+v0             12 56 28 59   66 cd d2 d2   1c 91 30 26   a8 95 0a a9
+v0             ee 5d 14 e3   fb c8 45 23   a9 fd 8c f1   ff c9 2c 93
+v0             65 ce 82 f2   dc ec 6b e2   53 a3 9c fb   07 70 e7 ad
+v0             1b 87 3d 7b   4d 15 1d c2   d2 45 f3 03   4b e4 f4 9b
+v0             3b 01 2b c5   c5 d2 9d a9   68 7c a2 61   c9 5b 49 90
+v0             5d 13 7d ef   eb f1 52 da   a0 29 89 ef   08 f2 51 3b
+v0             17 05 b3 80   77 3a f2 5e   82 7a c9 39   84 df 8e bf
+
+p0             11 fc 47 f4   6c 01 44 ba   ba 62 e7 3f   ba fb ba 85
+p0             a6 fc 67 16   5f c3 95 fc   58 51 f4 fd   58 5f 58 a5
+p0             12 fc 1f b3   50 1e 3f 9a   fd 5e 83 20   fd 9c fd dd
+p0             d9 fc 1e ee   22 42 10 7f   a0 2c f0 7c   a0 24 a0 dc
+p0             a2 fc 4c 30   41 ce ad eb   7e 4f c1 f0   7e 6e 7e 8e
+p0             8b fc 7c 7b   9f b5 38 67   35 91 2f 8b   35 a9 35 be
+p0             07 fc 89 1a   3b 21 fd db   54 35 7e 1f   54 74 54 4b
+p0             cf fc 94 5e   40 78 c2 31   10 4e 18 46   10 da 10 56

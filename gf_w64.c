@@ -704,6 +704,32 @@ gf_val_64_t gf_w64_composite_extract_word(gf_t *gf, void *start, int bytes, int 
 }
 
 static
+gf_val_64_t gf_w64_split_extract_word(gf_t *gf, void *start, int bytes, int index)
+{
+  int i;
+  uint64_t *r64, rv;
+  uint8_t *r8;
+  gf_region_data rd;
+
+  gf_set_region_data(&rd, gf, start, start, bytes, 0, 0, 128);
+  r64 = (uint64_t *) start;
+  if (r64 + index < (uint64_t *) rd.d_start) return r64[index];
+  if (r64 + index >= (uint64_t *) rd.d_top) return r64[index];
+  index -= (((uint64_t *) rd.d_start) - r64);
+  r8 = (uint8_t *) rd.d_start;
+  r8 += ((index & 0xfffffff0)*8);
+  r8 += (index & 0xf);
+  r8 += 112;
+  rv =0;
+  for (i = 0; i < 8; i++) {
+    rv <<= 8;
+    rv |= *r8;
+    r8 -= 16;
+  }
+  return rv;
+}
+
+static
 inline
 gf_val_64_t
 gf_w64_bytwo_b_multiply (gf_t *gf, gf_val_64_t a, gf_val_64_t b)
@@ -1235,6 +1261,88 @@ int gf_w64_composite_init(gf_t *gf)
   return 1;
 }
 
+static
+void
+gf_w64_split_4_64_lazy_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
+{
+#ifdef INTEL_SSE4
+  gf_internal_t *h;
+  int i, m, j, k, tindex;
+  uint64_t pp, v, s, *s64, *d64, *top;
+  __m128i si, tables[16][8], p[8], v0, mask1;
+  struct gf_split_4_64_lazy_data *ld;
+  uint8_t btable[16];
+  gf_region_data rd;
+
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+
+  h = (gf_internal_t *) gf->scratch;
+  pp = h->prim_poly;
+ 
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 128);
+  gf_do_initial_region_alignment(&rd);
+
+  s64 = (uint64_t *) rd.s_start;
+  d64 = (uint64_t *) rd.d_start;
+  top = (uint64_t *) rd.d_top;
+ 
+  ld = (struct gf_split_4_64_lazy_data *) h->private;
+
+  v = val;
+  for (i = 0; i < 16; i++) {
+    ld->tables[i][0] = 0;
+    for (j = 1; j < 16; j <<= 1) {
+      for (k = 0; k < j; k++) {
+        ld->tables[i][k^j] = (v ^ ld->tables[i][k]);
+      }
+      v = (v & GF_FIRST_BIT) ? ((v << 1) ^ pp) : (v << 1);
+    }
+    for (j = 0; j < 8; j++) {
+      for (k = 0; k < 16; k++) {
+        btable[k] = (uint8_t) ld->tables[i][k];
+        ld->tables[i][k] >>= 8;
+      }
+      tables[i][j] = _mm_loadu_si128((__m128i *) btable);
+    }
+  }
+
+  mask1 = _mm_set1_epi8(0xf);
+
+  while (d64 != top) {
+
+    if (xor) {
+      for (i = 0; i < 8; i++) p[i] = _mm_load_si128 ((__m128i *) (d64+i*2));
+    } else {
+      for (i = 0; i < 8; i++) p[i] = _mm_setzero_si128();
+    }
+    i = 0;
+    for (k = 0; k < 8; k++) {
+      v0 = _mm_load_si128((__m128i *) s64); 
+      s64 += 2;
+      
+      si = _mm_and_si128(v0, mask1);
+  
+      for (j = 0; j < 8; j++) {
+        p[j] = _mm_xor_si128(p[j], _mm_shuffle_epi8(tables[i][j], si));
+      }
+      i++;
+      v0 = _mm_srli_epi32(v0, 4);
+      si = _mm_and_si128(v0, mask1);
+      for (j = 0; j < 8; j++) {
+        p[j] = _mm_xor_si128(p[j], _mm_shuffle_epi8(tables[i][j], si));
+      }
+      i++;
+    }
+    for (i = 0; i < 8; i++) {
+      _mm_store_si128((__m128i *) d64, p[i]);
+      d64 += 2;
+    }
+  }
+  gf_do_final_region_alignment(&rd);
+#endif
+}
+
 #define GF_MULTBY_TWO(p) (((p) & GF_FIRST_BIT) ? (((p) << 1) ^ h->prim_poly) : (p) << 1);
 
 static
@@ -1258,7 +1366,15 @@ int gf_w64_split_init(gf_t *gf)
   if ((h->arg1 == 4 && h->arg2 == 64) || (h->arg1 == 64 && h->arg2 == 4)) {
     d4 = (struct gf_split_4_64_lazy_data *) h->private;
     d4->last_value = 0;
-    gf->multiply_region.w64 = gf_w64_split_4_64_lazy_multiply_region;
+    if (h->region_type & GF_REGION_SSE) {
+      if (h->region_type & GF_REGION_ALTMAP) {
+        gf->multiply_region.w64 = gf_w64_split_4_64_lazy_sse_altmap_multiply_region; 
+      } else {
+/*        gf->multiply_region.w32 = gf_w32_split_4_32_lazy_sse_multiply_region; */
+      }
+    } else {
+      gf->multiply_region.w64 = gf_w64_split_4_64_lazy_multiply_region;
+    }
   }
   if ((h->arg1 == 8 && h->arg2 == 64) || (h->arg1 == 64 && h->arg2 == 8)) {
     d8 = (struct gf_split_8_64_lazy_data *) h->private;
@@ -1351,14 +1467,13 @@ int gf_w64_scratch_size(int mult_type, int region_type, int divide_type, int arg
           if ((region_type & sa) == sa) return -1;
           if (region_type & (~(ss|sa))) return -1;
           if (region_type & GF_REGION_SSE) {
-/*            return sizeof(gf_internal_t) + sizeof(struct gf_split_4_64) + 64; */
+            return sizeof(gf_internal_t) + sizeof(struct gf_split_4_64_lazy_data) + 64;
           } else if (region_type & GF_REGION_ALTMAP) {
             return -1;
           } else {
             return sizeof(gf_internal_t) + sizeof(struct gf_split_4_64_lazy_data) + 64;
           }
         }
-        printf("WTF!\n");
         return -1;
 
     case GF_MULT_GROUP:
@@ -1423,6 +1538,8 @@ int gf_w64_init(gf_t *gf)
   if (h->region_type & GF_REGION_ALTMAP) {
     if (h->mult_type == GF_MULT_COMPOSITE) {
       gf->extract_word.w64 = gf_w64_composite_extract_word;
+    } else if (h->mult_type == GF_MULT_SPLIT_TABLE) {
+      gf->extract_word.w64 = gf_w64_split_extract_word;
     }
   } else {
     gf->extract_word.w64 = gf_w64_extract_word;
