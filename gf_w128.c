@@ -23,6 +23,11 @@
   a[i] = 0; \
   a[i + 1] = 0;}
 
+struct gf_w128_split_4_128_data {
+  uint64_t last_value[2];
+  uint64_t tables[2][32][16];
+};
+
 typedef struct gf_group_tables_s {
   gf_val_128_t m_table;
   gf_val_128_t r_table;
@@ -37,6 +42,15 @@ int xor)
     gf_val_128_t s128;
     gf_val_128_t d128;
     uint64_t c128[2];
+    gf_region_data rd;
+
+    /* We only do this to check on alignment. */
+    gf_set_region_data(&rd, gf, src, dest, bytes, 0, xor, 8);
+
+    if (val[0] == 0) {
+      if (val[1] == 0) { gf_multby_zero(dest, bytes, xor); return; }
+      if (val[1] == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+    }
 
     set_zero(c128, 0);
 
@@ -154,6 +168,186 @@ gf_w128_shift_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_12
   return;
 }
 
+void
+gf_w128_bytwo_b_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_t c128)
+{
+  uint64_t bmask, pp;
+  gf_internal_t *h;
+  uint64_t a[2], b[2], c[2];
+
+  h = (gf_internal_t *) gf->scratch;
+
+  bmask = (1L << 63);
+  set_zero(c, 0);
+  b[0] = a128[0];
+  b[1] = a128[1];
+  a[0] = b128[0];
+  a[1] = b128[1];
+  
+  while (1) {
+    if (a[1] & 1) {
+      c[0] ^= b[0];
+      c[1] ^= b[1];
+    }
+    a[1] >>= 1;
+    if (a[0] & 1) a[1] ^= bmask;
+    a[0] >>= 1;
+    if (a[1] == 0 && a[0] == 0) {
+      c128[0] = c[0];
+      c128[1] = c[1];
+      return;
+    }
+    pp = (b[0] & bmask);
+    b[0] <<= 1;
+    if (b[1] & bmask) b[0] ^= 1;
+    b[1] <<= 1;
+    if (pp) b[1] ^= h->prim_poly;
+  }
+}
+
+static
+void
+gf_w128_split_4_128_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
+{
+  int i, j, k;
+  uint64_t pp;
+  gf_internal_t *h;
+  uint64_t *s64, *d64, *top;
+  gf_region_data rd;
+  uint64_t v[2], s;
+  struct gf_w128_split_4_128_data *ld;
+
+  /* We only do this to check on alignment. */
+  gf_set_region_data(&rd, gf, src, dest, bytes, 0, xor, 8);
+
+  if (val[0] == 0) {
+    if (val[1] == 0) { gf_multby_zero(dest, bytes, xor); return; }
+    if (val[1] == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  }
+    
+  h = (gf_internal_t *) gf->scratch;
+  ld = (struct gf_w128_split_4_128_data *) h->private;
+
+  s64 = (uint64_t *) rd.s_start;
+  d64 = (uint64_t *) rd.d_start;
+  top = (uint64_t *) rd.d_top;
+
+  if (val[0] != ld->last_value[0] || val[1] != ld->last_value[1]) {
+    v[0] = val[0];
+    v[1] = val[1];
+    for (i = 0; i < 32; i++) {
+      ld->tables[0][i][0] = 0;
+      ld->tables[1][i][0] = 0;
+      for (j = 1; j < 16; j <<= 1) {
+        for (k = 0; k < j; k++) {
+          ld->tables[0][i][k^j] = (v[0] ^ ld->tables[0][i][k]);
+          ld->tables[1][i][k^j] = (v[1] ^ ld->tables[1][i][k]);
+        }
+        pp = (v[0] & (1L << 63));
+        v[0] <<= 1;
+        if (v[1] & (1L << 63)) v[0] ^= 1;
+        v[1] <<= 1;
+        if (pp) v[1] ^= h->prim_poly;
+      }
+    }
+  }
+  ld->last_value[0] = val[0];
+  ld->last_value[1] = val[1];
+
+  while (d64 < top) {
+    v[0] = (xor) ? d64[0] : 0;
+    v[1] = (xor) ? d64[1] : 0;
+    s = s64[1];
+    i = 0;
+    while (s != 0) {
+      v[0] ^= ld->tables[0][i][s&0xf];
+      v[1] ^= ld->tables[1][i][s&0xf];
+      s >>= 4;
+      i++;
+    }
+    s = s64[0];
+    i = 16;
+    while (s != 0) {
+      v[0] ^= ld->tables[0][i][s&0xf];
+      v[1] ^= ld->tables[1][i][s&0xf];
+      s >>= 4;
+      i++;
+    }
+    d64[0] = v[0];
+    d64[1] = v[1];
+    s64 += 2;
+    d64 += 2;
+  }
+}
+
+void
+gf_w128_bytwo_b_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
+{
+  uint64_t bmask, pp, vmask;
+  gf_internal_t *h;
+  uint64_t a[2], c[2], b[2], *s64, *d64, *top;
+  gf_region_data rd;
+
+  /* We only do this to check on alignment. */
+  gf_set_region_data(&rd, gf, src, dest, bytes, 0, xor, 8);
+
+  if (val[0] == 0) {
+    if (val[1] == 0) { gf_multby_zero(dest, bytes, xor); return; }
+    if (val[1] == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  }
+    
+  h = (gf_internal_t *) gf->scratch;
+  s64 = (uint64_t *) rd.s_start;
+  d64 = (uint64_t *) rd.d_start;
+  top = (uint64_t *) rd.d_top;
+  bmask = (1L << 63);
+
+  while (d64 < top) {
+    set_zero(c, 0);
+    b[0] = s64[0];
+    b[1] = s64[1];
+    a[0] = val[0];
+    a[1] = val[1];
+
+    while (a[0] != 0) {
+      if (a[1] & 1) {
+        c[0] ^= b[0];
+        c[1] ^= b[1];
+      }
+      a[1] >>= 1;
+      if (a[0] & 1) a[1] ^= bmask;
+      a[0] >>= 1;
+      pp = (b[0] & bmask);
+      b[0] <<= 1;
+      if (b[1] & bmask) b[0] ^= 1;    
+      b[1] <<= 1;
+      if (pp) b[1] ^= h->prim_poly;
+    }
+    while (1) {
+      if (a[1] & 1) {
+        c[0] ^= b[0];
+        c[1] ^= b[1];
+      }
+      a[1] >>= 1;
+      if (a[1] == 0) break;
+      pp = (b[0] & bmask);
+      b[0] <<= 1;
+      if (b[1] & bmask) b[0] ^= 1;    
+      b[1] <<= 1;
+      if (pp) b[1] ^= h->prim_poly;
+    }
+    if (xor) {
+      d64[0] ^= c[0];
+      d64[1] ^= c[1];
+    } else {
+      d64[0] = c[0];
+      d64[1] = c[1];
+    }
+    s64 += 2;
+    d64 += 2;
+  }
+}
+
 static
 void gf_w128_group_m_init(gf_t *gf, gf_val_128_t b128)
 {
@@ -258,6 +452,103 @@ gf_w128_group_multiply(GFP gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_
   c128[0] = p_i[0];
   c128[1] = p_i[1];
 }
+
+static
+void
+gf_w128_group_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
+{
+  int i;
+  int i_r, i_m, t_m;
+  int mask_m, mask_r;
+  int g_m, g_r;
+  uint64_t p_i[2], a[2];
+  gf_internal_t *scratch;
+  gf_group_tables_t *gt;
+  gf_region_data rd;
+  uint64_t *a128, *c128, *top;
+
+  /* We only do this to check on alignment. */
+  gf_set_region_data(&rd, gf, src, dest, bytes, 0, xor, 8);
+      
+  if (val[0] == 0) {
+    if (val[1] == 0) { gf_multby_zero(dest, bytes, xor); return; }
+    if (val[1] == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  }
+    
+  scratch = (gf_internal_t *) gf->scratch;
+  gt = scratch->private;
+  g_m = scratch->arg1;
+  g_r = scratch->arg2;
+
+  mask_m = (1 << g_m) - 1;
+  mask_r = (1 << g_r) - 1;
+
+  if (val[0] != gt->m_table[2] || val[1] != gt->m_table[3]) {
+    gf_w128_group_m_init(gf, val);
+  }
+
+  a128 = (uint64_t *) src;
+  c128 = (uint64_t *) dest;
+  top = (uint64_t *) rd.d_top;
+
+  while (c128 < top) {
+    p_i[0] = 0;
+    p_i[1] = 0;
+    a[0] = a128[0];
+    a[1] = a128[1];
+  
+    t_m = 0;
+    i_r = 0;
+  
+    /* Top 64 bits */
+    for (i = ((GF_FIELD_WIDTH / 2) / g_m) - 1; i >= 0; i--) {
+      i_m = (a[0] >> (i * g_m)) & mask_m;
+      i_r ^= (p_i[0] >> (64 - g_m)) & mask_r;
+      p_i[0] <<= g_m;
+      p_i[0] ^= (p_i[1] >> (64-g_m));
+      p_i[1] <<= g_m;
+      p_i[0] ^= gt->m_table[2 * i_m];
+      p_i[1] ^= gt->m_table[(2 * i_m) + 1];
+      t_m += g_m;
+      if (t_m == g_r) {
+        p_i[1] ^= gt->r_table[i_r];
+        t_m = 0;
+        i_r = 0;
+      } else {
+        i_r <<= g_m;
+      }
+    }
+  
+    for (i = ((GF_FIELD_WIDTH / 2) / g_m) - 1; i >= 0; i--) {
+      i_m = (a[1] >> (i * g_m)) & mask_m;
+      i_r ^= (p_i[0] >> (64 - g_m)) & mask_r;
+      p_i[0] <<= g_m;
+      p_i[0] ^= (p_i[1] >> (64-g_m));
+      p_i[1] <<= g_m;
+      p_i[0] ^= gt->m_table[2 * i_m];
+      p_i[1] ^= gt->m_table[(2 * i_m) + 1];
+      t_m += g_m;
+      if (t_m == g_r) {
+        p_i[1] ^= gt->r_table[i_r];
+        t_m = 0;
+        i_r = 0;
+      } else {
+        i_r <<= g_m;
+      }
+    }
+  
+    if (xor) {
+      c128[0] ^= p_i[0];
+      c128[1] ^= p_i[1];
+    } else {
+      c128[0] = p_i[0];
+      c128[1] = p_i[1];
+    }
+    a128 += 2;
+    c128 += 2;
+  }
+}
+
 
 /* a^-1 -> b */
 void
@@ -366,6 +657,16 @@ int gf_w128_shift_init(gf_t *gf)
   return 1;
 }
 
+static
+int gf_w128_bytwo_init(gf_t *gf)
+{
+  gf->multiply.w128 = gf_w128_bytwo_b_multiply;
+  gf->inverse.w128 = gf_w128_euclid;
+  gf->multiply_region.w128 = gf_w128_multiply_region_from_single;
+  gf->multiply_region.w128 = gf_w128_bytwo_b_multiply_region;
+  return 1;
+}
+
 /*
  * Because the prim poly is only 8 bits and we are limiting g_r to 16, I do not need the high 64
  * bits in all of these numbers.
@@ -395,6 +696,24 @@ void gf_w128_group_r_init(gf_t *gf)
   return;
 }
 
+static 
+int gf_w128_split_init(gf_t *gf)
+{
+  struct gf_w128_split_4_128_data *sd;
+  gf_internal_t *h;
+
+  h = (gf_internal_t *) gf->scratch;
+  sd = (struct gf_w128_split_4_128_data *) h->private;
+  sd->last_value[0] = 0;
+  sd->last_value[1] = 0;
+
+  gf->multiply.w128 = gf_w128_bytwo_b_multiply;
+  gf->inverse.w128 = gf_w128_euclid;
+  gf->multiply_region.w128 = gf_w128_split_4_128_multiply_region;
+  return 1;
+}
+
+
 static
 int gf_w128_group_init(gf_t *gf)
 {
@@ -417,8 +736,17 @@ int gf_w128_group_init(gf_t *gf)
 
   gf->multiply.w128 = gf_w128_group_multiply;
   gf->inverse.w128 = gf_w128_euclid;
-  gf->multiply_region.w128 = gf_w128_multiply_region_from_single; /* This needs to change */
+  gf->multiply_region.w128 = gf_w128_group_multiply_region;
   return 1;
+}
+
+void gf_w128_extract_word(gf_t *gf, void *start, int bytes, int index, gf_val_128_t rv)
+{
+  gf_val_128_t s;
+
+  s = (gf_val_128_t) start;
+  s += (index * 2); 
+  memcpy(rv, s, 16);
 }
 
 int gf_w128_scratch_size(int mult_type, int region_type, int divide_type, int arg1, int arg2)
@@ -431,6 +759,17 @@ int gf_w128_scratch_size(int mult_type, int region_type, int divide_type, int ar
     case GF_MULT_SHIFT:
       if (arg1 != 0 || arg2 != 0 || region_type != 0) return -1;
       return sizeof(gf_internal_t);
+      break;
+    case GF_MULT_BYTWO_b:
+      if (arg1 != 0 || arg2 != 0 || region_type != 0) return -1;
+      return sizeof(gf_internal_t);
+      break;
+    case GF_MULT_SPLIT_TABLE:
+      if (region_type != 0) return -1;
+      if ((arg1 == 4 && arg2 == 128) || (arg1 == 128 && arg2 == 4)) {
+        return sizeof(gf_internal_t) + sizeof(struct gf_w128_split_4_128_data) + 64;
+      }
+      return -1;
       break;
     case GF_MULT_GROUP:
 
@@ -474,10 +813,15 @@ int gf_w128_init(gf_t *gf)
 
   switch(h->mult_type) {
     case GF_MULT_DEFAULT: 
+    case GF_MULT_BYTWO_b:      if (gf_w128_bytwo_init(gf) == 0) return 0; break;
     case GF_MULT_SHIFT:        if (gf_w128_shift_init(gf) == 0) return 0; break;
     case GF_MULT_GROUP:        if (gf_w128_group_init(gf) == 0) return 0; break;
+    case GF_MULT_SPLIT_TABLE:  if (gf_w128_split_init(gf) == 0) return 0; break;
     default: return 0;
   }
+
+  gf->extract_word.w128 = gf_w128_extract_word;
+
   if (h->divide_type == GF_DIVIDE_EUCLID) {
     gf->divide.w128 = gf_w128_divide_from_inverse;
     gf->inverse.w128 = gf_w128_euclid;

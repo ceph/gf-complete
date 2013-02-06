@@ -358,7 +358,7 @@ void gf_set_region_data(gf_region_data *rd,
   a = (align <= 16) ? align : 16;
 
   if (align == -1) { /* This is cauchy.  Error check bytes, then set up the pointers
-                        so that there is no alignment regions. */
+                        so that there are no alignment regions. */
     if (bytes % h->w != 0) {
       fprintf(stderr, "Error in region multiply operation.\n");
       fprintf(stderr, "The size must be a multiple of %d bytes.\n", h->w);

@@ -40,7 +40,7 @@ void gf_general_set_one(gf_general_t *v, int w)
     v->w64 = 1;
   } else {
     v->w128[0] = 0;
-    v->w128[0] = 1;
+    v->w128[1] = 1;
   }
 }
 
@@ -52,7 +52,7 @@ void gf_general_set_two(gf_general_t *v, int w)
     v->w64 = 2;
   } else {
     v->w128[0] = 0;
-    v->w128[0] = 2;
+    v->w128[1] = 2;
   }
 }
 
