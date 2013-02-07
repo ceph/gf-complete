@@ -1323,6 +1323,7 @@ gf_w64_split_4_64_lazy_sse_altmap_multiply_region(gf_t *gf, void *src, void *des
       
       si = _mm_and_si128(v0, mask1);
   
+      /* Happy now? */
       for (j = 0; j < 8; j++) {
         p[j] = _mm_xor_si128(p[j], _mm_shuffle_epi8(tables[i][j], si));
       }
