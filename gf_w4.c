@@ -385,7 +385,7 @@ int gf_w4_single_table_init(gf_t *gf)
   gf->inverse.w32 = NULL;
   gf->divide.w32 = gf_w4_single_table_divide;
   gf->multiply.w32 = gf_w4_single_table_multiply;
-  if (h->region_type & GF_REGION_SSE) {  
+  if ((h->region_type & GF_REGION_SSE) || (h->mult_type == GF_MULT_DEFAULT && gf_is_sse())) {  
     gf->multiply_region.w32 = gf_w4_single_table_sse_multiply_region;
   } else {
     gf->multiply_region.w32 = gf_w4_single_table_multiply_region;
@@ -1921,12 +1921,13 @@ int gf_w4_scratch_size(int mult_type, int region_type, int divide_type, int arg1
       }
       return sizeof(gf_internal_t) + sizeof(struct gf_bytwo_data);
       break;
+    case GF_MULT_DEFAULT:
     case GF_MULT_TABLE:
       if (arg1 != 0 || arg2 != 0) return -1;
       if (region_type == GF_REGION_CAUCHY || region_type == (GF_REGION_CAUCHY | GF_REGION_SINGLE_TABLE)) {
         return sizeof(gf_internal_t) + sizeof(struct gf_single_table_data) + 64;
       }
-      if (region_type == 0) region_type = GF_REGION_SINGLE_TABLE;
+      if (mult_type == GF_MULT_DEFAULT || region_type == 0) region_type = GF_REGION_SINGLE_TABLE;
       if (region_type & GF_REGION_SINGLE_TABLE) {
         if ((region_type | sss) != sss) return -1;
         if ((region_type & sss) == sss) return -1;
@@ -1944,7 +1945,6 @@ int gf_w4_scratch_size(int mult_type, int region_type, int divide_type, int arg1
       }
       return -1;  
       break;
-    case GF_MULT_DEFAULT:
     case GF_MULT_LOG_TABLE:
       if (arg1 != 0 || arg2 != 0 || (region_type != 0 && region_type != GF_REGION_CAUCHY)) return -1;
       return sizeof(gf_internal_t) + sizeof(struct gf_logtable_data) + 64;
@@ -1977,8 +1977,8 @@ gf_w4_init (gf_t *gf)
     case GF_MULT_BYTWO_p:   
     case GF_MULT_BYTWO_b:   
       if (gf_w4_bytwo_init(gf) == 0) return 0; break;
-    case GF_MULT_DEFAULT:   
     case GF_MULT_LOG_TABLE: if (gf_w4_log_init(gf) == 0) return 0; break;
+    case GF_MULT_DEFAULT:   
     case GF_MULT_TABLE:     if (gf_w4_table_init(gf) == 0) return 0; break;
     default: return 0;
   }

@@ -104,9 +104,9 @@ void gf_alignment_error(char *s, int a)
   exit(1);
 }
 
-/* Lifted this code from Jens Gregor -- thanks, Jens */
+/* Lifted this code from Jens Gregor -- thanks, Jens.  Tests for SSE3 */
 
-int gf_is_sse2()
+int gf_is_sse()
 {
   unsigned int cpeinfo;
   unsigned int cpsse;
@@ -114,7 +114,8 @@ int gf_is_sse2()
                 "cpuid\n\t"
                 "mov %%edx, %0\n\t"
             "mov %%ecx, %1\n" : "=m" (cpeinfo), "=m" (cpsse));
-  if ((cpeinfo >> 26) & 0x1 ) return 1;
+  if ((cpsse       ) & 0x1 ) return 1;
+
   return 0;
 }
 
