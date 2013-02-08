@@ -253,10 +253,17 @@ gf_wgen_group_set_shift_tables(uint32_t *shift, uint32_t val, gf_internal_t *h)
 {
   int i;
   uint32_t j;
+  int g_s;
+
+  if (h->mult_type == GF_MULT_DEFAULT) {
+    g_s = 2;
+  } else {
+    g_s = h->arg1;
+  }
 
   shift[0] = 0;
 
-  for (i = 1; i < (1 << h->arg1); i <<= 1) {
+  for (i = 1; i < (1 << g_s); i <<= 1) {
     for (j = 0; j < i; j++) shift[i|j] = shift[j]^val;
     if (val & (1 << (h->w-1))) {
       val <<= 1;
@@ -357,8 +364,13 @@ gf_wgen_group_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
   int w;
 
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
-  g_s = h->arg1;
-  g_r = h->arg2;
+  if (h->mult_type == GF_MULT_DEFAULT) {
+    g_s = 2;
+    g_r = 8;
+  } else {
+    g_s = h->arg1;
+    g_r = h->arg2;
+  }
   w = h->w;
   gd = (struct gf_wgen_group_data *) h->private;
   gf_wgen_group_set_shift_tables(gd->shift, b, h);
@@ -403,8 +415,13 @@ int gf_wgen_group_init(gf_t *gf)
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
   int g_s, g_r;
 
-  g_s = h->arg1;
-  g_r = h->arg2;
+  if (h->mult_type == GF_MULT_DEFAULT) {
+    g_s = 2;
+    g_r = 8;
+  } else {
+    g_s = h->arg1;
+    g_r = h->arg2;
+  }
   gd = (struct gf_wgen_group_data *) h->private;
   gd->shift = &(gd->memory);
   gd->reduce = gd->shift + (1 << g_s);
@@ -797,6 +814,17 @@ int gf_wgen_scratch_size(int w, int mult_type, int region_type, int divide_type,
   switch(mult_type)
   {
     case GF_MULT_DEFAULT: 
+      if (w <= 8) {
+          return sizeof(gf_internal_t) + sizeof(struct gf_wgen_table_w8_data) +
+               sizeof(uint8_t)*(1 << w)*(1<<w)*2 + 64;
+      } else if (w <= 16) {
+        return sizeof(gf_internal_t) + sizeof(struct gf_wgen_log_w16_data) +
+               sizeof(uint16_t)*(1 << w)*3;
+      } else {
+        return sizeof(gf_internal_t) + sizeof(struct gf_wgen_group_data) +
+               sizeof(uint32_t) * (1 << 2) +
+               sizeof(uint32_t) * (1 << 8) + 64;
+      }
     case GF_MULT_SHIFT:
     case GF_MULT_BYTWO_b:
     case GF_MULT_BYTWO_p:
@@ -917,6 +945,14 @@ int gf_wgen_init(gf_t *gf)
 
   switch(h->mult_type) {
     case GF_MULT_DEFAULT:
+      if (h->w <= 8) {
+        if (gf_wgen_table_init(gf) == 0) return 0; 
+      } else if (h->w <= 16) {
+        if (gf_wgen_log_init(gf) == 0) return 0; 
+      } else {
+        if (gf_wgen_group_init(gf) == 0) return 0; 
+      }
+      break;
     case GF_MULT_SHIFT:     if (gf_wgen_shift_init(gf) == 0) return 0; break;
     case GF_MULT_BYTWO_b:     if (gf_wgen_bytwo_b_init(gf) == 0) return 0; break;
     case GF_MULT_BYTWO_p:     if (gf_wgen_bytwo_p_init(gf) == 0) return 0; break;

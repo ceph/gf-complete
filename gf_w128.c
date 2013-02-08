@@ -359,8 +359,13 @@ void gf_w128_group_m_init(gf_t *gf, gf_val_128_t b128)
   uint64_t a128[2];
   scratch = (gf_internal_t *) gf->scratch;
   gt = scratch->private;
-  g_m = scratch->arg1;
+  if (scratch->mult_type == GF_MULT_DEFAULT) {
+    g_m = 4;
+  } else {
+    g_m = scratch->arg1;
+  }
   prim_poly = scratch->prim_poly;
+
 
   set_zero(gt->m_table, 0);
   a_get_b(gt->m_table, 2, b128, 0);
@@ -394,8 +399,13 @@ gf_w128_group_multiply(GFP gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_
 
   scratch = (gf_internal_t *) gf->scratch;
   gt = scratch->private;
-  g_m = scratch->arg1;
-  g_r = scratch->arg2;
+  if (scratch->mult_type == GF_MULT_DEFAULT) {
+    g_m = 4;
+    g_r = 8;
+  } else {
+    g_m = scratch->arg1;
+    g_r = scratch->arg2;
+  }
 
   mask_m = (1 << g_m) - 1;
   mask_r = (1 << g_r) - 1;
@@ -477,8 +487,13 @@ gf_w128_group_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val,
     
   scratch = (gf_internal_t *) gf->scratch;
   gt = scratch->private;
-  g_m = scratch->arg1;
-  g_r = scratch->arg2;
+  if (scratch->mult_type == GF_MULT_DEFAULT) {
+    g_m = 4;
+    g_r = 8;
+  } else {
+    g_m = scratch->arg1;
+    g_r = scratch->arg2;
+  }
 
   mask_m = (1 << g_m) - 1;
   mask_r = (1 << g_r) - 1;
@@ -681,7 +696,11 @@ void gf_w128_group_r_init(gf_t *gf)
   gf_group_tables_t *gt;
   scratch = (gf_internal_t *) gf->scratch;
   gt = scratch->private;
-  g_r = scratch->arg2;
+  if (scratch->mult_type == GF_MULT_DEFAULT) {
+    g_r = 8;
+  } else {
+    g_r = scratch->arg2;
+  }
   pp = scratch->prim_poly;
 
   gt->r_table[0] = 0;
@@ -723,8 +742,13 @@ int gf_w128_group_init(gf_t *gf)
 
   scratch = (gf_internal_t *) gf->scratch;
   gt = scratch->private;
-  g_m = scratch->arg1;
-  g_r = scratch->arg2;
+  if (scratch->mult_type == GF_MULT_DEFAULT) {
+    g_m = 4;
+    g_r = 8;
+  } else {
+    g_m = scratch->arg1;
+    g_r = scratch->arg2;
+  }
   size_r = (1 << g_r);
 
   gt->r_table = scratch->private + (2 * sizeof(uint64_t *));
@@ -755,7 +779,6 @@ int gf_w128_scratch_size(int mult_type, int region_type, int divide_type, int ar
   int w = 128;
   switch(mult_type)
   {
-    case GF_MULT_DEFAULT:
     case GF_MULT_SHIFT:
       if (arg1 != 0 || arg2 != 0 || region_type != 0) return -1;
       return sizeof(gf_internal_t);
@@ -771,6 +794,9 @@ int gf_w128_scratch_size(int mult_type, int region_type, int divide_type, int ar
       }
       return -1;
       break;
+    case GF_MULT_DEFAULT: 
+      arg1 = 4;
+      arg2 = 8;
     case GF_MULT_GROUP:
 
       /* arg1 == mult size, arg2 == reduce size */
@@ -812,9 +838,9 @@ int gf_w128_init(gf_t *gf)
   gf->multiply_region.w128 = NULL;
 
   switch(h->mult_type) {
-    case GF_MULT_DEFAULT: 
     case GF_MULT_BYTWO_b:      if (gf_w128_bytwo_init(gf) == 0) return 0; break;
     case GF_MULT_SHIFT:        if (gf_w128_shift_init(gf) == 0) return 0; break;
+    case GF_MULT_DEFAULT: 
     case GF_MULT_GROUP:        if (gf_w128_group_init(gf) == 0) return 0; break;
     case GF_MULT_SPLIT_TABLE:  if (gf_w128_split_init(gf) == 0) return 0; break;
     default: return 0;

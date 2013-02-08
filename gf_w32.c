@@ -368,8 +368,13 @@ void gf_w32_group_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t v
   if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
-  g_s = h->arg1;
-  g_r = h->arg2;
+  if (h->mult_type == GF_MULT_DEFAULT) {
+    g_s = 3;
+    g_r = 8;
+  } else {
+    g_s = h->arg1;
+    g_r = h->arg2;
+  }
   gd = (struct gf_w32_group_data *) h->private;
   gf_w32_group_set_shift_tables(gd->shift, val, h);
 
@@ -377,7 +382,6 @@ void gf_w32_group_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t v
   if (leftover == 0) leftover = g_s;
 
   gd = (struct gf_w32_group_data *) h->private;
-  g_s = h->arg1;
   gf_w32_group_set_shift_tables(gd->shift, val, h);
 
   gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 4);
@@ -1875,11 +1879,7 @@ int gf_w32_split_init(gf_t *gf)
     d8 = (struct gf_split_8_8_data *) h->private;
     d8->last_value = 0;
     gf->multiply.w32 = gf_w32_split_8_8_multiply;
-    if (h->mult_type == GF_MULT_DEFAULT && gf_is_sse()) {
-      gf->multiply_region.w32 = gf_w32_split_4_32_lazy_sse_multiply_region;
-    } else {
-      gf->multiply_region.w32 = gf_w32_split_8_32_lazy_multiply_region;
-    }
+    gf->multiply_region.w32 = gf_w32_split_8_32_lazy_multiply_region;
     basep = 1;
     for (exp = 0; exp < 7; exp++) {
       for (j = 0; j < 256; j++) d8->tables[exp][0][j] = 0;
@@ -1986,7 +1986,6 @@ int gf_w32_group_init(gf_t *gf)
     if (h->mult_type == GF_MULT_DEFAULT) {
       if (gf_is_sse()) {
         gf->multiply_region.w32 = gf_w32_split_4_32_lazy_sse_multiply_region;
-      } else { /* Nothing for now */
       }
     }
   }

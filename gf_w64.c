@@ -388,10 +388,16 @@ gf_w64_group_set_shift_tables(uint64_t *shift, uint64_t val, gf_internal_t *h)
   int i;
   uint64_t j;
   uint64_t one = 1;
+  int g_s;
 
+  if (h->mult_type == GF_MULT_DEFAULT) {
+    g_s = 4;
+  } else {
+    g_s = h->arg1;
+  }
   shift[0] = 0;
  
-  for (i = 1; i < (1 << h->arg1); i <<= 1) {
+  for (i = 1; i < (1 << g_s); i <<= 1) {
     for (j = 0; j < i; j++) shift[i|j] = shift[j]^val;
     if (val & (one << 63)) {
       val <<= 1;
@@ -413,8 +419,13 @@ gf_w64_group_multiply(gf_t *gf, gf_val_64_t a, gf_val_64_t b)
   struct gf_w64_group_data *gd;
 
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
-  g_s = h->arg1;
-  g_r = h->arg2;
+  if (h->mult_type == GF_MULT_DEFAULT) {
+    g_s = 4;
+    g_r = 8;
+  } else {
+    g_s = h->arg1;
+    g_r = h->arg2;
+  }
   gd = (struct gf_w64_group_data *) h->private;
   gf_w64_group_set_shift_tables(gd->shift, b, h);
 
@@ -469,8 +480,13 @@ void gf_w64_group_multiply_region(gf_t *gf, void *src, void *dest, gf_val_64_t v
   if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
   gd = (struct gf_w64_group_data *) h->private;
-  g_s = h->arg1;
-  g_r = h->arg1;
+  if (h->mult_type == GF_MULT_DEFAULT) {
+    g_s = 4;
+    g_r = 8;
+  } else {
+    g_s = h->arg1;
+    g_r = h->arg2;
+  }
   gf_w64_group_set_shift_tables(gd->shift, val, h);
 
   for (i = 63; !(val & (1L << i)); i--) ;
@@ -635,18 +651,23 @@ int gf_w64_group_init(gf_t *gf)
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
   int g_r, g_s;
 
-  g_s = h->arg1;
-  g_r = h->arg2;
+  if (h->mult_type == GF_MULT_DEFAULT) {
+    g_s = 4;
+    g_r = 8;
+  } else {
+    g_s = h->arg1;
+    g_r = h->arg2;
+  }
 
   gd = (struct gf_w64_group_data *) h->private;
   gd->shift = (uint64_t *) (&(gd->memory));
-  gd->reduce = gd->shift + (1 << h->arg1);
+  gd->reduce = gd->shift + (1 << g_s);
 
   gd->reduce[0] = 0;
-  for (i = 0; i < (1 << h->arg2); i++) {
+  for (i = 0; i < (1 << g_r); i++) {
     p = 0;
     index = 0;
-    for (j = 0; j < h->arg2; j++) {
+    for (j = 0; j < g_r; j++) {
       if (i & (1 << j)) {
         p ^= (h->prim_poly << j);
         index ^= (1 << j);
@@ -656,7 +677,7 @@ int gf_w64_group_init(gf_t *gf)
     gd->reduce[index] = p;
   }
 
-  if (h->arg1 == h->arg2) {
+  if (g_s == g_r) {
     gf->multiply.w64 = gf_w64_group_s_equals_r_multiply;
     gf->multiply_region.w64 = gf_w64_group_s_equals_r_multiply_region; 
   } else {
@@ -1431,7 +1452,6 @@ int gf_w64_scratch_size(int mult_type, int region_type, int divide_type, int arg
   if (divide_type == GF_DIVIDE_MATRIX) return -1;
   switch(mult_type)
   {
-    case GF_MULT_DEFAULT:
     case GF_MULT_SHIFT:
       if (arg1 != 0 || arg2 != 0 || region_type != 0) return -1;
       return sizeof(gf_internal_t);
@@ -1477,6 +1497,9 @@ int gf_w64_scratch_size(int mult_type, int region_type, int divide_type, int arg
         }
         return -1;
 
+    case GF_MULT_DEFAULT:
+      arg1 = 4;
+      arg2 = 8;
     case GF_MULT_GROUP:
       if (arg1 <= 0 || arg2 <= 0) return -1;
       if (region_type != GF_REGION_DEFAULT && region_type != GF_REGION_CAUCHY) return -1;
@@ -1510,10 +1533,10 @@ int gf_w64_init(gf_t *gf)
   gf->multiply_region.w64 = NULL;
 
   switch(h->mult_type) {
-    case GF_MULT_DEFAULT: 
     case GF_MULT_SHIFT:     if (gf_w64_shift_init(gf) == 0) return 0; break;
     case GF_MULT_COMPOSITE: if (gf_w64_composite_init(gf) == 0) return 0; break;
     case GF_MULT_SPLIT_TABLE: if (gf_w64_split_init(gf) == 0) return 0; break; 
+    case GF_MULT_DEFAULT:
     case GF_MULT_GROUP:       if (gf_w64_group_init(gf) == 0) return 0; break; 
     case GF_MULT_BYTWO_p:
     case GF_MULT_BYTWO_b:     if (gf_w64_bytwo_init(gf) == 0) return 0; break;
