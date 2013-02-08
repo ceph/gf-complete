@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "gf.h"
+#include "gf_complete.h"
 #include "gf_method.h"
 
 #define NMULTS (14)

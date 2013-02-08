@@ -4,7 +4,7 @@
 #
 
 SRCS = gf_w4.c gf_w8.c gf_w16.c gf_w32.c gf_w64.c gf_w128.c gf_wgen.c gf.c gf_unit.c gf_time.c gf_mult.c gf_method.c gf_54.c gf_methods.c gf_div.c gf_rand.c gf_general.c gf_poly.c
-HDRS = gf.h gf_int.h
+HDRS = gf_complete.h gf_int.h
 EXECUTABLES = gf_mult gf_div gf_unit gf_time gf_54 gf_methods gf_poly
 CFLAGS = -O3 -msse4 -DINTEL_SSE4
 LDFLAGS = -O3 -msse4
@@ -32,20 +32,20 @@ clean:
 spotless: clean
 	$(RM) *~ $(EXECUTABLES)
 
-gf_div.o: gf.h gf_method.h
-gf_methods.o: gf.h gf_method.h
-gf_time.o: gf.h gf_method.h gf_rand.h gf_general.h
-gf_wgen.o: gf_int.h gf.h
-gf_w4.o: gf_int.h gf.h
-gf_w8.o: gf_int.h gf.h
-gf_w16.o: gf_int.h gf.h
-gf_w32.o: gf_int.h gf.h
-gf_w64.o: gf_int.h gf.h
-gf_54.o: gf.h
-gf_unit.o: gf.h gf_method.h gf_rand.h gf_general.h
-gf_general.o: gf.h gf_int.h gf_general.h gf_rand.h
-gf_mult.o: gf.h gf_method.h
-gf_method.o: gf.h
+gf_div.o: gf_complete.h gf_method.h
+gf_methods.o: gf_complete.h gf_method.h
+gf_time.o: gf_complete.h gf_method.h gf_rand.h gf_general.h
+gf_wgen.o: gf_int.h gf_complete.h
+gf_w4.o: gf_int.h gf_complete.h
+gf_w8.o: gf_int.h gf_complete.h
+gf_w16.o: gf_int.h gf_complete.h
+gf_w32.o: gf_int.h gf_complete.h
+gf_w64.o: gf_int.h gf_complete.h
+gf_54.o: gf_complete.h
+gf_unit.o: gf_complete.h gf_method.h gf_rand.h gf_general.h
+gf_general.o: gf_complete.h gf_int.h gf_general.h gf_rand.h
+gf_mult.o: gf_complete.h gf_method.h
+gf_method.o: gf_complete.h
 
 gf_div.c: gf_mult.c
 	sed 's/multiply/divide/g' gf_mult.c > gf_div.c

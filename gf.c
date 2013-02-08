@@ -423,7 +423,7 @@ void gf_multby_zero(void *dest, int bytes, int xor)
   return;
 }
 
-void gf_multby_one(gf_t *gf, void *src, void *dest, int bytes, int xor) 
+void gf_multby_one(void *src, void *dest, int bytes, int xor) 
 {
 #ifdef   INTEL_SSE4
   __m128i ms, md;
@@ -461,7 +461,7 @@ void gf_multby_one(gf_t *gf, void *src, void *dest, int bytes, int xor)
 
   /* If you don't have SSE, you'd better be aligned..... */
 
-  gf_set_region_data(&rd, gf, src, dest, bytes, 1, xor, 8);
+  gf_set_region_data(&rd, NULL, src, dest, bytes, 1, xor, 8);
   s8 = (uint8_t *) src;
   d8 = (uint8_t *) dest;
   while (d8 != rd.d_start) {

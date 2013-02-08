@@ -848,7 +848,7 @@ gf_wgen_cauchy_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int byte
   gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, -1);
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
-  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
   h = (gf_internal_t *) gf->scratch;
   rs = bytes / (h->w);
@@ -857,7 +857,7 @@ gf_wgen_cauchy_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int byte
   for (i = 0; i < h->w; i++) {
     for (j = 0; j < h->w; j++) {
       if (val & (1 << j)) {
-        gf_multby_one(gf, src, dest + j*rs, rs, (written & (1 << j)));
+        gf_multby_one(src, dest + j*rs, rs, (written & (1 << j)));
         written |= (1 << j);
       }
     }

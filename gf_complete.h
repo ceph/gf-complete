@@ -1,4 +1,4 @@
-/* gf.h
+/* gf_complete.h
  * External include file for Galois field arithmetic.  */
 
 #pragma once
@@ -8,6 +8,10 @@
 #include <nmmintrin.h>
 #include <emmintrin.h>
 #endif
+
+/* This does either memcpy or xor, depending on "xor" */
+
+extern void gf_multby_one(void *src, void *dest, int bytes, int xor);
 
 #define GF_W128_IS_ZERO(val) (val[0] == 0 && val[1] == 0)
 #define GF_W128_EQUAL(val1, val2) ((val1[0] == val2[0]) && (val1[1] == val2[1]))
@@ -100,9 +104,9 @@ typedef struct gf {
   void           *scratch;
 } gf_t;
     
-extern int gf_init_easy(gf_t *gf, int w, int mult_type);
+extern int gf_init_easy(GFP gf, int w, int mult_type);
 
-extern int gf_init_hard(gf_t *gf, 
+extern int gf_init_hard(GFP gf, 
                         int w, 
                         int mult_type, 
                         int region_type, 
@@ -110,7 +114,7 @@ extern int gf_init_hard(gf_t *gf,
                         uint64_t prim_poly,
                         int arg1, 
                         int arg2,
-                        gf_t *base_gf,
+                        GFP base_gf,
                         void *scratch_memory);
 
 extern int gf_scratch_size(int w, 
@@ -120,4 +124,4 @@ extern int gf_scratch_size(int w,
                            int arg1, 
                            int arg2);
 
-extern int gf_free(gf_t *gf, int recursive);
+extern int gf_free(GFP gf, int recursive);

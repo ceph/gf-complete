@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "gf.h"
+#include "gf_complete.h"
 #include "gf_int.h"
 #include "gf_method.h"
 #include "gf_rand.h"

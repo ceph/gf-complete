@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "gf.h"
+#include "gf_complete.h"
 
 main()
 {

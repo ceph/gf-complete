@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "gf.h"
+#include "gf_complete.h"
 
 /* This prints out the error string defining the methods that you can put on argv*/
 extern void methods_to_stderr();

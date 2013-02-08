@@ -195,7 +195,7 @@ gf_w64_split_4_64_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint64_t
   gf_region_data rd;
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
-  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
   h = (gf_internal_t *) gf->scratch;
   pp = h->prim_poly;
@@ -274,7 +274,7 @@ gf_w64_split_8_64_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint64_t
   gf_region_data rd;
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
-  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
   h = (gf_internal_t *) gf->scratch;
   pp = h->prim_poly;
@@ -328,7 +328,7 @@ gf_w64_split_16_64_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint64_
   gf_region_data rd;
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
-  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
   h = (gf_internal_t *) gf->scratch;
   pp = h->prim_poly;
@@ -466,7 +466,7 @@ void gf_w64_group_multiply_region(gf_t *gf, void *src, void *dest, gf_val_64_t v
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
-  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
   gd = (struct gf_w64_group_data *) h->private;
   g_s = h->arg1;
@@ -585,7 +585,7 @@ void gf_w64_group_s_equals_r_multiply_region(gf_t *gf, void *src, void *dest, gf
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
-  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
   gd = (struct gf_w64_group_data *) h->private;
   g_s = h->arg1;
@@ -794,7 +794,7 @@ gf_w64_bytwo_p_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_64_
   gf_internal_t *h;
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
-  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
   gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 8);
   gf_do_initial_region_alignment(&rd);
@@ -848,7 +848,7 @@ gf_w64_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_64_
   gf_internal_t *h;
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
-  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
   gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 8);
   gf_do_initial_region_alignment(&rd);
@@ -923,7 +923,7 @@ void gf_w64_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_
   gf_internal_t *h;
   
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
-  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
   gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 16);
   gf_do_initial_region_alignment(&rd);
@@ -988,7 +988,7 @@ gf_w64_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_64_t 
   gf_internal_t *h;
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
-  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
   gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 16);
   gf_do_initial_region_alignment(&rd);
@@ -1275,7 +1275,7 @@ gf_w64_split_4_64_lazy_sse_altmap_multiply_region(gf_t *gf, void *src, void *des
   gf_region_data rd;
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
-  if (val == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
   h = (gf_internal_t *) gf->scratch;
   pp = h->prim_poly;

@@ -49,7 +49,7 @@ int xor)
 
     if (val[0] == 0) {
       if (val[1] == 0) { gf_multby_zero(dest, bytes, xor); return; }
-      if (val[1] == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+      if (val[1] == 1) { gf_multby_one(src, dest, bytes, xor); return; }
     }
 
     set_zero(c128, 0);
@@ -222,7 +222,7 @@ gf_w128_split_4_128_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_
 
   if (val[0] == 0) {
     if (val[1] == 0) { gf_multby_zero(dest, bytes, xor); return; }
-    if (val[1] == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+    if (val[1] == 1) { gf_multby_one(src, dest, bytes, xor); return; }
   }
     
   h = (gf_internal_t *) gf->scratch;
@@ -293,7 +293,7 @@ gf_w128_bytwo_b_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t va
 
   if (val[0] == 0) {
     if (val[1] == 0) { gf_multby_zero(dest, bytes, xor); return; }
-    if (val[1] == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+    if (val[1] == 1) { gf_multby_one(src, dest, bytes, xor); return; }
   }
     
   h = (gf_internal_t *) gf->scratch;
@@ -472,7 +472,7 @@ gf_w128_group_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val,
       
   if (val[0] == 0) {
     if (val[1] == 0) { gf_multby_zero(dest, bytes, xor); return; }
-    if (val[1] == 1) { gf_multby_one(gf, src, dest, bytes, xor); return; }
+    if (val[1] == 1) { gf_multby_one(src, dest, bytes, xor); return; }
   }
     
   scratch = (gf_internal_t *) gf->scratch;

@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "gf.h"
+#include "gf_complete.h"
 
 typedef union {
   uint32_t w32;

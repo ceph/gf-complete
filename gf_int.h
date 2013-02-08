@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "gf.h"
+#include "gf_complete.h"
 
 #include <string.h>
 
@@ -98,4 +98,3 @@ extern void gf_do_final_region_alignment(gf_region_data *rd);
 extern void gf_two_byte_region_table_multiply(gf_region_data *rd, uint16_t *base);
 
 extern void gf_multby_zero(void *dest, int bytes, int xor);
-extern void gf_multby_one(gf_t *gf, void *src, void *dest, int bytes, int xor);
