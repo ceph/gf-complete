@@ -29,6 +29,15 @@ struct gf_w8_logzero_table_data {
     uint8_t         *inv_tbl;
 };
 
+/* Don't change the order of these relative to gf_w8_half_table_data */
+
+struct gf_w8_default_data {
+  uint8_t     high[GF_FIELD_SIZE][GF_HALF_SIZE];
+  uint8_t     low[GF_FIELD_SIZE][GF_HALF_SIZE];
+  uint8_t     divtable[GF_FIELD_SIZE][GF_FIELD_SIZE];
+  uint8_t     multtable[GF_FIELD_SIZE][GF_FIELD_SIZE];
+};
+
 struct gf_w8_half_table_data {
   uint8_t     high[GF_FIELD_SIZE][GF_HALF_SIZE];
   uint8_t     low[GF_FIELD_SIZE][GF_HALF_SIZE];
@@ -415,6 +424,26 @@ gf_w8_table_divide(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 
 static
 gf_val_32_t
+gf_w8_default_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
+{
+  struct gf_w8_default_data *ftd;
+
+  ftd = (struct gf_w8_default_data *) ((gf_internal_t *) gf->scratch)->private;
+  return (ftd->multtable[a][b]);
+}
+
+static
+gf_val_32_t
+gf_w8_default_divide(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
+{
+  struct gf_w8_default_data *ftd;
+
+  ftd = (struct gf_w8_default_data *) ((gf_internal_t *) gf->scratch)->private;
+  return (ftd->divtable[a][b]);
+}
+
+static
+gf_val_32_t
 gf_w8_double_table_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   struct gf_w8_double_table_data *ftd;
@@ -516,131 +545,6 @@ gf_w8_table_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, in
     }
   }
 }
-
-static
-int gf_w8_table_init(gf_t *gf)
-{
-  gf_internal_t *h;
-  struct gf_w8_single_table_data *ftd = NULL;
-  struct gf_w8_double_table_data *dtd = NULL;
-  struct gf_w8_double_table_lazy_data *ltd = NULL;
-  int a, b, c, prod, scase;
-
-  h = (gf_internal_t *) gf->scratch;
-
-  if (h->region_type == 0 || (h->region_type & GF_REGION_CAUCHY) || 
-                             (h->region_type & GF_REGION_SINGLE_TABLE)) {
-    ftd = (struct gf_w8_single_table_data *)h->private;
-    bzero(ftd->divtable, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
-    bzero(ftd->multtable, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
-    scase = 0;
-  } else if (h->region_type == GF_REGION_DOUBLE_TABLE) {
-    dtd = (struct gf_w8_double_table_data *)h->private;
-    bzero(dtd->div, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
-    bzero(dtd->mult, sizeof(uint16_t) * GF_FIELD_SIZE * GF_FIELD_SIZE * GF_FIELD_SIZE);
-    scase = 1;
-  } else if (h->region_type == (GF_REGION_DOUBLE_TABLE | GF_REGION_LAZY)) {
-    ltd = (struct gf_w8_double_table_lazy_data *)h->private;
-    bzero(ltd->div, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
-    bzero(ltd->smult, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
-    scase = 2;
-  } else {
-    fprintf(stderr, "Internal error in gf_w8_table_init\n");
-    exit(0);
-  }
-  
-  for (a = 1; a < GF_FIELD_SIZE; a++) {
-    b = 1;
-    prod = a;
-    do {
-      switch (scase) {
-      case 0: 
-        ftd->multtable[a][b] = prod;
-        ftd->divtable[prod][b] = a;
-        break;
-      case 1:
-        dtd->div[prod][b] = a;
-        for (c = 0; c < GF_FIELD_SIZE; c++) {
-          dtd->mult[a][(c<<8)|b] |= prod;
-          dtd->mult[a][(b<<8)|c] |= (prod<<8);
-        }
-        break;
-      case 2:
-        ltd->div[prod][b] = a;
-        ltd->smult[a][b] = prod;
-        break;
-      }
-      b <<= 1;
-      if (b & GF_FIELD_SIZE) b = b ^ h->prim_poly;
-      prod <<= 1;
-      if (prod & GF_FIELD_SIZE) prod = prod ^ h->prim_poly;
-      
-    } while (b != 1);
-  }
-
-  gf->inverse.w32 = NULL; /* Will set from divide */
-  switch (scase) {
-  case 0: 
-    gf->divide.w32 = gf_w8_table_divide;
-    gf->multiply.w32 = gf_w8_table_multiply;
-    gf->multiply_region.w32 = gf_w8_table_multiply_region;
-    break;
-  case 1:
-    gf->divide.w32 = gf_w8_double_table_divide;
-    gf->multiply.w32 = gf_w8_double_table_multiply;
-    gf->multiply_region.w32 = gf_w8_double_table_multiply_region;
-    break;
-  case 2:
-    gf->divide.w32 = gf_w8_double_table_lazy_divide;
-    gf->multiply.w32 = gf_w8_double_table_lazy_multiply;
-    gf->multiply_region.w32 = gf_w8_double_table_multiply_region;
-    break;
-  }
-  return 1;
-}
-
-/* ------------------------------------------------------------
-  IMPLEMENTATION: FULL_TABLE:
- */
-
-static
-gf_val_32_t
-gf_w8_split_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
-{
-  struct gf_w8_half_table_data *htd;
-  htd = (struct gf_w8_half_table_data *) ((gf_internal_t *) gf->scratch)->private;
-
-  return htd->high[b][a>>4] ^ htd->low[b][a&0xf];
-}
-
-static
-void
-gf_w8_split_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
-{
-  unsigned long uls, uld;
-  int i;
-  uint8_t lv, b, c;
-  uint8_t *s8, *d8;
-  struct gf_w8_half_table_data *htd;
-
-  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
-  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
-
-  htd = (struct gf_w8_half_table_data *) ((gf_internal_t *) gf->scratch)->private;
-  s8 = (uint8_t *) src;
-  d8 = (uint8_t *) dest;
-
-  if (xor) {
-    for (i = 0; i < bytes; i++) {
-      d8[i] ^= (htd->high[val][s8[i]>>4] ^ htd->low[val][s8[i]&0xf]);
-    }
-  } else {
-    for (i = 0; i < bytes; i++) {
-      d8[i] = (htd->high[val][s8[i]>>4] ^ htd->low[val][s8[i]&0xf]);
-    }
-  }
-}
-
 static
 void
 gf_w8_split_multiply_region_sse(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
@@ -702,7 +606,49 @@ gf_w8_split_multiply_region_sse(gf_t *gf, void *src, void *dest, gf_val_32_t val
 
   gf_do_final_region_alignment(&rd);
 #endif
+}
 
+
+/* ------------------------------------------------------------
+  IMPLEMENTATION: FULL_TABLE:
+ */
+
+static
+gf_val_32_t
+gf_w8_split_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
+{
+  struct gf_w8_half_table_data *htd;
+  htd = (struct gf_w8_half_table_data *) ((gf_internal_t *) gf->scratch)->private;
+
+  return htd->high[b][a>>4] ^ htd->low[b][a&0xf];
+}
+
+static
+void
+gf_w8_split_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
+{
+  unsigned long uls, uld;
+  int i;
+  uint8_t lv, b, c;
+  uint8_t *s8, *d8;
+  struct gf_w8_half_table_data *htd;
+
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
+
+  htd = (struct gf_w8_half_table_data *) ((gf_internal_t *) gf->scratch)->private;
+  s8 = (uint8_t *) src;
+  d8 = (uint8_t *) dest;
+
+  if (xor) {
+    for (i = 0; i < bytes; i++) {
+      d8[i] ^= (htd->high[val][s8[i]>>4] ^ htd->low[val][s8[i]&0xf]);
+    }
+  } else {
+    for (i = 0; i < bytes; i++) {
+      d8[i] = (htd->high[val][s8[i]>>4] ^ htd->low[val][s8[i]&0xf]);
+    }
+  }
 }
 
 
@@ -743,6 +689,111 @@ int gf_w8_split_init(gf_t *gf)
     gf->multiply_region.w32 = gf_w8_split_multiply_region;
   } else {
     gf->multiply_region.w32 = gf_w8_split_multiply_region_sse;
+  }
+  return 1;
+}
+
+static
+int gf_w8_table_init(gf_t *gf)
+{
+  gf_internal_t *h;
+  struct gf_w8_single_table_data *ftd = NULL;
+  struct gf_w8_double_table_data *dtd = NULL;
+  struct gf_w8_double_table_lazy_data *ltd = NULL;
+  struct gf_w8_default_data *dd = NULL;
+  int a, b, c, prod, scase;
+
+  h = (gf_internal_t *) gf->scratch;
+
+  if (h->mult_type == GF_MULT_DEFAULT) {
+    dd = (struct gf_w8_default_data *)h->private;
+    scase = 3;
+    bzero(dd->high, sizeof(uint8_t) * GF_FIELD_SIZE * GF_HALF_SIZE);
+    bzero(dd->low, sizeof(uint8_t) * GF_FIELD_SIZE * GF_HALF_SIZE);
+    bzero(dd->divtable, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+    bzero(dd->multtable, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+  } else if (h->region_type == 0 || (h->region_type & GF_REGION_CAUCHY) || 
+                             (h->region_type & GF_REGION_SINGLE_TABLE)) {
+    ftd = (struct gf_w8_single_table_data *)h->private;
+    bzero(ftd->divtable, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+    bzero(ftd->multtable, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+    scase = 0;
+  } else if (h->region_type == GF_REGION_DOUBLE_TABLE) {
+    dtd = (struct gf_w8_double_table_data *)h->private;
+    bzero(dtd->div, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+    bzero(dtd->mult, sizeof(uint16_t) * GF_FIELD_SIZE * GF_FIELD_SIZE * GF_FIELD_SIZE);
+    scase = 1;
+  } else if (h->region_type == (GF_REGION_DOUBLE_TABLE | GF_REGION_LAZY)) {
+    ltd = (struct gf_w8_double_table_lazy_data *)h->private;
+    bzero(ltd->div, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+    bzero(ltd->smult, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+    scase = 2;
+  } else {
+    fprintf(stderr, "Internal error in gf_w8_table_init\n");
+    exit(0);
+  }
+  
+  for (a = 1; a < GF_FIELD_SIZE; a++) {
+    b = 1;
+    prod = a;
+    do {
+      switch (scase) {
+      case 0: 
+        ftd->multtable[a][b] = prod;
+        ftd->divtable[prod][b] = a;
+        break;
+      case 1:
+        dtd->div[prod][b] = a;
+        for (c = 0; c < GF_FIELD_SIZE; c++) {
+          dtd->mult[a][(c<<8)|b] |= prod;
+          dtd->mult[a][(b<<8)|c] |= (prod<<8);
+        }
+        break;
+      case 2:
+        ltd->div[prod][b] = a;
+        ltd->smult[a][b] = prod;
+        break;
+      case 3:
+        dd->multtable[a][b] = prod;
+        dd->divtable[prod][b] = a;
+        if ((b & 0xf) == b) dd->low[a][b] = prod;
+        if ((b & 0xf0) == b) dd->high[a][b>>4] = prod;
+        break;
+      }
+      b <<= 1;
+      if (b & GF_FIELD_SIZE) b = b ^ h->prim_poly;
+      prod <<= 1;
+      if (prod & GF_FIELD_SIZE) prod = prod ^ h->prim_poly;
+      
+    } while (b != 1);
+  }
+
+  gf->inverse.w32 = NULL; /* Will set from divide */
+  switch (scase) {
+  case 0: 
+    gf->divide.w32 = gf_w8_table_divide;
+    gf->multiply.w32 = gf_w8_table_multiply;
+    gf->multiply_region.w32 = gf_w8_table_multiply_region;
+    break;
+  case 1:
+    gf->divide.w32 = gf_w8_double_table_divide;
+    gf->multiply.w32 = gf_w8_double_table_multiply;
+    gf->multiply_region.w32 = gf_w8_double_table_multiply_region;
+    break;
+  case 2:
+    gf->divide.w32 = gf_w8_double_table_lazy_divide;
+    gf->multiply.w32 = gf_w8_double_table_lazy_multiply;
+    gf->multiply_region.w32 = gf_w8_double_table_multiply_region;
+    break;
+  case 3:
+    gf->divide.w32 = gf_w8_default_divide;
+    gf->multiply.w32 = gf_w8_default_multiply;
+    if (gf_is_sse()) {
+      gf->multiply_region.w32 = gf_w8_split_multiply_region_sse;
+    } else {
+      gf->multiply_region.w32 = gf_w8_split_multiply_region;
+    }
+    break;
   }
   return 1;
 }
@@ -1723,6 +1774,8 @@ int gf_w8_scratch_size(int mult_type, int region_type, int divide_type, int arg1
   switch(mult_type)
   {
     case GF_MULT_DEFAULT:
+      if (arg1 != 0 || arg2 != 0 || region_type != 0) return -1;
+      return sizeof(gf_internal_t) + sizeof(struct gf_w8_default_data) + 64;
     case GF_MULT_TABLE:
       if (arg1 != 0 || arg2 != 0) return -1;
       if (region_type == GF_REGION_CAUCHY || region_type == (GF_REGION_CAUCHY | GF_REGION_SINGLE_TABLE)) {
@@ -1803,7 +1856,7 @@ int gf_w8_init(gf_t *gf)
   gf->extract_word.w32 = gf_w8_extract_word;
 
   switch(h->mult_type) {
-    case GF_MULT_DEFAULT: 
+    case GF_MULT_DEFAULT: if (gf_w8_table_init(gf) == 0) return 0; break;
     case GF_MULT_TABLE:     if (gf_w8_table_init(gf) == 0) return 0; break;
     case GF_MULT_BYTWO_p:
     case GF_MULT_BYTWO_b:   if (gf_w8_bytwo_init(gf) == 0) return 0; break;

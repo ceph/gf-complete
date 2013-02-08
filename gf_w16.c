@@ -787,9 +787,19 @@ int gf_w16_split_init(gf_t *gf)
   gf_w16_log_init(gf);
 
   h = (gf_internal_t *) gf->scratch;
-  if (h->arg1 == 8 || h->arg2 == 8) {
+
+  if (h->mult_type == GF_MULT_DEFAULT) {
+    if (gf_is_sse()) {
+      gf->multiply_region.w32 = gf_w16_split_4_16_lazy_sse_multiply_region;
+    } else {
+      gf->multiply_region.w32 = gf_w16_split_8_16_lazy_multiply_region;
+    }
+    return 1;
+  }
+
+  if ((h->arg1 == 8 && h->arg2 == 16) || (h->arg2 == 8 && h->arg1 == 16)) {
     gf->multiply_region.w32 = gf_w16_split_8_16_lazy_multiply_region;
-  } else if (h->arg1 == 4 || h->arg2 == 4) {
+  } else if ((h->arg1 == 4 && h->arg2 == 16) || (h->arg2 == 4 && h->arg1 == 16)) {
     if (h->region_type & GF_REGION_SSE) {
       if (h->region_type & GF_REGION_ALTMAP) {
         gf->multiply_region.w32 = gf_w16_split_4_16_lazy_sse_altmap_multiply_region;
@@ -1895,7 +1905,6 @@ int gf_w16_init(gf_t *gf)
   gf->multiply_region.w32 = NULL;
 
   switch(h->mult_type) {
-    case GF_MULT_DEFAULT: 
     case GF_MULT_LOG_TABLE:        
       if (h->arg1 == 1) {
         if (gf_w16_log_zero_init(gf) == 0) return 0;
@@ -1903,6 +1912,7 @@ int gf_w16_init(gf_t *gf)
         if (gf_w16_log_init(gf) == 0) return 0;
       }
       break;
+    case GF_MULT_DEFAULT: 
     case GF_MULT_SPLIT_TABLE: if (gf_w16_split_init(gf) == 0) return 0; break;
     case GF_MULT_TABLE:       if (gf_w16_table_init(gf) == 0) return 0; break;
     case GF_MULT_SHIFT:     if (gf_w16_shift_init(gf) == 0) return 0; break;
