@@ -10,21 +10,27 @@ CFLAGS = -O3 -msse4 -DINTEL_SSE4
 LDFLAGS = -O3 -msse4
 RM = /bin/rm -f
 
+LIBOBJS = gf.o gf_method.o gf_wgen.o gf_w4.o gf_w8.o gf_w16.o gf_w32.o gf_w64.o gf_w128.o gf_rand.o gf_general.o
+
 OBJS = $(addsuffix .o, $(basename $(SRCS)))
 
-DEFAULT = $(EXECUTABLES)
+DEFAULT = $(EXECUTABLES) gf_complete.a
 
 default: $(DEFAULT)
 
 all: $(OBJS)
 
-gf_methods: gf_methods.o gf.o gf_method.o gf_wgen.o gf_w4.o gf_w8.o gf_w16.o gf_w32.o gf_w64.o gf_w128.o
-gf_time: gf_time.o gf.o gf_method.o gf_wgen.o gf_w4.o gf_w8.o gf_w16.o gf_w32.o gf_w64.o gf_w128.o gf_rand.o gf_general.o
-gf_unit: gf_unit.o gf.o gf_method.o gf_wgen.o gf_w4.o gf_w8.o gf_w16.o gf_w32.o gf_w64.o gf_w128.o gf_rand.o gf_general.o
-gf_mult: gf_mult.o gf.o gf_wgen.o gf_w4.o gf_method.o gf_w8.o gf_w16.o gf_w32.o gf_w64.o gf_w128.o
-gf_div: gf_div.o gf.o gf_wgen.o gf_w4.o gf_method.o gf_w8.o gf_w16.o gf_w32.o gf_w64.o gf_w128.o
-gf_54: gf_54.o gf.o gf_wgen.o gf_w4.o gf_w8.o gf_w16.o gf_w32.o gf_w64.o gf_w128.o
-gf_poly: gf_poly.o gf.o gf_method.o gf_w4.o gf_w8.o gf_w16.o gf_w32.o gf_w64.o gf_w128.o gf_rand.o gf_wgen.o
+gf_complete.a: $(LIBOBJS)
+	ar ru gf_complete.a $(LIBOBJS)
+	ranlib gf_complete.a
+
+gf_methods: gf_methods.o gf_complete.a
+gf_time: gf_time.o gf_complete.a
+gf_unit: gf_unit.o gf_complete.a
+gf_mult: gf_mult.o gf_complete.a
+gf_div: gf_div.o gf_complete.a
+gf_54: gf_54.o gf_complete.a
+gf_poly: gf_poly.o gf_complete.a
 
 clean:
 	$(RM) $(OBJS) gf_div.c
