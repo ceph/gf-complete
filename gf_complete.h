@@ -104,7 +104,7 @@ typedef struct gf {
   void           *scratch;
 } gf_t;
     
-extern int gf_init_easy(GFP gf, int w, int mult_type);
+extern int gf_init_easy(GFP gf, int w);
 
 extern int gf_init_hard(GFP gf, 
                         int w, 

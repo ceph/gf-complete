@@ -95,7 +95,7 @@ int main(int argc, char **argv)
   single = (strchr(argv[2], 'S') != NULL || strchr(argv[2], 'A') != NULL);
   region = (strchr(argv[2], 'R') != NULL || strchr(argv[2], 'A') != NULL);
 
-  if (!gf_init_easy(&gf_def, w, GF_MULT_DEFAULT)) problem("No default for this value of w");
+  if (!gf_init_easy(&gf_def, w)) problem("No default for this value of w");
   
   if (verbose) printf("Seed: %ld\n", t0);
 

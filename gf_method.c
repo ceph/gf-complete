@@ -59,8 +59,7 @@ int create_gf_from_argv(gf_t *gf, int w, int argc, char **argv, int starting)
   char *crt, *x, *y;
 
   if (argc <= starting || strcmp(argv[starting], "-") == 0) {
-    mult_type = GF_MULT_DEFAULT;
-    if (!gf_init_easy(gf, w, mult_type)) return 0;
+    if (!gf_init_easy(gf, w)) return 0;
     return (argc <= starting) ? starting : starting+1;
   }
 

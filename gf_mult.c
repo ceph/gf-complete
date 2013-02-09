@@ -16,7 +16,7 @@
 void usage(char *s)
 {
   fprintf(stderr, "usage: gf_mult a b w [method] - does multiplication of a and b in GF(2^w)\n");
-  fprintf(stderr, "       If w has an h on the end, treat a, b and the product as hexadecimal (no 0x)\n");
+  fprintf(stderr, "       If w has an h on the end, treat a, b and the product as hexadecimal (no 0x required)\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "       legal w are: 1-32, 64 and 128\n");
   fprintf(stderr, "           128 is hex only (i.e. '128' will be an error - do '128h')\n");

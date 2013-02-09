@@ -31,9 +31,9 @@ int gf_dummy_init(gf_t *gf)
   return 0;
 }
 
-int gf_init_easy(gf_t *gf, int w, int mult_type)
+int gf_init_easy(gf_t *gf, int w)
 {
-  return gf_init_hard(gf, w, mult_type, GF_REGION_DEFAULT, GF_DIVIDE_DEFAULT, 0, 0, 0, NULL, NULL);
+  return gf_init_hard(gf, w, GF_MULT_DEFAULT, GF_REGION_DEFAULT, GF_DIVIDE_DEFAULT, 0, 0, 0, NULL, NULL);
 }
 
 int gf_init_hard(gf_t *gf, int w, int mult_type, 
