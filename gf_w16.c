@@ -789,15 +789,11 @@ int gf_w16_split_init(gf_t *gf)
   h = (gf_internal_t *) gf->scratch;
 
   if (h->mult_type == GF_MULT_DEFAULT) {
-    if (gf_is_sse()) {
-      gf->multiply_region.w32 = gf_w16_split_4_16_lazy_sse_multiply_region;
-    } else {
-      gf->multiply_region.w32 = gf_w16_split_8_16_lazy_multiply_region;
-    }
-    return 1;
-  }
-
-  if ((h->arg1 == 8 && h->arg2 == 16) || (h->arg2 == 8 && h->arg1 == 16)) {
+    gf->multiply_region.w32 = gf_w16_split_8_16_lazy_multiply_region;
+#ifdef INTEL_SSE4
+    gf->multiply_region.w32 = gf_w16_split_4_16_lazy_sse_multiply_region;
+#endif
+  } else if ((h->arg1 == 8 && h->arg2 == 16) || (h->arg2 == 8 && h->arg1 == 16)) {
     gf->multiply_region.w32 = gf_w16_split_8_16_lazy_multiply_region;
   } else if ((h->arg1 == 4 && h->arg2 == 16) || (h->arg2 == 4 && h->arg1 == 16)) {
     if (h->region_type & GF_REGION_SSE) {

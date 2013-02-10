@@ -14,8 +14,6 @@ extern void     timer_start (double *t);
 extern double   timer_split (const double *t);
 extern void     galois_fill_random (void *buf, int len, unsigned int seed);
 
-extern int      gf_is_sse();
-
 typedef struct {
   int mult_type;
   int region_type;

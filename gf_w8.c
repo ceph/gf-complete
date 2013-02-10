@@ -788,11 +788,10 @@ int gf_w8_table_init(gf_t *gf)
   case 3:
     gf->divide.w32 = gf_w8_default_divide;
     gf->multiply.w32 = gf_w8_default_multiply;
-    if (gf_is_sse()) {
-      gf->multiply_region.w32 = gf_w8_split_multiply_region_sse;
-    } else {
-      gf->multiply_region.w32 = gf_w8_split_multiply_region;
-    }
+    gf->multiply_region.w32 = gf_w8_split_multiply_region;
+#ifdef INTEL_SSE4
+    gf->multiply_region.w32 = gf_w8_split_multiply_region_sse;
+#endif
     break;
   }
   return 1;

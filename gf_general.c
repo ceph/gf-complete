@@ -100,12 +100,13 @@ void gf_general_val_to_s(gf_general_t *v, int w, char *s)
   if (w <= 32) {
     sprintf(s, "%x", v->w32);
   } else if (w <= 64) {
-    sprintf(s, "%llx", v->w64);
+    sprintf(s, "%llx", (long long unsigned int) v->w64);
   } else {
     if (v->w128[0] == 0) {
-      sprintf(s, "%llx", v->w128[1]);
+      sprintf(s, "%llx", (long long unsigned int) v->w128[1]);
     } else {
-      sprintf(s, "%llx%016llx", v->w128[0], v->w128[1]);
+      sprintf(s, "%llx%016llx", (long long unsigned int) v->w128[0], 
+                                (long long unsigned int) v->w128[1]);
     }
   }
 }

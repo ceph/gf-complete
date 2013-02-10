@@ -42,12 +42,12 @@ int main(int argc, char **argv)
   /* And multiply a and b using the galois field: */
 
   c = gf.multiply.w64(&gf, a, b);
-  printf("%llx * %llx = %llx\n", a, b, c);
+  printf("%llx * %llx = %llx\n", (long long unsigned int) a, (long long unsigned int) b, (long long unsigned int) c);
 
   /* Divide the product by a and b */
 
-  printf("%llx / %llx = %llx\n", c, a, gf.divide.w64(&gf, c, a));
-  printf("%llx / %llx = %llx\n", c, b, gf.divide.w64(&gf, c, b));
+  printf("%llx / %llx = %llx\n", (long long unsigned int) c, (long long unsigned int) a, (long long unsigned int) gf.divide.w64(&gf, c, a));
+  printf("%llx / %llx = %llx\n", (long long unsigned int) c, (long long unsigned int) b, (long long unsigned int) gf.divide.w64(&gf, c, b));
 
   r1 = (uint64_t *) malloc(32);
   r2 = (uint64_t *) malloc(32);
@@ -58,12 +58,12 @@ int main(int argc, char **argv)
 
   gf.multiply_region.w64(&gf, r1, r2, a, 32, 0);
 
-  printf("\nmultiply_region by %llx\n\n", a);
+  printf("\nmultiply_region by %llx\n\n", (long long unsigned int) a);
   printf("R1 (the source):  ");
-  for (i = 0; i < 4; i++) printf(" %016llx", r1[i]);
+  for (i = 0; i < 4; i++) printf(" %016llx", (long long unsigned int) r1[i]);
 
   printf("\nR2 (the product): ");
-  for (i = 0; i < 4; i++) printf(" %016llx", r2[i]);
+  for (i = 0; i < 4; i++) printf(" %016llx", (long long unsigned int) r2[i]);
   printf("\n");
 
   exit(0);

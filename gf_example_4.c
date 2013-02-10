@@ -14,6 +14,8 @@
 #include "gf_complete.h"
 #include "gf_rand.h"
 
+#define LLUI (long long unsigned int) 
+
 void usage(char *s)
 {
   fprintf(stderr, "usage: gf_example_3\n");
@@ -43,7 +45,7 @@ int main(int argc, char **argv)
 
   gf.multiply.w128(&gf, a, b, c);
   printf("%016llx%016llx * %016llx%016llx =\n%016llx%016llx\n", 
-      a[0], a[1], b[0], b[1], c[0], c[1]);
+      LLUI a[0], LLUI a[1], LLUI b[0], LLUI b[1], LLUI c[0], LLUI c[1]);
 
   r1 = (uint64_t *) malloc(32);
   r2 = (uint64_t *) malloc(32);
@@ -52,12 +54,12 @@ int main(int argc, char **argv)
 
   gf.multiply_region.w128(&gf, r1, r2, a, 32, 0);
 
-  printf("\nmultiply_region by %016llx%016llx\n\n", a[0], a[1]);
+  printf("\nmultiply_region by %016llx%016llx\n\n", LLUI a[0], LLUI a[1]);
   printf("R1 (the source):  ");
-  for (i = 0; i < 4; i += 2) printf(" %016llx%016llx", r1[i], r1[i+1]);
+  for (i = 0; i < 4; i += 2) printf(" %016llx%016llx", LLUI r1[i], LLUI r1[i+1]);
 
   printf("\nR2 (the product): ");
-  for (i = 0; i < 4; i += 2) printf(" %016llx%016llx", r2[i], r2[i+1]);
+  for (i = 0; i < 4; i += 2) printf(" %016llx%016llx", LLUI r2[i], LLUI r2[i+1]);
   printf("\n");
   exit(0);
 }

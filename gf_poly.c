@@ -9,6 +9,8 @@
 #define GF_POLY_COEF_MASK32 0xffffffff
 #define GF_POLY_COEF_MASK64 0xffffffffffffffff
 
+#define LLUI (long long unsigned int)
+
 struct gf_poly_coef_s;
 
 typedef struct gf_poly_coef_s {
@@ -92,7 +94,7 @@ void gf_poly_print(gf_poly_t *gf_poly, char *message)
   tmp = gf_poly->leading_coef;
 
   while (tmp != NULL) {
-    printf("%llu * x^%llu", tmp->coef, tmp->power);
+    printf("%llu * x^%llu", LLUI tmp->coef, LLUI tmp->power);
     tmp = tmp->next;
     if (tmp) {
       printf(" + ");
@@ -434,10 +436,10 @@ int is_suitible_s(int w, gf_t *gf, uint64_t s)
   for (; i < num_elems; i++) {
     i_inv = gf_inverse(w, gf, i);
     if ((i ^ i_inv) == s) {
-      fprintf(stderr, "Bailed on %llu ^ %llu = %llu\n", i, i_inv, s);
+      fprintf(stderr, "Bailed on %llu ^ %llu = %llu\n", LLUI i, LLUI i_inv, LLUI s);
       return -1;
     }
-    if (i % 1000000000 == 0) fprintf(stderr, "Processed %llu\n", i);
+    if (i % 1000000000 == 0) fprintf(stderr, "Processed %llu\n", LLUI i);
   }
 
   return 0;
@@ -508,10 +510,10 @@ int main(int argc, char **argv)
      * an irreducible polynomial.
      */
     if (is_suitible_s(w, &gf, irred_coef_s) < 0) {
-      fprintf(stderr, "%llu is not a suitable coeffient!\n", irred_coef_s);
+      fprintf(stderr, "%llu is not a suitable coeffient!\n", LLUI irred_coef_s);
       return -1;
     } else {
-      fprintf(stderr, "%llu IS A suitable coeffient!\n", irred_coef_s);
+      fprintf(stderr, "%llu IS A suitable coeffient!\n", LLUI irred_coef_s);
     }
 
 

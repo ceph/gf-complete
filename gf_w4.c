@@ -354,6 +354,12 @@ int gf_w4_single_table_init(gf_t *gf)
   int a, b, prod, loga, logb;
   uint8_t log_tbl[GF_FIELD_SIZE];
   uint8_t antilog_tbl[GF_FIELD_SIZE*2];
+  int sse;
+
+  sse = 0;
+#ifdef INTEL_SSE4
+  sse = 1;
+#endif
 
   h = (gf_internal_t *) gf->scratch;
   std = (struct gf_single_table_data *)h->private;
@@ -385,7 +391,7 @@ int gf_w4_single_table_init(gf_t *gf)
   gf->inverse.w32 = NULL;
   gf->divide.w32 = gf_w4_single_table_divide;
   gf->multiply.w32 = gf_w4_single_table_multiply;
-  if ((h->region_type & GF_REGION_SSE) || (h->mult_type == GF_MULT_DEFAULT && gf_is_sse())) {  
+  if ((h->region_type & GF_REGION_SSE) || (h->mult_type == GF_MULT_DEFAULT && sse)) {  
     gf->multiply_region.w32 = gf_w4_single_table_sse_multiply_region;
   } else {
     gf->multiply_region.w32 = gf_w4_single_table_multiply_region;
