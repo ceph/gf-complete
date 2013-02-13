@@ -1,3 +1,7 @@
+/*
+ * gf_rand.c -- Random number generator.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

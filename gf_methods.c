@@ -1,7 +1,7 @@
 /*
- * gf_mult.c
+ * gf_methods.c
  *
- * Multiplies two numbers in gf_2^w
+ * Lists supported methods (incomplete w.r.t. GROUP and COMPOSITE 
  */
 
 #include <stdio.h>

@@ -28,3 +28,4 @@ gf_w4.c
 gf_w64.c
 gf_w8.c
 gf_wgen.c
+whats_my_sse.c

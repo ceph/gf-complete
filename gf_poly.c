@@ -1,3 +1,7 @@
+/*
+ * gf_poly.c - program to help find primitive polynomials in composite fields
+ */
+
 #include "gf_complete.h"
 #include "gf_method.h"
 #include <stdio.h>

@@ -1,7 +1,7 @@
 /*
- * gf_unit.c
+ * gf_time.c
  *
- * Performs unit testing for gf arithmetic
+ * Performs timing for gf arithmetic
  */
 
 #include <stdio.h>

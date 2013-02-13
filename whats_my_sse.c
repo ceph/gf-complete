@@ -1,3 +1,7 @@
+/*
+ * whats_my_sse.c - lifted from Jens Gregor -- thanks Jens
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 int main()
