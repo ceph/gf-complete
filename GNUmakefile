@@ -3,14 +3,22 @@
 #
 #
 
-SRCS = gf_w4.c gf_w8.c gf_w16.c gf_w32.c gf_w64.c gf_w128.c gf_wgen.c gf.c gf_unit.c gf_time.c gf_mult.c gf_method.c gf_methods.c gf_div.c gf_rand.c gf_general.c gf_poly.c gf_example_1.c gf_add.c gf_example_2.c gf_example_3.c gf_example_4.c
+SRCS = gf_w4.c gf_w8.c gf_w16.c gf_w32.c gf_w64.c gf_w128.c gf_wgen.c gf.c gf_unit.c \
+       gf_time.c gf_mult.c gf_method.c gf_methods.c gf_div.c gf_rand.c gf_general.c \
+       gf_poly.c gf_example_1.c gf_add.c gf_example_2.c gf_example_3.c gf_example_4.c
+
 HDRS = gf_complete.h gf_int.h
-EXECUTABLES = gf_mult gf_div gf_add gf_unit gf_time gf_methods gf_poly gf_example_1 gf_example_2 gf_example_3 gf_example_4
+
+EXECUTABLES = gf_mult gf_div gf_add gf_unit gf_time gf_methods gf_poly \
+              gf_example_1 gf_example_2 gf_example_3 gf_example_4
+
 CFLAGS = -O3 -msse4 -DINTEL_SSE4
 LDFLAGS = -O3 -msse4
+
 RM = /bin/rm -f
 
-LIBOBJS = gf.o gf_method.o gf_wgen.o gf_w4.o gf_w8.o gf_w16.o gf_w32.o gf_w64.o gf_w128.o gf_rand.o gf_general.o
+LIBOBJS = gf.o gf_method.o gf_wgen.o gf_w4.o gf_w8.o gf_w16.o gf_w32.o \
+          gf_w64.o gf_w128.o gf_rand.o gf_general.o
 
 OBJS = $(addsuffix .o, $(basename $(SRCS)))
 
