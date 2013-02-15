@@ -10,7 +10,7 @@
 #include <smmintrin.h>
 #endif
 
-#ifdef  INTEL_AES
+#ifdef  INTEL_PCLMUL
 #include <wmmintrin.h>
 #endif
 

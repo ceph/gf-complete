@@ -12,8 +12,8 @@ HDRS = gf_complete.h gf_int.h
 EXECUTABLES = gf_mult gf_div gf_add gf_unit gf_time gf_methods gf_poly \
               gf_example_1 gf_example_2 gf_example_3 gf_example_4
 
-CFLAGS = -O3 -msse4 -maes -DINTEL_SSE4 -DINTEL_AES
-LDFLAGS = -O3 -msse4 -maes
+CFLAGS = -O3 -msse4 -maes -mpclmul -DINTEL_SSE4 -DINTEL_PCLMUL
+LDFLAGS = -O3 -msse4 -maes -mpclmul
 
 RM = /bin/rm -f
 

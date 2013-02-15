@@ -185,7 +185,7 @@ gf_w64_shift_multiply (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
   return pr;
 }
 
-#ifdef  INTEL_AES
+#ifdef  INTEL_PCLMUL
 /*
  * ELM: Use the Intel carryless multiply instruction to do very fast 64x64 multiply.
  */
@@ -197,22 +197,23 @@ gf_w64_clm_multiply (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
         __m128i         a, b;
         __m128i         result;
         __m128i         prim_poly;
-        __m128i         v;
+        __m128i         v, w;
         gf_internal_t * h = gf->scratch;
 
-        a = _mm_set_epi32 (0, 0, (uint32_t)(a64 >> 32ULL), (uint32_t)(a64 & 0xffffffffULL));
-        b = _mm_set_epi32 (0, 0, (uint32_t)(b64 >> 32ULL), (uint32_t)(b64 & 0xffffffffULL));
+        a = _mm_insert_epi64 (_mm_setzero_si128(), a64, 0);
+        b = _mm_insert_epi64 (_mm_setzero_si128(), b64, 0);
         prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0xffffffffULL));
-
         /* Do the initial multiply */
         result = _mm_clmulepi64_si128 (a, b, 0);
         /* Mask off the high order 32 bits using subtraction of the polynomial.
          * NOTE: this part requires that the polynomial have at least 32 leading 0 bits.
          */
-        v = _mm_srli_si128 (result, 12);
-        result = _mm_xor_si128 (result, _mm_clmulepi64_si128 (prim_poly, v, 0));
-        v = _mm_srli_si128 (result, 8);
-        result = _mm_xor_si128 (result, _mm_clmulepi64_si128 (prim_poly, v, 0));
+        v = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 0);
+        w = _mm_clmulepi64_si128 (prim_poly, v, 0);
+        result = _mm_xor_si128 (result, w);
+        v = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 1);
+        w = _mm_clmulepi64_si128 (prim_poly, v, 0);
+        result = _mm_xor_si128 (result, w);
 
         return ((gf_val_64_t)_mm_extract_epi64(result, 0));
 }
@@ -408,7 +409,8 @@ gf_w64_split_16_64_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint64_
 static 
 int gf_w64_shift_init(gf_t *gf)
 {
-  gf->multiply.w64 = gf_w64_shift_multiply;
+        /*  gf->multiply.w64 = gf_w64_shift_multiply; */
+        gf->multiply.w64 = gf_w64_clm_multiply;
   gf->inverse.w64 = gf_w64_euclid;
   gf->multiply_region.w64 = gf_w64_multiply_region_from_single;
   return 1;
@@ -1415,7 +1417,8 @@ int gf_w64_split_init(gf_t *gf)
 
   /* Defaults */
   gf->multiply_region.w64 = gf_w64_multiply_region_from_single;
-  gf->multiply.w64 = gf_w64_shift_multiply;
+  gf->multiply.w64 = gf_w64_clm_multiply;
+  /*  gf->multiply.w64 = gf_w64_shift_multiply; */
   gf->inverse.w64 = gf_w64_euclid;
 
   if ((h->arg1 == 4 && h->arg2 == 64) || (h->arg1 == 64 && h->arg2 == 4)) {
