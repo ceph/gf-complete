@@ -7,6 +7,11 @@
 #ifdef  INTEL_SSE4
 #include <nmmintrin.h>
 #include <emmintrin.h>
+#include <smmintrin.h>
+#endif
+
+#ifdef  INTEL_AES
+#include <wmmintrin.h>
 #endif
 
 /* This does either memcpy or xor, depending on "xor" */

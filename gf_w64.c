@@ -185,6 +185,39 @@ gf_w64_shift_multiply (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
   return pr;
 }
 
+#ifdef  INTEL_AES
+/*
+ * ELM: Use the Intel carryless multiply instruction to do very fast 64x64 multiply.
+ */
+static
+inline
+gf_val_64_t
+gf_w64_clm_multiply (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
+{
+        __m128i         a, b;
+        __m128i         result;
+        __m128i         prim_poly;
+        __m128i         v;
+        gf_internal_t * h = gf->scratch;
+
+        a = _mm_set_epi32 (0, 0, (uint32_t)(a64 >> 32ULL), (uint32_t)(a64 & 0xffffffffULL));
+        b = _mm_set_epi32 (0, 0, (uint32_t)(b64 >> 32ULL), (uint32_t)(b64 & 0xffffffffULL));
+        prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0xffffffffULL));
+
+        /* Do the initial multiply */
+        result = _mm_clmulepi64_si128 (a, b, 0);
+        /* Mask off the high order 32 bits using subtraction of the polynomial.
+         * NOTE: this part requires that the polynomial have at least 32 leading 0 bits.
+         */
+        v = _mm_srli_si128 (result, 12);
+        result = _mm_xor_si128 (result, _mm_clmulepi64_si128 (prim_poly, v, 0));
+        v = _mm_srli_si128 (result, 8);
+        result = _mm_xor_si128 (result, _mm_clmulepi64_si128 (prim_poly, v, 0));
+
+        return ((gf_val_64_t)_mm_extract_epi64(result, 0));
+}
+#endif
+
 void
 gf_w64_split_4_64_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
 {
@@ -1509,7 +1542,7 @@ int gf_w64_scratch_size(int mult_type, int region_type, int divide_type, int arg
       break;
     case GF_MULT_COMPOSITE:
       if (region_type & ~(GF_REGION_ALTMAP | GF_REGION_STDMAP)) return -1;
-      if (arg1 == 2 && arg2 == 0 || arg1 == 2 && arg2 == 1) {
+      if ((arg1 == 2 && arg2 == 0) || (arg1 == 2 && arg2 == 1)) {
         return sizeof(gf_internal_t) + sizeof(w64_composite_int_t) + 4;
       } else {
         return -1;
