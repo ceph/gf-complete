@@ -190,6 +190,8 @@ int main(int argc, char **argv)
         gf_general_set_zero(a, w);
       } else if (i < 40) {
         gf_general_set_one(a, w);
+      } else if (i < 60) {
+        gf_general_set_two(a, w);
       } else {
         gf_general_set_random(a, w, 1);
       }
