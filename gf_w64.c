@@ -203,7 +203,7 @@ gf_w64_clm_multiply (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
         gf_internal_t * h = gf->scratch;
 
         a = _mm_insert_epi64 (_mm_setzero_si128(), a64, 0);
-        b = _mm_insert_epi64 (a, b64, 0);
+        b = _mm_insert_epi64 (a, b64, 0); 
         prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0xffffffffULL));
         /* Do the initial multiply */
         result = _mm_clmulepi64_si128 (a, b, 0);
@@ -219,6 +219,92 @@ gf_w64_clm_multiply (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
 
         return ((gf_val_64_t)_mm_extract_epi64(result, 0));
 #endif
+}
+
+void
+gf_w64_clm_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
+{
+  gf_internal_t *h;
+  int i, j, k;
+  uint8_t *s8, *d8, *dtop;
+  uint64_t *s64, *d64;
+  gf_region_data rd;
+  __m128i  v, b, m, prim_poly, c, fr, w, result;
+
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
+
+  h = (gf_internal_t *) gf->scratch;
+
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 16);
+  gf_do_initial_region_alignment(&rd);
+
+  s8 = (uint8_t *) rd.s_start;
+  d8 = (uint8_t *) rd.d_start;
+  dtop = (uint8_t *) rd.d_top;
+
+  v = _mm_insert_epi64(_mm_setzero_si128(), val, 0);
+  m = _mm_set_epi32(0, 0, 0xffffffff, 0xffffffff);
+  prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0xffffffffULL));
+
+  if (xor) {
+    while (d8 != dtop) {
+      s64 = (uint64_t *) s8;
+      b = _mm_load_si128((__m128i *) s8);
+      result = _mm_clmulepi64_si128 (b, v, 0);
+      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 0);
+      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
+      result = _mm_xor_si128 (result, w);
+      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 1);
+      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
+      fr = _mm_xor_si128 (result, w);
+      fr = _mm_and_si128 (fr, m);
+  
+      result = _mm_clmulepi64_si128 (b, v, 1);
+      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 0);
+      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
+      result = _mm_xor_si128 (result, w);
+      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 1);
+      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
+      result = _mm_xor_si128 (result, w);
+      result = _mm_slli_si128 (result, 8);
+      fr = _mm_xor_si128 (result, fr);
+      result = _mm_load_si128((__m128i *) d8);
+      fr = _mm_xor_si128 (result, fr);
+  
+      _mm_store_si128((__m128i *) d8, fr);
+      d8 += 16;
+      s8 += 16;
+    }
+  } else {
+    while (d8 < dtop) {
+      s64 = (uint64_t *) s8;
+      b = _mm_load_si128((__m128i *) s8);
+      result = _mm_clmulepi64_si128 (b, v, 0);
+      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 0);
+      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
+      result = _mm_xor_si128 (result, w);
+      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 1);
+      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
+      fr = _mm_xor_si128 (result, w);
+      fr = _mm_and_si128 (fr, m);
+  
+      result = _mm_clmulepi64_si128 (b, v, 1);
+      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 0);
+      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
+      result = _mm_xor_si128 (result, w);
+      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 1);
+      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
+      result = _mm_xor_si128 (result, w);
+      result = _mm_slli_si128 (result, 8);
+      fr = _mm_xor_si128 (result, fr);
+  
+      _mm_store_si128((__m128i *) d8, fr);
+      d8 += 16;
+      s8 += 16;
+    }
+  }
+  gf_do_final_region_alignment(&rd);
 }
 
 void
@@ -238,7 +324,7 @@ gf_w64_split_4_64_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint64_t
 
   ld = (struct gf_split_4_64_lazy_data *) h->private;
 
-  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 4);
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 8);
   gf_do_initial_region_alignment(&rd);
 
   if (ld->last_value != val) {
@@ -416,12 +502,14 @@ int gf_w64_shift_init(gf_t *gf)
   h = (gf_internal_t *) gf->scratch;
 
   gf->multiply.w64 = gf_w64_shift_multiply;
-#ifdef  INTEL_PCLMUL
-  if (h->region_type != GF_REGION_NOSSE) gf->multiply.w64 = gf_w64_clm_multiply;
-#endif
-
   gf->inverse.w64 = gf_w64_euclid;
   gf->multiply_region.w64 = gf_w64_multiply_region_from_single;
+
+#ifdef  INTEL_PCLMUL
+  if (h->region_type != GF_REGION_NOSSE) gf->multiply.w64 = gf_w64_clm_multiply;
+  if (h->region_type != GF_REGION_NOSSE) gf->multiply_region.w64 = gf_w64_clm_multiply_region;
+#endif
+
   return 1;
 }
 
