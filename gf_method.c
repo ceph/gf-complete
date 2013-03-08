@@ -28,6 +28,7 @@ void methods_to_stderr()
   fprintf(stderr, "       TABLE: Full multiplication table\n");
   fprintf(stderr, "       LOG:   Discrete logs\n");
   fprintf(stderr, "       LOG_ZERO: Discrete logs with a large table for zeros\n");
+  fprintf(stderr, "       LOG_ZERO_EXT: Discrete logs with an extra large table for zeros\n");
   fprintf(stderr, "       SPLIT g_a g_b: Split tables defined by g_a and g_b\n");
   fprintf(stderr, "       COMPOSITE k rec METHOD: Composite field.  GF((2^l)^k), l=w/k.\n");
   fprintf(stderr, "                               rec = 0 means inline single multiplication\n");
@@ -99,6 +100,10 @@ int create_gf_from_argv(gf_t *gf, int w, int argc, char **argv, int starting)
   } else if (strcmp(argv[starting], "LOG_ZERO") == 0) {
     mult_type = GF_MULT_LOG_TABLE;
     arg1 = 1;
+    starting++;
+  } else if (strcmp(argv[starting], "LOG_ZERO_EXT") == 0) {
+    mult_type = GF_MULT_LOG_TABLE;
+    arg1 = 2;
     starting++;
   } else if (strcmp(argv[starting], "SPLIT") == 0) {
     mult_type = GF_MULT_SPLIT_TABLE;

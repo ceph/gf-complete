@@ -224,6 +224,7 @@ gf_w64_clm_multiply (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
 void
 gf_w64_clm_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
 {
+#ifdef  INTEL_PCLMUL
   gf_internal_t *h;
   int i, j, k;
   uint8_t *s8, *d8, *dtop;
@@ -305,6 +306,7 @@ gf_w64_clm_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int by
     }
   }
   gf_do_final_region_alignment(&rd);
+#endif
 }
 
 void

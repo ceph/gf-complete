@@ -249,19 +249,53 @@ void gf_general_do_region_check(gf_t *gf, gf_general_t *a, void *orig_a, void *o
 
 void gf_general_set_up_single_timing_test(int w, void *ra, void *rb, int size)
 {
+  void *top;
+  gf_general_t g;
+  uint8_t *r8;
+  uint16_t *r16;
   uint32_t *r32;
+  uint64_t *r64;
   int i;
 
-  /* If w is 8, 16, 32, 64 or 128, this is easy -- 
-     just fill the regions with random bytes.
+  top = rb+size;
 
+  /* If w is 8, 16, 32, 64 or 128, fill the regions with random bytes.
+     However, don't allow for zeros in rb, because that will screw up
+     division.
+     
      Otherwise, treat every four bytes as an uint32_t
      and fill it with a random value mod (1 << w).
    */
 
   if (w == 8 || w == 16 || w == 32 || w == 64 || w == 128) {
     MOA_Fill_Random_Region (ra, size);
-    MOA_Fill_Random_Region (rb, size);
+    while (rb < top) {
+      gf_general_set_random(&g, w, 0);
+      switch (w) {
+        case 8: 
+          r8 = (uint8_t *) rb;
+          *r8 = g.w32;
+          break;
+        case 16: 
+          r16 = (uint16_t *) rb;
+          *r16 = g.w32;
+          break;
+        case 32: 
+          r32 = (uint32_t *) rb;
+          *r32 = g.w32;
+          break;
+        case 64:
+          r64 = (uint64_t *) rb;
+          *r64 = g.w64;
+          break;
+        case 128: 
+          r64 = (uint64_t *) rb;
+          r64[0] = g.w128[0];
+          r64[1] = g.w128[1];
+          break;
+      }
+      rb += (w/8);
+    }
   } else {
     r32 = (uint32_t *) ra;
     for (i = 0; i < size/4; i++) r32[i] = MOA_Random_W(w, 1);

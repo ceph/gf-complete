@@ -15,6 +15,10 @@ EXECUTABLES = gf_mult gf_div gf_add gf_unit gf_time gf_methods gf_poly \
 CFLAGS = -O3 -msse4 -maes -mpclmul -DINTEL_SSE4 -DINTEL_PCLMUL
 LDFLAGS = -O3 -msse4 -maes -mpclmul
 
+# Use these if you don't have INTEL_PCLMUL
+# CFLAGS = -O3 -msse4 -DINTEL_SSE4
+# LDFLAGS = -O3 -msse4 
+
 RM = /bin/rm -f
 
 LIBOBJS = gf.o gf_method.o gf_wgen.o gf_w4.o gf_w8.o gf_w16.o gf_w32.o \

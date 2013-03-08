@@ -24,9 +24,17 @@ struct gf_w8_logtable_data {
 };
 
 struct gf_w8_logzero_table_data {
-    uint16_t        log_tbl[GF_FIELD_SIZE];
+    short           log_tbl[GF_FIELD_SIZE];  /* Make this signed, so that we can divide easily */
     uint8_t         antilog_tbl[512+512+1];
+    uint8_t         *div_tbl;
     uint8_t         *inv_tbl;
+};
+
+struct gf_w8_logzero_small_table_data {
+    short           log_tbl[GF_FIELD_SIZE];  /* Make this signed, so that we can divide easily */
+    uint8_t         antilog_tbl[255*3];
+    uint8_t         inv_tbl[GF_FIELD_SIZE];
+    uint8_t         *div_tbl;
 };
 
 /* Don't change the order of these relative to gf_w8_half_table_data */
@@ -217,7 +225,7 @@ gf_w8_logzero_multiply (gf_t *gf, uint32_t a, uint32_t b)
   struct gf_w8_logzero_table_data *ltd;
 
   ltd = (struct gf_w8_logzero_table_data *) ((gf_internal_t *) gf->scratch)->private;
-  return ltd->antilog_tbl[(unsigned)(ltd->log_tbl[a] + ltd->log_tbl[b])];
+  return ltd->antilog_tbl[ltd->log_tbl[a] + ltd->log_tbl[b]];
 }
 
 static
@@ -228,7 +236,30 @@ gf_w8_logzero_divide (gf_t *gf, uint32_t a, uint32_t b)
   struct gf_w8_logzero_table_data *ltd;
 
   ltd = (struct gf_w8_logzero_table_data *) ((gf_internal_t *) gf->scratch)->private;
-  return ltd->antilog_tbl[(unsigned)((255 + ltd->log_tbl[a]) - ltd->log_tbl[b])];
+  return ltd->div_tbl[ltd->log_tbl[a] - ltd->log_tbl[b]];
+}
+
+static
+inline
+uint32_t
+gf_w8_logzero_small_multiply (gf_t *gf, uint32_t a, uint32_t b)
+{
+  struct gf_w8_logzero_small_table_data *std;
+
+  std = (struct gf_w8_logzero_small_table_data *) ((gf_internal_t *) gf->scratch)->private;
+  if (b == 0) return 0;
+  return std->antilog_tbl[std->log_tbl[a] + std->log_tbl[b]];
+}
+
+static
+inline
+uint32_t
+gf_w8_logzero_small_divide (gf_t *gf, uint32_t a, uint32_t b)
+{
+  struct gf_w8_logzero_small_table_data *std;
+
+  std = (struct gf_w8_logzero_small_table_data *) ((gf_internal_t *) gf->scratch)->private;
+  return std->div_tbl[std->log_tbl[a] - std->log_tbl[b]];
 }
 
 static
@@ -278,6 +309,16 @@ gf_w8_logzero_inverse (gf_t *gf, uint32_t a)
 }
 
 static
+uint32_t
+gf_w8_logzero_small_inverse (gf_t *gf, uint32_t a)
+{
+  struct gf_w8_logzero_small_table_data *std;
+
+  std = (struct gf_w8_logzero_small_table_data *) ((gf_internal_t *) gf->scratch)->private;
+  return (std->inv_tbl[a]);
+}
+
+static
 void
 gf_w8_log_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
@@ -314,23 +355,37 @@ gf_w8_logzero_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int
   uint8_t lv, b, c;
   uint8_t *s8, *d8;
   struct gf_w8_logzero_table_data *ltd;
+  struct gf_w8_logzero_small_table_data *std;
+  short *log;
+  uint8_t *alt;
+  gf_internal_t *h;
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
   if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
-  ltd = (struct gf_w8_logzero_table_data *) ((gf_internal_t *) gf->scratch)->private;
+  h = (gf_internal_t *) gf->scratch;
+
+  if (h->arg1 == 1) {
+    std = (struct gf_w8_logzero_small_table_data *) h->private;
+    log = std->log_tbl;
+    alt = std->antilog_tbl;
+  } else {
+    ltd = (struct gf_w8_logzero_table_data *) h->private;
+    log = ltd->log_tbl;
+    alt = ltd->antilog_tbl;
+  }
   s8 = (uint8_t *) src;
   d8 = (uint8_t *) dest;
 
-  lv = ltd->log_tbl[val];
+  lv = log[val];
 
   if (xor) {
     for (i = 0; i < bytes; i++) {
-      d8[i] ^= (ltd->antilog_tbl[lv + ltd->log_tbl[s8[i]]]);
+      d8[i] ^= (alt[lv + log[s8[i]]]);
     }
   } else {
     for (i = 0; i < bytes; i++) {
-      d8[i] = (ltd->antilog_tbl[lv + ltd->log_tbl[s8[i]]]);
+      d8[i] = (alt[lv + log[s8[i]]]);
     }
   }
 }
@@ -341,6 +396,7 @@ int gf_w8_log_init(gf_t *gf)
   gf_internal_t *h;
   struct gf_w8_logtable_data *ltd;
   struct gf_w8_logzero_table_data *ztd;
+  struct gf_w8_logzero_small_table_data *std;
   uint8_t *alt;
   uint8_t *inv;
   int i, b;
@@ -350,25 +406,35 @@ int gf_w8_log_init(gf_t *gf)
     ltd = h->private;
     alt = ltd->antilog_tbl;
     inv = ltd->inv_tbl;
+  } else if (h->arg1 == 1) {
+    std = h->private;
+    alt = std->antilog_tbl;
+    std->div_tbl = (alt + 255);
+    inv = std->inv_tbl;
   } else {
     ztd = h->private;
     alt = ztd->antilog_tbl;
     ztd->inv_tbl = (alt + 512 + 256);
+    ztd->div_tbl = (alt + 255);
     inv = ztd->inv_tbl;
   }
   
-  if (h->arg1 == 1) {
-    ztd->log_tbl[0] = 512;
-  } else {
+  if (h->arg1 == 0) {
     ltd->log_tbl[0] = 0;
+  } else if (h->arg1 == 1) {
+    std->log_tbl[0] = 510;
+  } else {
+    ztd->log_tbl[0] = 512;
   }
 
   b = 1;
   for (i = 0; i < GF_MULT_GROUP_SIZE; i++) {
-      if (h->arg1 == 1) {
-        ztd->log_tbl[b] = i;
-      } else {
+      if (h->arg1 == 0) {
         ltd->log_tbl[b] = i;
+      } else if (h->arg1 == 1) {
+        std->log_tbl[b] = i;
+      } else {
+        ztd->log_tbl[b] = i;
       }
       alt[i] = b;
       alt[i+GF_MULT_GROUP_SIZE] = b;
@@ -377,22 +443,39 @@ int gf_w8_log_init(gf_t *gf)
           b = b ^ h->prim_poly;
       }
   }
-  if (h->arg1 == 1) {
+  if (h->arg1 == 1) bzero(alt+510, 255);
+
+  if (h->arg1 == 2) {
     bzero(alt+512, 255);
     alt[512+512] = 0;
   }
 
   inv[0] = 0;  /* Not really, but we need to fill it with something  */
-  inv[1] = 1;
-  for (i = 2; i < GF_FIELD_SIZE; i++) {
-    b = (h->arg1 == 1) ? ztd->log_tbl[i] : ltd->log_tbl[i];
-    inv[i] = alt[GF_MULT_GROUP_SIZE-b];
+  i = 1;
+  b = GF_MULT_GROUP_SIZE;
+  do {
+    inv[i] = alt[b];
+    i <<= 1;
+    if (i & (1 << 8)) i ^= h->prim_poly;
+    b--;
+  } while (i != 1);
+    
+  if (h->arg1 == 0) {
+    gf->inverse.w32 = gf_w8_log_inverse;
+    gf->divide.w32 = gf_w8_log_divide;
+    gf->multiply.w32 = gf_w8_log_multiply;
+    gf->multiply_region.w32 = gf_w8_log_multiply_region;
+  } else if (h->arg1 == 1) {
+    gf->inverse.w32 = gf_w8_logzero_small_inverse;
+    gf->divide.w32 = gf_w8_logzero_small_divide;
+    gf->multiply.w32 = gf_w8_logzero_small_multiply;
+    gf->multiply_region.w32 = gf_w8_logzero_multiply_region;
+  } else {
+    gf->inverse.w32 = gf_w8_logzero_inverse;
+    gf->divide.w32 = gf_w8_logzero_divide;
+    gf->multiply.w32 = gf_w8_logzero_multiply;
+    gf->multiply_region.w32 = gf_w8_logzero_multiply_region;
   }
-
-  gf->inverse.w32 = (h->arg1 == 0) ? gf_w8_log_inverse : gf_w8_logzero_inverse;
-  gf->divide.w32 = (h->arg1 == 0) ? gf_w8_log_divide : gf_w8_logzero_divide;
-  gf->multiply.w32 = (h->arg1 == 0) ? gf_w8_log_multiply : gf_w8_logzero_multiply;
-  gf->multiply_region.w32 = (h->arg1 == 0) ? gf_w8_log_multiply_region : gf_w8_logzero_multiply_region;
   return 1;
 }
 
@@ -1818,9 +1901,10 @@ int gf_w8_scratch_size(int mult_type, int region_type, int divide_type, int arg1
       return -1;
       break;
     case GF_MULT_LOG_TABLE:
-      if ((arg1 != 0 && arg1 != 1) || arg2 != 0) return -1;
+      if ((arg1 != 0 && arg1 != 1 && arg1 != 2) || arg2 != 0) return -1;
       if (region_type != 0 && region_type != GF_REGION_CAUCHY) return -1;
       if (arg1 == 0) return sizeof(gf_internal_t) + sizeof(struct gf_w8_logtable_data) + 64;
+      if (arg1 == 1) return sizeof(gf_internal_t) + sizeof(struct gf_w8_logzero_small_table_data) + 64;
       return sizeof(gf_internal_t) + sizeof(struct gf_w8_logzero_table_data) + 64;
       break;
     case GF_MULT_SHIFT:

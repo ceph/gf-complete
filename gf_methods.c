@@ -12,9 +12,9 @@
 #include "gf_complete.h"
 #include "gf_method.h"
 
-#define NMULTS (14)
+#define NMULTS (15)
 static char *mults[NMULTS] = { "SHIFT", "GROUP44", "GROUP48", "BYTWO_p", "BYTWO_b",
-                               "TABLE", "LOG", "LOG_ZERO", "SPLIT2", "SPLIT4", "SPLIT8", "SPLIT88", "COMPOSITE-0", "COMPOSITE-1" };
+                               "TABLE", "LOG", "LOG_ZERO", "LOG_ZERO_EXT", "SPLIT2", "SPLIT4", "SPLIT8", "SPLIT88", "COMPOSITE-0", "COMPOSITE-1" };
 
 #define NREGIONS (96) 
 static char *regions[NREGIONS] = { "-", "SINGLE", "DOUBLE", "QUAD",
