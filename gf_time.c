@@ -16,8 +16,6 @@
 #include "gf_rand.h"
 #include "gf_general.h"
 
-#define REGION_SIZE (4096)
-
 void
 timer_start (double *t)
 {

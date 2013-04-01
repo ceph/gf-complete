@@ -54,6 +54,8 @@ int main(int argc, char **argv)
   time_t t0;
   gf_internal_t *h;
   gf_general_t *a, *b, *c, *d, *ai, *bi;
+  uint8_t a8, b8, c8, *mult4, *div4, *mult8, *div8;
+  uint16_t a16, b16, c16, d16, *log16, *alog16;
   char as[50], bs[50], cs[50], ds[50], ais[50], bis[50];
   uint32_t mask;
   char *ra, *rb, *rc, *rd, *target;
@@ -97,6 +99,21 @@ int main(int argc, char **argv)
 
   if (!gf_init_easy(&gf_def, w)) problem("No default for this value of w");
   
+  if (w == 4) {
+    mult4 = gf_w4_get_mult_table(&gf);
+    div4 = gf_w4_get_div_table(&gf);
+  }
+
+  if (w == 8) {
+    mult8 = gf_w8_get_mult_table(&gf);
+    div8 = gf_w8_get_div_table(&gf);
+  }
+
+  if (w == 16) {
+    log16 = gf_w16_get_log_table(&gf);
+    alog16 = gf_w16_get_mult_alog_table(&gf);
+  }
+
   if (verbose) printf("Seed: %ld\n", t0);
 
   if (single) {
@@ -132,6 +149,45 @@ int main(int argc, char **argv)
       tested = 0;
       gf_general_multiply(&gf, a, b, c);
       
+      /* If w is 4, 8 or 16, then there are inline multiplication/division methods.  
+         Test them here. */
+
+      if (w == 4 && mult4 != NULL) {
+        a8 = a->w32;
+        b8 = b->w32;
+        c8 = GF_W4_INLINE_MULTDIV(mult4, a8, b8);
+        if (c8 != c->w32) {
+          printf("Error in inline multiplication. %d * %d.  Inline = %d.  Default = %d.\n",
+             a8, b8, c8, c->w32);
+          exit(1);
+        }
+      }
+
+      if (w == 8 && mult8 != NULL) {
+        a8 = a->w32;
+        b8 = b->w32;
+        c8 = GF_W8_INLINE_MULTDIV(mult8, a8, b8);
+        if (c8 != c->w32) {
+          printf("Error in inline multiplication. %d * %d.  Inline = %d.  Default = %d.\n",
+             a8, b8, c8, c->w32);
+          exit(1);
+        }
+      }
+
+      if (w == 16 && log16 != NULL) {
+        a16 = a->w32;
+        b16 = b->w32;
+        c16 = GF_W16_INLINE_MULT(log16, alog16, a16, b16);
+        if (c16 != c->w32) {
+          printf("Error in inline multiplication. %d * %d.  Inline = %d.  Default = %d.\n",
+             a16, b16, c16, c->w32);
+          printf("%d %d\n", log16[a16], log16[b16]);
+          top = log16[a16] + log16[b16];
+          printf("%d %d\n", top, alog16[top]);
+          exit(1);
+        }
+      }
+
       /* If this is not composite, then first test against the default: */
 
       if (h->mult_type != GF_MULT_COMPOSITE) {

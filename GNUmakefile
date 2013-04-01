@@ -5,19 +5,20 @@
 
 SRCS = gf_w4.c gf_w8.c gf_w16.c gf_w32.c gf_w64.c gf_w128.c gf_wgen.c gf.c gf_unit.c \
        gf_time.c gf_mult.c gf_method.c gf_methods.c gf_div.c gf_rand.c gf_general.c \
-       gf_poly.c gf_example_1.c gf_add.c gf_example_2.c gf_example_3.c gf_example_4.c
+       gf_poly.c gf_example_1.c gf_add.c gf_example_2.c gf_example_3.c gf_example_4.c \
+       gf_inline_time.c
 
 HDRS = gf_complete.h gf_int.h
 
 EXECUTABLES = gf_mult gf_div gf_add gf_unit gf_time gf_methods gf_poly \
-              gf_example_1 gf_example_2 gf_example_3 gf_example_4
+              gf_example_1 gf_example_2 gf_example_3 gf_example_4 gf_inline_time
 
-CFLAGS = -O3 -msse4 -maes -mpclmul -DINTEL_SSE4 -DINTEL_PCLMUL
-LDFLAGS = -O3 -msse4 -maes -mpclmul
+# CFLAGS = -O3 -msse4 -maes -mpclmul -DINTEL_SSE4 -DINTEL_PCLMUL
+# LDFLAGS = -O3 -msse4 -maes -mpclmul
 
 # Use these if you don't have INTEL_PCLMUL
-# CFLAGS = -O3 -msse4 -DINTEL_SSE4
-# LDFLAGS = -O3 -msse4 
+ CFLAGS = -O3 -msse4 -DINTEL_SSE4
+ LDFLAGS = -O3 -msse4 
 
 RM = /bin/rm -f
 
@@ -38,6 +39,7 @@ gf_complete.a: $(LIBOBJS)
 
 gf_methods: gf_methods.o gf_complete.a
 gf_time: gf_time.o gf_complete.a
+gf_inline_time: gf_inline_time.o gf_complete.a
 gf_unit: gf_unit.o gf_complete.a
 gf_example_1: gf_example_1.o gf_complete.a
 gf_example_2: gf_example_2.o gf_complete.a
@@ -57,6 +59,7 @@ spotless: clean
 gf_div.o: gf_complete.h gf_method.h
 gf_methods.o: gf_complete.h gf_method.h
 gf_time.o: gf_complete.h gf_method.h gf_rand.h gf_general.h
+gf_inline_time.o: gf_complete.h gf_rand.h
 gf_wgen.o: gf_int.h gf_complete.h
 gf_w4.o: gf_int.h gf_complete.h
 gf_w8.o: gf_int.h gf_complete.h

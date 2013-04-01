@@ -146,7 +146,6 @@ gf_val_32_t gf_w4_matrix (gf_t *gf, gf_val_32_t b)
   return gf_bitmatrix_inverse(b, 4, ((gf_internal_t *) (gf->scratch))->prim_poly);
 }
 
-
 /* ------------------------------------------------------------
   IMPLEMENTATION: LOG_TABLE: 
 
@@ -2010,3 +2009,32 @@ gf_w4_init (gf_t *gf)
   }
   return 1;
 }
+
+/* Inline setup functions */
+
+uint8_t *gf_w4_get_mult_table(gf_t *gf)
+{
+  gf_internal_t *h;
+  struct gf_single_table_data *std;
+  
+  h = (gf_internal_t *) gf->scratch;
+  if (gf->multiply.w32 == gf_w4_single_table_multiply) {
+    std = (struct gf_single_table_data *) h->private;
+    return (uint8_t *) std->mult;
+  } 
+  return NULL;
+}
+    
+uint8_t *gf_w4_get_div_table(gf_t *gf)
+{
+  gf_internal_t *h;
+  struct gf_single_table_data *std;
+  
+  h = (gf_internal_t *) gf->scratch;
+  if (gf->multiply.w32 == gf_w4_single_table_multiply) {
+    std = (struct gf_single_table_data *) h->private;
+    return (uint8_t *) std->div;
+  } 
+  return NULL;
+}
+

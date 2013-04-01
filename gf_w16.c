@@ -17,9 +17,10 @@
 #define GF_S_GF_8_2 (63)
 
 struct gf_logtable_data {
-    int              log_tbl[GF_FIELD_SIZE];
+    uint16_t      log_tbl[GF_FIELD_SIZE];
     uint16_t      antilog_tbl[GF_FIELD_SIZE * 2];
     uint16_t      inv_tbl[GF_FIELD_SIZE];
+    uint16_t      *d_antilog;
 };
 
 struct gf_zero_logtable_data {
@@ -308,7 +309,7 @@ gf_w16_log_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
   struct gf_logtable_data *ltd;
 
   ltd = (struct gf_logtable_data *) ((gf_internal_t *) gf->scratch)->private;
-  return (a == 0 || b == 0) ? 0 : ltd->antilog_tbl[ltd->log_tbl[a] + ltd->log_tbl[b]];
+  return (a == 0 || b == 0) ? 0 : ltd->antilog_tbl[(int) ltd->log_tbl[a] + (int) ltd->log_tbl[b]];
 }
 
 static
@@ -322,8 +323,8 @@ gf_w16_log_divide(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
   if (a == 0 || b == 0) return 0;
   ltd = (struct gf_logtable_data *) ((gf_internal_t *) gf->scratch)->private;
 
-  log_sum = ltd->log_tbl[a] - ltd->log_tbl[b] + (GF_MULT_GROUP_SIZE);
-  return (ltd->antilog_tbl[log_sum]);
+  log_sum = (int) ltd->log_tbl[a] - (int) ltd->log_tbl[b];
+  return (ltd->d_antilog[log_sum]);
 }
 
 static
@@ -347,6 +348,7 @@ int gf_w16_log_init(gf_t *gf)
   ltd = h->private;
 
   ltd->log_tbl[0] = 0;
+  ltd->d_antilog = ltd->log_tbl + GF_MULT_GROUP_SIZE;
 
   b = 1;
   for (i = 0; i < GF_MULT_GROUP_SIZE; i++) {
@@ -1944,4 +1946,45 @@ int gf_w16_init(gf_t *gf)
     gf->extract_word.w32 = gf_w16_extract_word;
   }
   return 1;
+}
+
+/* Inline setup functions */
+
+uint16_t *gf_w16_get_log_table(gf_t *gf)
+{
+  gf_internal_t *h;
+  struct gf_logtable_data *ltd;
+
+  h = (gf_internal_t *) gf->scratch;
+  if (gf->multiply.w32 == gf_w16_log_multiply) {
+    ltd = (struct gf_logtable_data *) ((gf_internal_t *) gf->scratch)->private;
+    return (uint16_t *) ltd->log_tbl;
+  }
+  return NULL;
+}
+
+uint16_t *gf_w16_get_mult_alog_table(gf_t *gf)
+{
+  gf_internal_t *h;
+  struct gf_logtable_data *ltd;
+
+  h = (gf_internal_t *) gf->scratch;
+  if (gf->multiply.w32 == gf_w16_log_multiply) {
+    ltd = (struct gf_logtable_data *) h->private;
+    return (uint16_t *) ltd->antilog_tbl;
+  }
+  return NULL;
+}
+
+uint16_t *gf_w16_get_div_alog_table(gf_t *gf)
+{
+  gf_internal_t *h;
+  struct gf_logtable_data *ltd;
+
+  h = (gf_internal_t *) gf->scratch;
+  if (gf->multiply.w32 == gf_w16_log_multiply) {
+    ltd = (struct gf_logtable_data *) h->private;
+    return (uint16_t *) ltd->d_antilog;
+  }
+  return NULL;
 }

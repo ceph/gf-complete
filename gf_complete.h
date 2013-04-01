@@ -130,3 +130,28 @@ extern int gf_scratch_size(int w,
                            int arg2);
 
 extern int gf_free(GFP gf, int recursive);
+
+/* This is support for inline single multiplications and divisions.
+   I know it's yucky, but if you've got to be fast, you've got to be fast.
+   We'll support inlines for w=4, w=8 and w=16.  
+
+   To use inline multiplication and division with w=4 or 8, you should use the 
+   default gf_t, or one with a single table.  Otherwise, gf_w4/8_get_mult_table()
+   will return NULL. */
+
+uint8_t *gf_w4_get_mult_table(GFP gf);
+uint8_t *gf_w4_get_div_table(GFP gf);
+
+#define GF_W4_INLINE_MULTDIV(table, a, b) (table[((a)<<4)|b])
+
+uint8_t *gf_w8_get_mult_table(GFP gf);
+uint8_t *gf_w8_get_div_table(GFP gf);
+
+#define GF_W8_INLINE_MULTDIV(table, a, b) (table[(((uint32_t) a)<<8)|b])
+
+uint16_t *gf_w16_get_log_table(GFP gf);
+uint16_t *gf_w16_get_mult_alog_table(GFP gf);
+uint16_t *gf_w16_get_div_alog_table(GFP gf);
+
+#define GF_W16_INLINE_MULT(log, alog, a, b) ((a) == 0 || (b) == 0) ? 0 : (alog[(uint32_t)log[a]+(uint32_t)log[b]])
+#define GF_W16_INLINE_DIV(log, alog, a, b) ((a) == 0 || (b) == 0) ? 0 : (alog[(int)log[a]-(int)log[b]])

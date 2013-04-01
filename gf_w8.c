@@ -1971,3 +1971,40 @@ int gf_w8_init(gf_t *gf)
 
   return 1;
 }
+
+
+/* Inline setup functions */
+
+uint8_t *gf_w8_get_mult_table(gf_t *gf)
+{
+  gf_internal_t *h;
+  struct gf_w8_default_data *ftd;
+  struct gf_w8_single_table_data *std;
+
+  h = (gf_internal_t *) gf->scratch;
+  if (gf->multiply.w32 == gf_w8_default_multiply) {
+    ftd = (struct gf_w8_default_data *) h->private;
+    return (uint8_t *) ftd->multtable;
+  } else if (gf->multiply.w32 == gf_w8_table_multiply) {
+    std = (struct gf_w8_single_table_data *) h->private;
+    return (uint8_t *) std->multtable;
+  }
+  return NULL;
+}
+
+uint8_t *gf_w8_get_div_table(gf_t *gf)
+{
+  gf_internal_t *h;
+  struct gf_w8_default_data *ftd;
+  struct gf_w8_single_table_data *std;
+
+  h = (gf_internal_t *) gf->scratch;
+  if (gf->multiply.w32 == gf_w8_default_multiply) {
+    ftd = (struct gf_w8_default_data *) ((gf_internal_t *) gf->scratch)->private;
+    return (uint8_t *) std->divtable;
+  } else if (gf->multiply.w32 == gf_w8_table_multiply) {
+    std = (struct gf_w8_single_table_data *) ((gf_internal_t *) gf->scratch)->private;
+    return (uint8_t *) std->divtable;
+  }
+  return NULL;
+}
