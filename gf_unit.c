@@ -236,6 +236,22 @@ int main(int argc, char **argv)
         printf("  gf.multiply.w32(gf, %s, %s) = %s, which is too big.\n", as, bs, cs);
         exit(1);
       }
+
+      /* Finally, let's check to see that multiplication and division work together */
+
+      if (!gf_general_is_zero(a, w)) {
+        gf_general_divide(&gf, c, a, d);
+        if (!gf_general_are_equal(b, d, w)) {
+          gf_general_val_to_s(a, w, as);
+          gf_general_val_to_s(b, w, bs);
+          gf_general_val_to_s(c, w, cs);
+          gf_general_val_to_s(d, w, ds);
+          printf("Error in single multiplication/division (all numbers in hex):\n\n");
+          printf("  gf.multiply(gf, %s, %s) = %s, but gf.divide(gf, %s, %s) = %s\n", as, bs, cs, cs, as, ds);
+          exit(1);
+        }
+      }
+
     }
   }
 

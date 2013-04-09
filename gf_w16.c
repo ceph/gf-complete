@@ -348,7 +348,7 @@ int gf_w16_log_init(gf_t *gf)
   ltd = h->private;
 
   ltd->log_tbl[0] = 0;
-  ltd->d_antilog = ltd->log_tbl + (1 << 16);
+  ltd->d_antilog = ltd->antilog_tbl + GF_MULT_GROUP_SIZE;
 
   b = 1;
   for (i = 0; i < GF_MULT_GROUP_SIZE; i++) {
