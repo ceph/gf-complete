@@ -221,16 +221,43 @@ gf_w64_clm_multiply (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
 #endif
 }
 
+#ifdef  INTEL_PCLMUL
+inline
+__m128i
+gf_w64_clm_multiply_single (__m128i v, __m128i b, __m128i pp_l, __m128i pp_h)
+{
+  __m128i       r0, r1, c0, c1, w0, w1;
+
+  r0 = _mm_clmulepi64_si128 (b, v, 0);
+  c0 = _mm_srli_si128 (r0, 12);
+  w0 = _mm_clmulepi64_si128 (pp_h, c0, 0);
+  r0 = _mm_xor_si128 (r0, w0);
+  c0 = _mm_srli_si128 (_mm_slli_si128 (r0, 4), 12);
+  w0 = _mm_clmulepi64_si128 (pp_l, c0, 0);
+  r0 = _mm_insert_epi64 (_mm_xor_si128 (r0, w0), 0, 1);
+
+  r1 = _mm_clmulepi64_si128 (b, v, 1);
+  c1 = _mm_srli_si128 (r1, 12);
+  w1 = _mm_clmulepi64_si128 (pp_h, c1, 0);
+  r1 = _mm_xor_si128 (r1, w1);
+  c1 = _mm_srli_si128 (_mm_slli_si128 (r1, 4), 12);
+  w1 = _mm_clmulepi64_si128 (pp_l, c1, 0);
+  r1 = _mm_slli_si128 (_mm_xor_si128 (r1, w1), 8);
+
+  return (_mm_xor_si128 (r0, r1));
+}
+
+#endif
+
 void
 gf_w64_clm_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
 {
 #ifdef  INTEL_PCLMUL
   gf_internal_t *h;
-  int i, j, k;
-  uint8_t *s8, *d8, *dtop;
-  uint64_t *s64, *d64;
+  int i, top;
+  uint8_t *s8, *d8;
   gf_region_data rd;
-  __m128i  v, b, m, prim_poly, c, fr, w, result;
+  __m128i  v, b, xv, pp_l, pp_h, final;
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
   if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
@@ -242,67 +269,25 @@ gf_w64_clm_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int by
 
   s8 = (uint8_t *) rd.s_start;
   d8 = (uint8_t *) rd.d_start;
-  dtop = (uint8_t *) rd.d_top;
+  top = (uint8_t *) rd.d_top - (uint8_t *)rd.d_start;
 
   v = _mm_insert_epi64(_mm_setzero_si128(), val, 0);
-  m = _mm_set_epi32(0, 0, 0xffffffff, 0xffffffff);
-  prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0xffffffffULL));
+  pp_l = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0xffffffffULL));
+  pp_h = _mm_slli_si128 (pp_l, 4);
 
   if (xor) {
-    while (d8 != dtop) {
-      s64 = (uint64_t *) s8;
-      b = _mm_load_si128((__m128i *) s8);
-      result = _mm_clmulepi64_si128 (b, v, 0);
-      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 0);
-      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
-      result = _mm_xor_si128 (result, w);
-      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 1);
-      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
-      fr = _mm_xor_si128 (result, w);
-      fr = _mm_and_si128 (fr, m);
-  
-      result = _mm_clmulepi64_si128 (b, v, 1);
-      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 0);
-      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
-      result = _mm_xor_si128 (result, w);
-      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 1);
-      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
-      result = _mm_xor_si128 (result, w);
-      result = _mm_slli_si128 (result, 8);
-      fr = _mm_xor_si128 (result, fr);
-      result = _mm_load_si128((__m128i *) d8);
-      fr = _mm_xor_si128 (result, fr);
-  
-      _mm_store_si128((__m128i *) d8, fr);
-      d8 += 16;
-      s8 += 16;
+    for (i = 0; i < top; i += 16) {
+      b = _mm_load_si128((__m128i *) (s8 + i));
+      final = gf_w64_clm_multiply_single (v, b, pp_l, pp_h);
+      xv = _mm_load_si128((__m128i *) (d8 + i));
+      final = _mm_xor_si128 (final, xv);
+      _mm_store_si128((__m128i *) (d8 + i), final);
     }
   } else {
-    while (d8 < dtop) {
-      s64 = (uint64_t *) s8;
-      b = _mm_load_si128((__m128i *) s8);
-      result = _mm_clmulepi64_si128 (b, v, 0);
-      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 0);
-      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
-      result = _mm_xor_si128 (result, w);
-      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 1);
-      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
-      fr = _mm_xor_si128 (result, w);
-      fr = _mm_and_si128 (fr, m);
-  
-      result = _mm_clmulepi64_si128 (b, v, 1);
-      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 0);
-      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
-      result = _mm_xor_si128 (result, w);
-      c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 1);
-      w = _mm_clmulepi64_si128 (prim_poly, c, 0);
-      result = _mm_xor_si128 (result, w);
-      result = _mm_slli_si128 (result, 8);
-      fr = _mm_xor_si128 (result, fr);
-  
-      _mm_store_si128((__m128i *) d8, fr);
-      d8 += 16;
-      s8 += 16;
+    for (i = 0; i < top; i += 16) {
+      b = _mm_load_si128((__m128i *) (s8 + i));
+      final = gf_w64_clm_multiply_single (v, b, pp_l, pp_h);
+      _mm_store_si128((__m128i *) (d8 + i), final);
     }
   }
   gf_do_final_region_alignment(&rd);
