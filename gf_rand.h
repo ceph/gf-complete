@@ -1,5 +1,11 @@
-/* gf_rand.h
- * External include file for random number generation.  */
+/* 
+ * GF-Complete: A Comprehensive Open Source Library for Galois Field Arithmetic
+ * James S. Plank, Ethan L. Miller, Kevin M. Greenan,
+ * Benjamin A. Arnold, John A. Burnum, Adam W. Disney, Allen C. McBride.
+ *
+ * gf_rand.h
+ *
+ * Random number generation, using the "Mother of All" random number generator.  */
 
 #pragma once
 #include <stdint.h>

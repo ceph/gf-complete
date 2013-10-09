@@ -1,7 +1,12 @@
 /*
+ * GF-Complete: A Comprehensive Open Source Library for Galois Field Arithmetic
+ * James S. Plank, Ethan L. Miller, Kevin M. Greenan,
+ * Benjamin A. Arnold, John A. Burnum, Adam W. Disney, Allen C. McBride.
+ *
  * gf_int.h
  *
- * Internal code for Galois field routines.
+ * Internal code for Galois field routines.  This is not meant for 
+ * users to include, but for the internal GF files to use. 
  */
 
 #pragma once
