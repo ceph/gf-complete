@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/time.h>
 
 #include "gf_complete.h"
 #include "gf_rand.h"

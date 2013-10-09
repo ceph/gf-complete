@@ -4,22 +4,30 @@
 #pragma once
 #include <stdint.h>
 
-#ifdef  INTEL_SSE4
-#include <nmmintrin.h>
-#include <emmintrin.h>
-#include <smmintrin.h>
+#ifdef INTEL_SSE4
+  #define INTEL_SSSE3
+  #include <nmmintrin.h>
 #endif
 
-#ifdef  INTEL_PCLMUL
-#include <wmmintrin.h>
+#ifdef INTEL_SSSE3
+  #define INTEL_SSE2
+  #include <tmmintrin.h>
 #endif
 
-/* This does either memcpy or xor, depending on "xor" */
+#ifdef INTEL_SSE2
+  #include <emmintrin.h>
+#endif
 
-extern void gf_multby_one(void *src, void *dest, int bytes, int xor);
+#ifdef INTEL_PCLMUL
+  #include <wmmintrin.h>
+  #ifdef INTEL_SSE4
+    #define INTEL_SSE4_PCLMUL
+  #endif
+  #ifdef INTEL_SSSE3
+    #define INTEL_SSSE3_PCLMUL
+  #endif
+#endif
 
-#define GF_W128_IS_ZERO(val) (val[0] == 0 && val[1] == 0)
-#define GF_W128_EQUAL(val1, val2) ((val1[0] == val2[0]) && (val1[1] == val2[1]))
 
 /* These are the different ways to perform multiplication.
    Not all are implemented for all values of w.
@@ -27,30 +35,30 @@ extern void gf_multby_one(void *src, void *dest, int bytes, int xor);
 
 typedef enum {GF_MULT_DEFAULT,   
               GF_MULT_SHIFT,   
+              GF_MULT_CARRY_FREE,   
               GF_MULT_GROUP,   
               GF_MULT_BYTWO_p,
               GF_MULT_BYTWO_b,
               GF_MULT_TABLE,   
               GF_MULT_LOG_TABLE,   
+              GF_MULT_LOG_ZERO,
+              GF_MULT_LOG_ZERO_EXT,
               GF_MULT_SPLIT_TABLE,   
               GF_MULT_COMPOSITE } gf_mult_type_t;
 
 /* These are the different ways to optimize region 
-   operations.  They are bits because you can compose them:
-   You can mix SINGLE/DOUBLE/QUAD, LAZY, SSE/NOSSE, STDMAP/ALTMAP/CAUCHY.
+   operations.  They are bits because you can compose them.
    Certain optimizations only apply to certain gf_mult_type_t's.  
    Again, please see documentation for how to use these */
    
 #define GF_REGION_DEFAULT      (0x0)
-#define GF_REGION_SINGLE_TABLE (0x1)
-#define GF_REGION_DOUBLE_TABLE (0x2)
-#define GF_REGION_QUAD_TABLE   (0x4)
-#define GF_REGION_LAZY         (0x8)
-#define GF_REGION_SSE          (0x10)
-#define GF_REGION_NOSSE        (0x20)
-#define GF_REGION_STDMAP       (0x40)
-#define GF_REGION_ALTMAP       (0x80)
-#define GF_REGION_CAUCHY       (0x100)
+#define GF_REGION_DOUBLE_TABLE (0x1)
+#define GF_REGION_QUAD_TABLE   (0x2)
+#define GF_REGION_LAZY         (0x4)
+#define GF_REGION_SSE          (0x8)
+#define GF_REGION_NOSSE        (0x10)
+#define GF_REGION_ALTMAP       (0x20)
+#define GF_REGION_CAUCHY       (0x40)
 
 typedef uint32_t gf_region_type_t;
 
@@ -73,6 +81,9 @@ typedef enum { GF_DIVIDE_DEFAULT,
 typedef uint32_t    gf_val_32_t;
 typedef uint64_t    gf_val_64_t;
 typedef uint64_t   *gf_val_128_t;
+
+extern int _gf_errno;
+extern void gf_error();
 
 typedef struct gf *GFP;
 
@@ -109,7 +120,20 @@ typedef struct gf {
   void           *scratch;
 } gf_t;
     
+/* Initializes the GF to defaults.  Pass it a pointer to a gf_t.
+   Returns 0 on failure, 1 on success. */
+
 extern int gf_init_easy(GFP gf, int w);
+
+/* Initializes the GF changing the defaults.
+   Returns 0 on failure, 1 on success.
+   Pass it a pointer to a gf_t.
+   For mult_type and divide_type, use one of gf_mult_type_t gf_divide_type_t .  
+   For region_type, OR together the GF_REGION_xxx's defined above.  
+   Use 0 as prim_poly for defaults.  Otherwise, the leading 1 is optional.
+   Use NULL for scratch_memory to have init_hard allocate memory.  Otherwise,
+   use gf_scratch_size() to determine how big scratch_memory has to be.
+ */
 
 extern int gf_init_hard(GFP gf, 
                         int w, 
@@ -122,6 +146,9 @@ extern int gf_init_hard(GFP gf,
                         GFP base_gf,
                         void *scratch_memory);
 
+/* Determines the size for scratch_memory.  
+   Returns 0 on failure and non-zero on success. */
+
 extern int gf_scratch_size(int w, 
                            int mult_type, 
                            int region_type, 
@@ -129,25 +156,32 @@ extern int gf_scratch_size(int w,
                            int arg1, 
                            int arg2);
 
+/* This reports the gf_scratch_size of a gf_t that has already been created */
+
+extern int gf_size(GFP gf);
+
+/* Frees scratch memory if gf_init_easy/gf_init_hard called malloc.
+   If recursive = 1, then it calls itself recursively on base_gf. */
+
 extern int gf_free(GFP gf, int recursive);
 
 /* This is support for inline single multiplications and divisions.
    I know it's yucky, but if you've got to be fast, you've got to be fast.
-   We'll support inlines for w=4, w=8 and w=16.  
+   We support inlining for w=4, w=8 and w=16.  
 
    To use inline multiplication and division with w=4 or 8, you should use the 
    default gf_t, or one with a single table.  Otherwise, gf_w4/8_get_mult_table()
-   will return NULL. */
+   will return NULL. Similarly, with w=16, the gf_t must be LOG */
 
 uint8_t *gf_w4_get_mult_table(GFP gf);
 uint8_t *gf_w4_get_div_table(GFP gf);
 
-#define GF_W4_INLINE_MULTDIV(table, a, b) (table[((a)<<4)|b])
+#define GF_W4_INLINE_MULTDIV(table, a, b) (table[((a)<<4)|(b)])
 
 uint8_t *gf_w8_get_mult_table(GFP gf);
 uint8_t *gf_w8_get_div_table(GFP gf);
 
-#define GF_W8_INLINE_MULTDIV(table, a, b) (table[(((uint32_t) a)<<8)|b])
+#define GF_W8_INLINE_MULTDIV(table, a, b) (table[(((uint32_t) (a))<<8)|(b)])
 
 uint16_t *gf_w16_get_log_table(GFP gf);
 uint16_t *gf_w16_get_mult_alog_table(GFP gf);

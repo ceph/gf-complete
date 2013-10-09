@@ -93,6 +93,7 @@ gf_val_32_t gf_wgen_euclid (gf_t *gf, gf_val_32_t b)
     while (d_ip1 >= d_i) {
       c_i ^= (1 << (d_ip1 - d_i));
       e_ip1 ^= (e_i << (d_ip1 - d_i));
+      if (e_ip1 == 0) return 0;
       while ((e_ip1 & (1 << d_ip1)) == 0) d_ip1--;
     }
 
@@ -223,7 +224,7 @@ gf_wgen_bytwo_p_multiply (gf_t *gf, gf_val_32_t a, gf_val_32_t b)
   pp = h->prim_poly;
 
   prod = 0;
-  pmask = (1 << (h->w)-1);
+  pmask = (1 << ((h->w)-1)); /*Ben: Had an operator precedence warning here*/
   amask = pmask;
 
   while (amask != 0) {
@@ -508,16 +509,11 @@ int gf_wgen_table_8_init(gf_t *gf)
   }
     
   for (a = 1; a < (1 << w); a++) {
-    b = 1;
-    p = a;
-    do {
+    for (b = 1; b < (1 << w); b++) {
+      p = gf_wgen_shift_multiply(gf, a, b);
       std->mult[(a<<w)|b] = p;
-      std->div[(p<<w)|b] = a;
-      b = (b & (1 << (w-1))) ? (b << 1) ^ h->prim_poly : (b << 1);
-      b &= ((1 << w)-1);
-      p = (p & (1 << (w-1))) ? (p << 1) ^ h->prim_poly : (p << 1);
-      p &= ((1 << w)-1);
-    } while (b != 1);
+      std->div[(p<<w)|a] = b;
+    }
   }
 
   gf->multiply.w32 = gf_wgen_table_8_multiply;
@@ -572,18 +568,13 @@ int gf_wgen_table_16_init(gf_t *gf)
     std->div[a] = 0;
     std->div[a<<w] = 0;
   }
-    
+  
   for (a = 1; a < (1 << w); a++) {
-    b = 1;
-    p = a;
-    do {
+    for (b = 1; b < (1 << w); b++) {
+      p = gf_wgen_shift_multiply(gf, a, b);
       std->mult[(a<<w)|b] = p;
-      std->div[(p<<w)|b] = a;
-      b = (b & (1 << (w-1))) ? (b << 1) ^ h->prim_poly : (b << 1);
-      b &= ((1 << w)-1);
-      p = (p & (1 << (w-1))) ? (p << 1) ^ h->prim_poly : (p << 1);
-      p &= ((1 << w)-1);
-    } while (b != 1);
+      std->div[(p<<w)|a] = b;
+    }
   }
 
   gf->multiply.w32 = gf_wgen_table_16_multiply;
@@ -599,6 +590,11 @@ int gf_wgen_table_init(gf_t *gf)
   h = (gf_internal_t *) gf->scratch;
   if (h->w <= 8) return gf_wgen_table_8_init(gf);
   if (h->w <= 14) return gf_wgen_table_16_init(gf);
+
+  /* Returning zero to make the compiler happy, but this won't get 
+     executed, because it is tested in _scratch_space. */
+
+  return 0;
 }
 
 static
@@ -640,6 +636,7 @@ int gf_wgen_log_8_init(gf_t *gf)
   struct gf_wgen_log_w8_data *std;
   int w;
   uint32_t a, i;
+  int check = 0;
   
   h = (gf_internal_t *) gf->scratch;
   w = h->w;
@@ -649,17 +646,27 @@ int gf_wgen_log_8_init(gf_t *gf)
   std->anti = std->log + (1<<h->w);
   std->danti = std->anti + (1<<h->w)-1;
   
-  i = 0;
+  for (i = 0; i < (1 << w); i++)
+    std->log[i] = 0;
+
   a = 1;
-  do {
+  for(i=0; i < (1<<w)-1; i++)
+  {
+    if (std->log[a] != 0) check = 1;
     std->log[a] = i;
     std->anti[i] = a;
     std->danti[i] = a;
-    i++;
-    a = (a & (1 << (w-1))) ? (a << 1) ^ h->prim_poly : (a << 1);
-    a &= ((1 << w)-1);
-  } while (a != 1);
-  
+    a <<= 1;
+    if(a & (1<<w))
+      a ^= h->prim_poly;
+    //a &= ((1 << w)-1);
+  }
+
+  if (check != 0) {
+    _gf_errno = GF_E_LOGPOLY;
+    return 0;
+  }
+
   gf->multiply.w32 = gf_wgen_log_8_multiply;
   gf->divide.w32 = gf_wgen_log_8_divide;
   return 1;
@@ -704,6 +711,7 @@ int gf_wgen_log_16_init(gf_t *gf)
   struct gf_wgen_log_w16_data *std;
   int w;
   uint32_t a, i;
+  int check = 0;
   
   h = (gf_internal_t *) gf->scratch;
   w = h->w;
@@ -712,17 +720,28 @@ int gf_wgen_log_16_init(gf_t *gf)
   std->log = &(std->base);
   std->anti = std->log + (1<<h->w);
   std->danti = std->anti + (1<<h->w)-1;
-  
-  i = 0;
+ 
+  for (i = 0; i < (1 << w); i++)
+    std->log[i] = 0;
+
   a = 1;
-  do {
+  for(i=0; i < (1<<w)-1; i++)
+  {
+    if (std->log[a] != 0) check = 1;
     std->log[a] = i;
     std->anti[i] = a;
     std->danti[i] = a;
-    i++;
-    a = (a & (1 << (w-1))) ? (a << 1) ^ h->prim_poly : (a << 1);
-    a &= ((1 << w)-1);
-  } while (a != 1);
+    a <<= 1;
+    if(a & (1<<w))
+      a ^= h->prim_poly;
+    //a &= ((1 << w)-1);
+  }
+
+  if (check) {
+    if (h->mult_type != GF_MULT_LOG_TABLE) return gf_wgen_shift_init(gf);
+    _gf_errno = GF_E_LOGPOLY;
+    return 0;
+  }
   
   gf->multiply.w32 = gf_wgen_log_16_multiply;
   gf->divide.w32 = gf_wgen_log_16_divide;
@@ -768,7 +787,8 @@ int gf_wgen_log_32_init(gf_t *gf)
   struct gf_wgen_log_w32_data *std;
   int w;
   uint32_t a, i;
-  
+  int check = 0;
+
   h = (gf_internal_t *) gf->scratch;
   w = h->w;
   std = (struct gf_wgen_log_w32_data *) h->private;
@@ -777,17 +797,27 @@ int gf_wgen_log_32_init(gf_t *gf)
   std->anti = std->log + (1<<h->w);
   std->danti = std->anti + (1<<h->w)-1;
   
-  i = 0;
+  for (i = 0; i < (1 << w); i++)
+    std->log[i] = 0;
+
   a = 1;
-  do {
+  for(i=0; i < (1<<w)-1; i++)
+  {
+    if (std->log[a] != 0) check = 1;
     std->log[a] = i;
     std->anti[i] = a;
     std->danti[i] = a;
-    i++;
-    a = (a & (1 << (w-1))) ? (a << 1) ^ h->prim_poly : (a << 1);
-    a &= ((1 << w)-1);
-  } while (a != 1);
-  
+    a <<= 1;
+    if(a & (1<<w))
+      a ^= h->prim_poly;
+    //a &= ((1 << w)-1);
+  }
+
+  if (check != 0) {
+    _gf_errno = GF_E_LOGPOLY;
+    return 0;
+  }
+
   gf->multiply.w32 = gf_wgen_log_32_multiply;
   gf->divide.w32 = gf_wgen_log_32_divide;
   return 1;
@@ -802,14 +832,15 @@ int gf_wgen_log_init(gf_t *gf)
   if (h->w <= 8) return gf_wgen_log_8_init(gf);
   if (h->w <= 16) return gf_wgen_log_16_init(gf);
   if (h->w <= 32) return gf_wgen_log_32_init(gf); 
+
+  /* Returning zero to make the compiler happy, but this won't get 
+     executed, because it is tested in _scratch_space. */
+
+  return 0;
 }
 
 int gf_wgen_scratch_size(int w, int mult_type, int region_type, int divide_type, int arg1, int arg2)
 {
-
-  if (w > 32 || w < 0) return -1;
-
-  if ((region_type | GF_REGION_CAUCHY) != GF_REGION_CAUCHY) return -1;
 
   switch(mult_type)
   {
@@ -828,40 +859,37 @@ int gf_wgen_scratch_size(int w, int mult_type, int region_type, int divide_type,
     case GF_MULT_SHIFT:
     case GF_MULT_BYTWO_b:
     case GF_MULT_BYTWO_p:
-      if (arg1 != 0 || arg2 != 0) return -1;
       return sizeof(gf_internal_t);
       break;
     case GF_MULT_GROUP:
-      if (arg1 <= 0 || arg2 <= 0) return -1;
       return sizeof(gf_internal_t) + sizeof(struct gf_wgen_group_data) +
                sizeof(uint32_t) * (1 << arg1) +
                sizeof(uint32_t) * (1 << arg2) + 64;
       break;
 
     case GF_MULT_TABLE: 
-      if (arg1 != 0 || arg2 != 0) return -1;
       if (w <= 8) {
         return sizeof(gf_internal_t) + sizeof(struct gf_wgen_table_w8_data) +
                sizeof(uint8_t)*(1 << w)*(1<<w)*2 + 64;
       } else if (w < 15) {
         return sizeof(gf_internal_t) + sizeof(struct gf_wgen_table_w16_data) +
                sizeof(uint16_t)*(1 << w)*(1<<w)*2 + 64;
-      } else return -1;
+      } 
+      return 0;
     case GF_MULT_LOG_TABLE: 
-      if (arg1 != 0 || arg2 != 0) return -1;
       if (w <= 8) {
         return sizeof(gf_internal_t) + sizeof(struct gf_wgen_log_w8_data) +
                sizeof(uint8_t)*(1 << w)*3;
       } else if (w <= 16) {
         return sizeof(gf_internal_t) + sizeof(struct gf_wgen_log_w16_data) +
                sizeof(uint16_t)*(1 << w)*3;
-      } else if (w <= 29) {
+      } else if (w <= 27) {
         return sizeof(gf_internal_t) + sizeof(struct gf_wgen_log_w32_data) +
                sizeof(uint32_t)*(1 << w)*3;
-      } else return -1;
-
+      } else 
+      return 0;
     default:
-      return -1;
+      return 0;
    }
 }
 
@@ -935,6 +963,13 @@ int gf_wgen_init(gf_t *gf)
       case 32: h->prim_poly = 00020000007; break;
       default: fprintf(stderr, "gf_wgen_init: w not defined yet\n"); exit(1);
     }
+  } else {
+    if (h->w == 32) {
+      h->prim_poly &= 0xffffffff;
+    } else {
+      h->prim_poly |= (1 << h->w);
+      if (h->prim_poly & ~((1ULL<<(h->w+1))-1)) return 0;
+    }
   }
 
   gf->multiply.w32 = NULL;
@@ -950,7 +985,7 @@ int gf_wgen_init(gf_t *gf)
       } else if (h->w <= 16) {
         if (gf_wgen_log_init(gf) == 0) return 0; 
       } else {
-        if (gf_wgen_group_init(gf) == 0) return 0; 
+        if (gf_wgen_bytwo_p_init(gf) == 0) return 0; 
       }
       break;
     case GF_MULT_SHIFT:     if (gf_wgen_shift_init(gf) == 0) return 0; break;

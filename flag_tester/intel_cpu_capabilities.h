@@ -16,7 +16,7 @@
 #define CPU_CPSSE               0x2000
 #define CPU_CAP_SSE3            (CPU_CPSSE | 0)
 #define CPU_CAP_PCLMULQDQ       (CPU_CPSSE | 1)
-#define CPU_CAP_SSSE3           (CPU_CPSSE | 10)
+#define CPU_CAP_SSSE3           (CPU_CPSSE | 9)
 #define CPU_CAP_SSE41           (CPU_CPSSE | 19)
 #define CPU_CAP_SSE42           (CPU_CPSSE | 20)
 #define CPU_CAP_AVX             (CPU_CPSSE | 28)
@@ -25,7 +25,6 @@
         __asm__ __volatile__ ("cpuid":\
                               "=a" (ax), "=b" (bx), "=c" (cx), "=d" (dx) : "a" (func));
 
-inline
 int
 cpu_has_feature (unsigned which)
 {

@@ -95,12 +95,20 @@ void gf_general_set_random(gf_general_t *v, int w, int zero_ok)
   }
 }
 
-void gf_general_val_to_s(gf_general_t *v, int w, char *s)
+void gf_general_val_to_s(gf_general_t *v, int w, char *s, int hex)
 {
   if (w <= 32) {
-    sprintf(s, "%x", v->w32);
+    if (hex) {
+      sprintf(s, "%x", v->w32);
+    } else {
+      sprintf(s, "%d", v->w32);
+    }
   } else if (w <= 64) {
-    sprintf(s, "%llx", (long long unsigned int) v->w64);
+    if (hex) {
+      sprintf(s, "%llx", (long long unsigned int) v->w64);
+    } else {
+      sprintf(s, "%lld", (long long unsigned int) v->w64);
+    }
   } else {
     if (v->w128[0] == 0) {
       sprintf(s, "%llx", (long long unsigned int) v->w128[1]);
@@ -111,6 +119,64 @@ void gf_general_val_to_s(gf_general_t *v, int w, char *s)
   }
 }
 
+int gf_general_s_to_val(gf_general_t *v, int w, char *s, int hex)
+{
+  int l;
+  int save;
+
+  if (w <= 32) {
+    if (hex) {
+      if (sscanf(s, "%x", &(v->w32)) == 0) return 0;
+    } else {
+      if (sscanf(s, "%d", &(v->w32)) == 0) return 0;
+    }
+    if (w == 32) return 1;
+    if (w == 31) {
+      if (v->w32 & (1 << 31)) return 0;
+      return 1;
+    } 
+    if (v->w32 & ~((1 << w)-1)) return 0;
+    return 1;
+  } else if (w <= 64) {
+    if (hex) return (sscanf(s, "%llx", &(v->w64)) == 1);
+    return (sscanf(s, "%lld", &(v->w64)) == 1);
+  } else {
+    if (!hex) return 0;
+    l = strlen(s);
+    if (l <= 16) {
+      v->w128[0] = 0;
+      return (sscanf(s, "%llx", &(v->w128[1])) == 1);
+    } else {
+      if (l > 32) return 0;
+      save = s[l-16];
+      s[l-16] = '\0';
+      if (sscanf(s, "%llx", &(v->w128[0])) == 0) {
+        s[l-16] = save;
+        return 0;
+      }
+      return (sscanf(s+(l-16), "%llx", &(v->w128[1])) == 1);
+    }
+  }
+}
+    
+void gf_general_add(gf_t *gf, gf_general_t *a, gf_general_t *b, gf_general_t *c)
+{
+  gf_internal_t *h;
+  int w;
+
+  h = (gf_internal_t *) gf->scratch;
+  w = h->w;
+
+  if (w <= 32) {
+    c->w32 = a->w32 ^ b->w32;
+  } else if (w <= 64) {
+    c->w64 = a->w64 ^ b->w64;
+  } else {
+    c->w128[0] = a->w128[0] ^ b->w128[0];
+    c->w128[1] = a->w128[1] ^ b->w128[1];
+  }
+}
+  
 void gf_general_multiply(gf_t *gf, gf_general_t *a, gf_general_t *b, gf_general_t *c)
 {
   gf_internal_t *h;
@@ -229,19 +295,19 @@ void gf_general_do_region_check(gf_t *gf, gf_general_t *a, void *orig_a, void *o
 
     if (!gf_general_are_equal(&ft, &sb, w)) {
       
-      printf("Problem with region multiply (all values in hex):\n");
-      printf("   Target address base: 0x%lx.  Word 0x%x of 0x%x.  Xor: %d\n", 
+      fprintf(stderr,"Problem with region multiply (all values in hex):\n");
+      fprintf(stderr,"   Target address base: 0x%lx.  Word 0x%x of 0x%x.  Xor: %d\n", 
                  (unsigned long) final_target, i, words, xor);
-      gf_general_val_to_s(a, w, sa);
-      gf_general_val_to_s(&oa, w, soa);
-      gf_general_val_to_s(&ot, w, sot);
-      gf_general_val_to_s(&ft, w, sft);
-      gf_general_val_to_s(&sb, w, ssb);
-      printf("   Value: %s\n", sa);
-      printf("   Original source word: %s\n", soa);
-      if (xor) printf("   XOR with target word: %s\n", sot);
-      printf("   Product word: %s\n", sft);
-      printf("   It should be: %s\n", ssb);
+      gf_general_val_to_s(a, w, sa, 1);
+      gf_general_val_to_s(&oa, w, soa, 1);
+      gf_general_val_to_s(&ot, w, sot, 1);
+      gf_general_val_to_s(&ft, w, sft, 1);
+      gf_general_val_to_s(&sb, w, ssb, 1);
+      fprintf(stderr,"   Value: %s\n", sa);
+      fprintf(stderr,"   Original source word: %s\n", soa);
+      if (xor) fprintf(stderr,"   XOR with target word: %s\n", sot);
+      fprintf(stderr,"   Product word: %s\n", sft);
+      fprintf(stderr,"   It should be: %s\n", ssb);
       exit(0);
     }
   }
@@ -251,7 +317,7 @@ void gf_general_set_up_single_timing_test(int w, void *ra, void *rb, int size)
 {
   void *top;
   gf_general_t g;
-  uint8_t *r8;
+  uint8_t *r8, *r8a;
   uint16_t *r16;
   uint32_t *r32;
   uint64_t *r64;
@@ -263,6 +329,8 @@ void gf_general_set_up_single_timing_test(int w, void *ra, void *rb, int size)
      However, don't allow for zeros in rb, because that will screw up
      division.
      
+     When w is 4, you fill the regions with random 4-bit words in each byte.
+
      Otherwise, treat every four bytes as an uint32_t
      and fill it with a random value mod (1 << w).
    */
@@ -296,6 +364,17 @@ void gf_general_set_up_single_timing_test(int w, void *ra, void *rb, int size)
       }
       rb += (w/8);
     }
+  } else if (w == 4) {
+    r8a = (uint8_t *) ra;
+    r8 = (uint8_t *) rb;
+    while (r8 < (uint8_t *) top) {
+      gf_general_set_random(&g, w, 1);
+      *r8a = g.w32;
+      gf_general_set_random(&g, w, 0);
+      *r8 = g.w32;
+      r8a++;
+      r8++;
+    }
   } else {
     r32 = (uint32_t *) ra;
     for (i = 0; i < size/4; i++) r32[i] = MOA_Random_W(w, 1);
@@ -306,7 +385,7 @@ void gf_general_set_up_single_timing_test(int w, void *ra, void *rb, int size)
 
 /* This sucks, but in order to time, you really need to avoid putting ifs in 
    the inner loops.  So, I'm doing a separate timing test for each w: 
-   8, 16, 32, 64, 128 and everything else.  Fortunately, the "everything else"
+   (4 & 8), 16, 32, 64, 128 and everything else.  Fortunately, the "everything else"
    tests can be equivalent to w=32.
 
    I'm also putting the results back into ra, because otherwise, the optimizer might
@@ -327,7 +406,7 @@ int gf_general_do_single_timing_test(gf_t *gf, void *ra, void *rb, int size, cha
   w = h->w;
   top = ra + size;
 
-  if (w == 8) {
+  if (w == 8 || w == 4) {
     r8a = (uint8_t *) ra; 
     r8b = (uint8_t *) rb; 
     top8 = (uint8_t *) top;

@@ -15,7 +15,6 @@
 
 #define GF_BASE_FIELD_WIDTH (4)
 #define GF_BASE_FIELD_SIZE       (1 << GF_BASE_FIELD_WIDTH)
-#define GF_S_GF_4_2 (4)
 
 struct gf_w8_logtable_data {
     uint8_t         log_tbl[GF_FIELD_SIZE];
@@ -35,6 +34,10 @@ struct gf_w8_logzero_small_table_data {
     uint8_t         antilog_tbl[255*3];
     uint8_t         inv_tbl[GF_FIELD_SIZE];
     uint8_t         *div_tbl;
+};
+
+struct gf_w8_composite_data {
+  uint8_t *mult_table;
 };
 
 /* Don't change the order of these relative to gf_w8_half_table_data */
@@ -139,6 +142,7 @@ uint32_t gf_w8_euclid (gf_t *gf, uint32_t b)
     while (d_ip1 >= d_i) {
       c_i ^= (1 << (d_ip1 - d_i));
       e_ip1 ^= (e_i << (d_ip1 - d_i));
+      if (e_ip1 == 0) return 0;
       while ((e_ip1 & (1 << d_ip1)) == 0) d_ip1--;
     }
 
@@ -165,28 +169,402 @@ gf_val_32_t gf_w8_extract_word(gf_t *gf, void *start, int bytes, int index)
 }
 
 static
+gf_val_32_t gf_w8_composite_extract_word(gf_t *gf, void *start, int bytes, int index)
+{
+  int sub_size;
+  gf_internal_t *h;
+  uint8_t *r8, *top;
+  uint8_t a, b;
+  gf_region_data rd;
+
+  h = (gf_internal_t *) gf->scratch;
+  gf_set_region_data(&rd, gf, start, start, bytes, 0, 0, 32);
+  r8 = (uint8_t *) start;
+  if (r8 + index < (uint8_t *) rd.d_start) return r8[index];
+  if (r8 + index >= (uint8_t *) rd.d_top) return r8[index];
+  index -= (((uint8_t *) rd.d_start) - r8);
+  r8 = (uint8_t *) rd.d_start;
+  top = (uint8_t *) rd.d_top;
+  sub_size = (top-r8)/2;
+
+  a = h->base_gf->extract_word.w32(h->base_gf, r8, sub_size, index);
+  b = h->base_gf->extract_word.w32(h->base_gf, r8+sub_size, sub_size, index);
+  return (a | (b << 4));
+}
+
+static
 inline
 uint32_t gf_w8_matrix (gf_t *gf, uint32_t b)
 {
   return gf_bitmatrix_inverse(b, 8, ((gf_internal_t *) (gf->scratch))->prim_poly);
 }
 
-/* ------------------------------------------------------------
-  IMPLEMENTATION: SHIFT:
-
-   JSP: The world's dumbest multiplication algorithm.  I only
-   include it for completeness.  It does have the feature that it requires no
-   extra memory.  
-*/
 
 static
 inline
-uint32_t
+gf_val_32_t
+gf_w8_clm_multiply_2 (gf_t *gf, gf_val_32_t a8, gf_val_32_t b8)
+{
+  gf_val_32_t rv = 0;
+
+#ifdef INTEL_SSE4_PCLMUL
+
+  __m128i         a, b;
+  __m128i         result;
+  __m128i         prim_poly;
+  __m128i         v, w;
+  gf_internal_t * h = gf->scratch;
+
+  a = _mm_insert_epi32 (_mm_setzero_si128(), a8, 0);
+  b = _mm_insert_epi32 (a, b8, 0);
+
+  prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0x1ffULL));
+
+  /* Do the initial multiply */
+
+  result = _mm_clmulepi64_si128 (a, b, 0);
+
+  /* Ben: Do prim_poly reduction twice. We are guaranteed that we will only
+     have to do the reduction at most twice, because (w-2)/z == 2. Where
+     z is equal to the number of zeros after the leading 1
+
+     _mm_clmulepi64_si128 is the carryless multiply operation. Here
+     _mm_srli_si128 shifts the result to the right by 1 byte. This allows
+     us to multiply the prim_poly by the leading bits of the result. We
+     then xor the result of that operation back with the result.*/
+
+  w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+  result = _mm_xor_si128 (result, w);
+  w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+  result = _mm_xor_si128 (result, w);
+
+  /* Extracts 32 bit value from result. */
+  
+  rv = ((gf_val_32_t)_mm_extract_epi32(result, 0));
+
+#endif
+  return rv;
+}
+
+static
+inline
+gf_val_32_t
+gf_w8_clm_multiply_3 (gf_t *gf, gf_val_32_t a8, gf_val_32_t b8)
+{
+  gf_val_32_t rv = 0;
+
+#ifdef INTEL_SSE4_PCLMUL
+
+  __m128i         a, b;
+  __m128i         result;
+  __m128i         prim_poly;
+  __m128i         v, w;
+  gf_internal_t * h = gf->scratch;
+
+  a = _mm_insert_epi32 (_mm_setzero_si128(), a8, 0);
+  b = _mm_insert_epi32 (a, b8, 0);
+
+  prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0x1ffULL));
+
+  /* Do the initial multiply */
+  
+  result = _mm_clmulepi64_si128 (a, b, 0);
+
+  w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+  result = _mm_xor_si128 (result, w);
+  w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+  result = _mm_xor_si128 (result, w);
+  w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+  result = _mm_xor_si128 (result, w);
+
+  /* Extracts 32 bit value from result. */
+  
+  rv = ((gf_val_32_t)_mm_extract_epi32(result, 0));
+
+#endif
+  return rv;
+}
+
+static
+inline
+gf_val_32_t
+gf_w8_clm_multiply_4 (gf_t *gf, gf_val_32_t a8, gf_val_32_t b8)
+{
+  gf_val_32_t rv = 0;
+
+#ifdef INTEL_SSE4_PCLMUL
+
+  __m128i         a, b;
+  __m128i         result;
+  __m128i         prim_poly;
+  __m128i         v, w;
+  gf_internal_t * h = gf->scratch;
+
+  a = _mm_insert_epi32 (_mm_setzero_si128(), a8, 0);
+  b = _mm_insert_epi32 (a, b8, 0);
+
+  prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0x1ffULL));
+
+  /* Do the initial multiply */
+  
+  result = _mm_clmulepi64_si128 (a, b, 0);
+
+  w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+  result = _mm_xor_si128 (result, w);
+  w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+  result = _mm_xor_si128 (result, w);
+  w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+  result = _mm_xor_si128 (result, w);
+  w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+  result = _mm_xor_si128 (result, w);
+
+  /* Extracts 32 bit value from result. */
+  rv = ((gf_val_32_t)_mm_extract_epi32(result, 0));
+
+#endif
+  return rv;
+}
+
+
+static
+void
+gf_w8_multiply_region_from_single(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int
+    xor)
+{
+  gf_region_data rd;
+  uint8_t *s8;
+  uint8_t *d8;
+
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
+
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 1);
+  gf_do_initial_region_alignment(&rd);
+
+  s8 = (uint8_t *) rd.s_start;
+  d8 = (uint8_t *) rd.d_start;
+
+  if (xor) {
+    while (d8 < ((uint8_t *) rd.d_top)) {
+      *d8 ^= gf->multiply.w32(gf, val, *s8);
+      d8++;
+      s8++;
+    }
+  } else {
+    while (d8 < ((uint8_t *) rd.d_top)) {
+      *d8 = gf->multiply.w32(gf, val, *s8);
+      d8++;
+      s8++;
+    }
+  }
+  gf_do_final_region_alignment(&rd);
+}
+
+static
+void
+gf_w8_clm_multiply_region_from_single_2(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int
+    xor)
+{
+  gf_region_data rd;
+  uint8_t *s8;
+  uint8_t *d8;
+
+#ifdef INTEL_SSE4_PCLMUL
+
+  __m128i         a, b;
+  __m128i         result;
+  __m128i         prim_poly;
+  __m128i         v, w;
+  gf_internal_t * h = gf->scratch;
+
+  prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0x1ffULL));
+
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
+
+  a = _mm_insert_epi32 (_mm_setzero_si128(), val, 0);
+
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 1);
+  gf_do_initial_region_alignment(&rd);
+
+  s8 = (uint8_t *) rd.s_start;
+  d8 = (uint8_t *) rd.d_start;
+
+  if (xor) {
+    while (d8 < ((uint8_t *) rd.d_top)) {
+      b = _mm_insert_epi32 (a, (gf_val_32_t)(*s8), 0);
+      result = _mm_clmulepi64_si128 (a, b, 0);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      *d8 ^= ((gf_val_32_t)_mm_extract_epi32(result, 0));
+      d8++;
+      s8++;
+    }
+  } else {
+    while (d8 < ((uint8_t *) rd.d_top)) {
+      b = _mm_insert_epi32 (a, (gf_val_32_t)(*s8), 0);
+      result = _mm_clmulepi64_si128 (a, b, 0);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      *d8 = ((gf_val_32_t)_mm_extract_epi32(result, 0));
+      d8++;
+      s8++;
+    }
+  }
+  gf_do_final_region_alignment(&rd);
+#endif
+}
+
+static
+void
+gf_w8_clm_multiply_region_from_single_3(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int
+    xor)
+{
+  gf_region_data rd;
+  uint8_t *s8;
+  uint8_t *d8;
+
+#ifdef INTEL_SSE4_PCLMUL
+
+  __m128i         a, b;
+  __m128i         result;
+  __m128i         prim_poly;
+  __m128i         v, w;
+  gf_internal_t * h = gf->scratch;
+
+  prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0x1ffULL));
+
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
+
+  a = _mm_insert_epi32 (_mm_setzero_si128(), val, 0);
+
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 1);
+  gf_do_initial_region_alignment(&rd);
+
+  s8 = (uint8_t *) rd.s_start;
+  d8 = (uint8_t *) rd.d_start;
+
+  if (xor) {
+    while (d8 < ((uint8_t *) rd.d_top)) {
+      b = _mm_insert_epi32 (a, (gf_val_32_t)(*s8), 0);
+      result = _mm_clmulepi64_si128 (a, b, 0);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      *d8 ^= ((gf_val_32_t)_mm_extract_epi32(result, 0));
+      d8++;
+      s8++;
+    }
+  } else {
+    while (d8 < ((uint8_t *) rd.d_top)) {
+      b = _mm_insert_epi32 (a, (gf_val_32_t)(*s8), 0);
+      result = _mm_clmulepi64_si128 (a, b, 0);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      *d8 = ((gf_val_32_t)_mm_extract_epi32(result, 0));
+      d8++;
+      s8++;
+    }
+  }
+  gf_do_final_region_alignment(&rd);
+#endif
+}
+
+static
+void
+gf_w8_clm_multiply_region_from_single_4(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int
+    xor)
+{
+  gf_region_data rd;
+  uint8_t *s8;
+  uint8_t *d8;
+
+#ifdef INTEL_SSE4_PCLMUL
+
+  __m128i         a, b;
+  __m128i         result;
+  __m128i         prim_poly;
+  __m128i         v, w;
+  gf_internal_t * h = gf->scratch;
+
+  prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0x1ffULL));
+
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
+
+  a = _mm_insert_epi32 (_mm_setzero_si128(), val, 0);
+
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 1);
+  gf_do_initial_region_alignment(&rd);
+
+  s8 = (uint8_t *) rd.s_start;
+  d8 = (uint8_t *) rd.d_start;
+
+  if (xor) {
+    while (d8 < ((uint8_t *) rd.d_top)) {
+      b = _mm_insert_epi32 (a, (gf_val_32_t)(*s8), 0);
+      result = _mm_clmulepi64_si128 (a, b, 0);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      *d8 ^= ((gf_val_32_t)_mm_extract_epi32(result, 0));
+      d8++;
+      s8++;
+    }
+  } else {
+    while (d8 < ((uint8_t *) rd.d_top)) {
+      b = _mm_insert_epi32 (a, (gf_val_32_t)(*s8), 0);
+      result = _mm_clmulepi64_si128 (a, b, 0);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      w = _mm_clmulepi64_si128 (prim_poly, _mm_srli_si128 (result, 1), 0);
+      result = _mm_xor_si128 (result, w);
+      *d8 = ((gf_val_32_t)_mm_extract_epi32(result, 0));
+      d8++;
+      s8++;
+    }
+  }
+  gf_do_final_region_alignment(&rd);
+#endif
+}
+
+/* ------------------------------------------------------------
+IMPLEMENTATION: SHIFT:
+
+JSP: The world's dumbest multiplication algorithm.  I only
+include it for completeness.  It does have the feature that it requires no
+extra memory.  
+ */
+
+static
+inline
+  uint32_t
 gf_w8_shift_multiply (gf_t *gf, uint32_t a8, uint32_t b8)
 {
   uint16_t product, i, pp, a, b;
   gf_internal_t *h;
-  
+
   a = a8;
   b = b8;
   h = (gf_internal_t *) gf->scratch;
@@ -197,29 +575,55 @@ gf_w8_shift_multiply (gf_t *gf, uint32_t a8, uint32_t b8)
   for (i = 0; i < GF_FIELD_WIDTH; i++) { 
     if (a & (1 << i)) product ^= (b << i);
   }
-  for (i = (GF_FIELD_WIDTH*2-1); i >= GF_FIELD_WIDTH; i--) {
+  for (i = (GF_FIELD_WIDTH*2-2); i >= GF_FIELD_WIDTH; i--) {
     if (product & (1 << i)) product ^= (pp << (i-GF_FIELD_WIDTH)); 
   }
   return product;
 }
 
 static 
+int gf_w8_cfm_init(gf_t *gf)
+{ 
+  gf_internal_t *h;
+
+  h = (gf_internal_t *) gf->scratch;
+
+#ifdef INTEL_SSE4_PCLMUL
+    if ((0xe0 & h->prim_poly) == 0){
+      gf->multiply.w32 = gf_w8_clm_multiply_2;
+      gf->multiply_region.w32 = gf_w8_clm_multiply_region_from_single_2;
+    }else if ((0xc0 & h->prim_poly) == 0){
+      gf->multiply.w32 = gf_w8_clm_multiply_3;
+      gf->multiply_region.w32 = gf_w8_clm_multiply_region_from_single_3;
+    }else if ((0x80 & h->prim_poly) == 0){ 
+      gf->multiply.w32 = gf_w8_clm_multiply_4;
+      gf->multiply_region.w32 = gf_w8_clm_multiply_region_from_single_4;
+    }else{
+      return 0;
+    }
+  return 1;
+#endif
+
+  return 0;
+
+}
+
+static 
 int gf_w8_shift_init(gf_t *gf)
-{
-  gf->multiply.w32 = gf_w8_shift_multiply;
-  gf->inverse.w32 = gf_w8_euclid;
+{ 
+  gf->multiply.w32 = gf_w8_shift_multiply;  /* The others will be set automatically */
   return 1;
 }
 
 /* ------------------------------------------------------------
-  IMPLEMENTATION: LOG_TABLE:
+IMPLEMENTATION: LOG_TABLE:
 
-  JSP: Kevin wrote this, and I'm converting it to my structure.
- */
+JSP: Kevin wrote this, and I'm converting it to my structure.
+*/
 
 static
 inline
-uint32_t
+  uint32_t
 gf_w8_logzero_multiply (gf_t *gf, uint32_t a, uint32_t b)
 {
   struct gf_w8_logzero_table_data *ltd;
@@ -230,7 +634,7 @@ gf_w8_logzero_multiply (gf_t *gf, uint32_t a, uint32_t b)
 
 static
 inline
-uint32_t
+  uint32_t
 gf_w8_logzero_divide (gf_t *gf, uint32_t a, uint32_t b)
 {
   struct gf_w8_logzero_table_data *ltd;
@@ -241,7 +645,7 @@ gf_w8_logzero_divide (gf_t *gf, uint32_t a, uint32_t b)
 
 static
 inline
-uint32_t
+  uint32_t
 gf_w8_logzero_small_multiply (gf_t *gf, uint32_t a, uint32_t b)
 {
   struct gf_w8_logzero_small_table_data *std;
@@ -253,7 +657,7 @@ gf_w8_logzero_small_multiply (gf_t *gf, uint32_t a, uint32_t b)
 
 static
 inline
-uint32_t
+  uint32_t
 gf_w8_logzero_small_divide (gf_t *gf, uint32_t a, uint32_t b)
 {
   struct gf_w8_logzero_small_table_data *std;
@@ -264,7 +668,7 @@ gf_w8_logzero_small_divide (gf_t *gf, uint32_t a, uint32_t b)
 
 static
 inline
-uint32_t
+  uint32_t
 gf_w8_log_multiply (gf_t *gf, uint32_t a, uint32_t b)
 {
   struct gf_w8_logtable_data *ltd;
@@ -275,7 +679,7 @@ gf_w8_log_multiply (gf_t *gf, uint32_t a, uint32_t b)
 
 static
 inline
-uint32_t
+  uint32_t
 gf_w8_log_divide (gf_t *gf, uint32_t a, uint32_t b)
 {
   int log_sum = 0;
@@ -289,7 +693,7 @@ gf_w8_log_divide (gf_t *gf, uint32_t a, uint32_t b)
 }
 
 static
-uint32_t
+  uint32_t
 gf_w8_log_inverse (gf_t *gf, uint32_t a)
 {
   struct gf_w8_logtable_data *ltd;
@@ -299,7 +703,7 @@ gf_w8_log_inverse (gf_t *gf, uint32_t a)
 }
 
 static
-uint32_t
+  uint32_t
 gf_w8_logzero_inverse (gf_t *gf, uint32_t a)
 {
   struct gf_w8_logzero_table_data *ltd;
@@ -309,7 +713,7 @@ gf_w8_logzero_inverse (gf_t *gf, uint32_t a)
 }
 
 static
-uint32_t
+  uint32_t
 gf_w8_logzero_small_inverse (gf_t *gf, uint32_t a)
 {
   struct gf_w8_logzero_small_table_data *std;
@@ -319,7 +723,7 @@ gf_w8_logzero_small_inverse (gf_t *gf, uint32_t a)
 }
 
 static
-void
+  void
 gf_w8_log_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
   int i;
@@ -348,7 +752,7 @@ gf_w8_log_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int byt
 }
 
 static
-void
+  void
 gf_w8_logzero_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
   int i;
@@ -390,7 +794,7 @@ gf_w8_logzero_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int
   }
 }
 
-static
+  static
 int gf_w8_log_init(gf_t *gf)
 {
   gf_internal_t *h;
@@ -400,13 +804,14 @@ int gf_w8_log_init(gf_t *gf)
   uint8_t *alt;
   uint8_t *inv;
   int i, b;
+  int check = 0;
 
   h = (gf_internal_t *) gf->scratch;
-  if (h->arg1 == 0) {
+  if (h->mult_type == GF_MULT_LOG_TABLE) {
     ltd = h->private;
     alt = ltd->antilog_tbl;
     inv = ltd->inv_tbl;
-  } else if (h->arg1 == 1) {
+  } else if (h->mult_type == GF_MULT_LOG_ZERO) {
     std = h->private;
     alt = std->antilog_tbl;
     std->div_tbl = (alt + 255);
@@ -418,10 +823,19 @@ int gf_w8_log_init(gf_t *gf)
     ztd->div_tbl = (alt + 255);
     inv = ztd->inv_tbl;
   }
-  
-  if (h->arg1 == 0) {
+
+  for (i = 0; i < GF_MULT_GROUP_SIZE+1; i++) {
+    if (h->mult_type == GF_MULT_LOG_TABLE)
+      ltd->log_tbl[i] = 0;
+    else if (h->mult_type == GF_MULT_LOG_ZERO)
+      std->log_tbl[i] = 0;
+    else
+      ztd->log_tbl[i] = 0;
+  }
+
+  if (h->mult_type == GF_MULT_LOG_TABLE) {
     ltd->log_tbl[0] = 0;
-  } else if (h->arg1 == 1) {
+  } else if (h->mult_type == GF_MULT_LOG_ZERO) {
     std->log_tbl[0] = 510;
   } else {
     ztd->log_tbl[0] = 512;
@@ -429,23 +843,31 @@ int gf_w8_log_init(gf_t *gf)
 
   b = 1;
   for (i = 0; i < GF_MULT_GROUP_SIZE; i++) {
-      if (h->arg1 == 0) {
-        ltd->log_tbl[b] = i;
-      } else if (h->arg1 == 1) {
-        std->log_tbl[b] = i;
-      } else {
-        ztd->log_tbl[b] = i;
-      }
-      alt[i] = b;
-      alt[i+GF_MULT_GROUP_SIZE] = b;
-      b <<= 1;
-      if (b & GF_FIELD_SIZE) {
-          b = b ^ h->prim_poly;
-      }
+    if (h->mult_type == GF_MULT_LOG_TABLE) {
+      if (ltd->log_tbl[b] != 0) check = 1;
+      ltd->log_tbl[b] = i;
+    } else if (h->mult_type == GF_MULT_LOG_ZERO) {
+      if (std->log_tbl[b] != 0) check = 1;
+      std->log_tbl[b] = i;
+    } else {
+      if (ztd->log_tbl[b] != 0) check = 1;
+      ztd->log_tbl[b] = i;
+    }
+    alt[i] = b;
+    alt[i+GF_MULT_GROUP_SIZE] = b;
+    b <<= 1;
+    if (b & GF_FIELD_SIZE) {
+      b = b ^ h->prim_poly;
+    }
   }
-  if (h->arg1 == 1) bzero(alt+510, 255);
+  if (check) {
+    _gf_errno = GF_E_LOGPOLY;
+    return 0;
+  }
 
-  if (h->arg1 == 2) {
+  if (h->mult_type == GF_MULT_LOG_ZERO) bzero(alt+510, 255);
+
+  if (h->mult_type == GF_MULT_LOG_ZERO_EXT) {
     bzero(alt+512, 255);
     alt[512+512] = 0;
   }
@@ -459,13 +881,13 @@ int gf_w8_log_init(gf_t *gf)
     if (i & (1 << 8)) i ^= h->prim_poly;
     b--;
   } while (i != 1);
-    
-  if (h->arg1 == 0) {
+
+  if (h->mult_type == GF_MULT_LOG_TABLE) {
     gf->inverse.w32 = gf_w8_log_inverse;
     gf->divide.w32 = gf_w8_log_divide;
     gf->multiply.w32 = gf_w8_log_multiply;
     gf->multiply_region.w32 = gf_w8_log_multiply_region;
-  } else if (h->arg1 == 1) {
+  } else if (h->mult_type == GF_MULT_LOG_ZERO) {
     gf->inverse.w32 = gf_w8_logzero_small_inverse;
     gf->divide.w32 = gf_w8_logzero_small_divide;
     gf->multiply.w32 = gf_w8_logzero_small_multiply;
@@ -480,13 +902,13 @@ int gf_w8_log_init(gf_t *gf)
 }
 
 /* ------------------------------------------------------------
-  IMPLEMENTATION: FULL_TABLE:
+IMPLEMENTATION: FULL_TABLE:
 
-  JSP: Kevin wrote this, and I'm converting it to my structure.
+JSP: Kevin wrote this, and I'm converting it to my structure.
  */
 
 static
-gf_val_32_t
+  gf_val_32_t
 gf_w8_table_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   struct gf_w8_single_table_data *ftd;
@@ -496,7 +918,7 @@ gf_w8_table_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 }
 
 static
-gf_val_32_t
+  gf_val_32_t
 gf_w8_table_divide(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   struct gf_w8_single_table_data *ftd;
@@ -506,7 +928,7 @@ gf_w8_table_divide(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 }
 
 static
-gf_val_32_t
+  gf_val_32_t
 gf_w8_default_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   struct gf_w8_default_data *ftd;
@@ -516,7 +938,7 @@ gf_w8_default_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 }
 
 static
-gf_val_32_t
+  gf_val_32_t
 gf_w8_default_divide(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   struct gf_w8_default_data *ftd;
@@ -526,7 +948,7 @@ gf_w8_default_divide(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 }
 
 static
-gf_val_32_t
+  gf_val_32_t
 gf_w8_double_table_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   struct gf_w8_double_table_data *ftd;
@@ -536,7 +958,7 @@ gf_w8_double_table_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 }
 
 static
-gf_val_32_t
+  gf_val_32_t
 gf_w8_double_table_divide(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   struct gf_w8_double_table_data *ftd;
@@ -546,7 +968,7 @@ gf_w8_double_table_divide(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 }
 
 static
-void
+  void
 gf_w8_double_table_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
   uint16_t *base;
@@ -570,7 +992,7 @@ gf_w8_double_table_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t 
         base[(b << 8)| c] = (vb | vc);
       }
     }
-      
+
   } else {
     dtd = (struct gf_w8_double_table_data *) h->private;
     base = &(dtd->mult[val][0]);
@@ -583,7 +1005,7 @@ gf_w8_double_table_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t 
 }
 
 static
-gf_val_32_t
+  gf_val_32_t
 gf_w8_double_table_lazy_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   struct gf_w8_double_table_lazy_data *ftd;
@@ -593,7 +1015,7 @@ gf_w8_double_table_lazy_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 }
 
 static
-gf_val_32_t
+  gf_val_32_t
 gf_w8_double_table_lazy_divide(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   struct gf_w8_double_table_lazy_data *ftd;
@@ -603,7 +1025,7 @@ gf_w8_double_table_lazy_divide(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 }
 
 static
-void
+  void
 gf_w8_table_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
   int i;
@@ -628,11 +1050,12 @@ gf_w8_table_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, in
     }
   }
 }
+
 static
-void
+  void
 gf_w8_split_multiply_region_sse(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-#ifdef   INTEL_SSE4
+#ifdef INTEL_SSSE3
   uint8_t *s8, *d8, *bh, *bl, *sptr, *dptr, *top;
   __m128i  tbl, loset, t1, r, va, mth, mtl;
   uint64_t altable[4];
@@ -654,7 +1077,7 @@ gf_w8_split_multiply_region_sse(gf_t *gf, void *src, void *dest, gf_val_32_t val
 
   sptr = rd.s_start;
   dptr = rd.d_start;
-  
+
   mth = _mm_loadu_si128 ((__m128i *)(bh));
   mtl = _mm_loadu_si128 ((__m128i *)(bl));
   loset = _mm_set1_epi8 (0x0f);
@@ -693,11 +1116,11 @@ gf_w8_split_multiply_region_sse(gf_t *gf, void *src, void *dest, gf_val_32_t val
 
 
 /* ------------------------------------------------------------
-  IMPLEMENTATION: FULL_TABLE:
+IMPLEMENTATION: FULL_TABLE:
  */
 
 static
-gf_val_32_t
+  gf_val_32_t
 gf_w8_split_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   struct gf_w8_half_table_data *htd;
@@ -707,7 +1130,7 @@ gf_w8_split_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 }
 
 static
-void
+  void
 gf_w8_split_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
   unsigned long uls, uld;
@@ -735,12 +1158,12 @@ gf_w8_split_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, in
 }
 
 
-static
+  static
 int gf_w8_split_init(gf_t *gf)
 {
   gf_internal_t *h;
   struct gf_w8_half_table_data *htd;
-  int a, b, c, d, pp;
+  int a, b, pp;
 
   h = (gf_internal_t *) gf->scratch;
   htd = (struct gf_w8_half_table_data *)h->private;
@@ -748,34 +1171,34 @@ int gf_w8_split_init(gf_t *gf)
 
   bzero(htd->high, sizeof(uint8_t)*GF_FIELD_SIZE*GF_HALF_SIZE);
   bzero(htd->low, sizeof(uint8_t)*GF_FIELD_SIZE*GF_HALF_SIZE);
-  
-  for (a = 1; a < GF_HALF_SIZE; a++) {
-    b = 1;
-    c = a;
-    d = (a << (GF_FIELD_WIDTH/2));
-    do {
-      htd->low[b][a] = c;
-      htd->high[b][a] = d;
-      b <<= 1;
-      if (b & GF_FIELD_SIZE) b ^= pp;
-      c <<= 1;
-      if (c & GF_FIELD_SIZE) c ^= pp;
-      d <<= 1;
-      if (d & GF_FIELD_SIZE) d ^= pp;
-    } while (c != a);
+
+  for (a = 1; a < GF_FIELD_SIZE; a++) {
+    for (b = 1; b < GF_HALF_SIZE; b++) {
+      htd->low[a][b] = gf_w8_shift_multiply(gf,a,b);
+      htd->high[a][b] = gf_w8_shift_multiply(gf,a,b<<4);
+    }
   }
 
-  gf->inverse.w32 = NULL; /* Will set from divide */
-  gf->divide.w32 = NULL;  /* Let the user figure it out. */
   gf->multiply.w32 = gf_w8_split_multiply;
-  if (h->region_type == GF_REGION_NOSSE) {
+  
+  #ifdef INTEL_SSSE3
+    if (h->region_type & GF_REGION_NOSSE)
+      gf->multiply_region.w32 = gf_w8_split_multiply_region;
+    else
+      gf->multiply_region.w32 = gf_w8_split_multiply_region_sse;
+  #else
     gf->multiply_region.w32 = gf_w8_split_multiply_region;
-  } else {
-    gf->multiply_region.w32 = gf_w8_split_multiply_region_sse;
-  }
+    if(h->region_type & GF_REGION_SSE)
+      return 0;
+  #endif
+
   return 1;
 }
 
+/* JSP: This is disgusting, but it is what it is.  If there is no SSE,
+   then the default is equivalent to single table.  If there is SSE, then
+   we use the "gf_w8_default_data" which is a hybrid of SPLIT & TABLE. */
+   
 static
 int gf_w8_table_init(gf_t *gf)
 {
@@ -784,19 +1207,24 @@ int gf_w8_table_init(gf_t *gf)
   struct gf_w8_double_table_data *dtd = NULL;
   struct gf_w8_double_table_lazy_data *ltd = NULL;
   struct gf_w8_default_data *dd = NULL;
-  int a, b, c, prod, scase;
+  int a, b, c, prod, scase, issse;
 
   h = (gf_internal_t *) gf->scratch;
 
-  if (h->mult_type == GF_MULT_DEFAULT) {
+  issse = 0;
+#ifdef INTEL_SSSE3
+  issse = 1;
+#endif
+
+  if (h->mult_type == GF_MULT_DEFAULT && issse) {
     dd = (struct gf_w8_default_data *)h->private;
     scase = 3;
     bzero(dd->high, sizeof(uint8_t) * GF_FIELD_SIZE * GF_HALF_SIZE);
     bzero(dd->low, sizeof(uint8_t) * GF_FIELD_SIZE * GF_HALF_SIZE);
     bzero(dd->divtable, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
     bzero(dd->multtable, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
-  } else if (h->region_type == 0 || (h->region_type & GF_REGION_CAUCHY) || 
-                             (h->region_type & GF_REGION_SINGLE_TABLE)) {
+  } else if (h->mult_type == GF_MULT_DEFAULT || 
+             h->region_type == 0 || (h->region_type & GF_REGION_CAUCHY)) {
     ftd = (struct gf_w8_single_table_data *)h->private;
     bzero(ftd->divtable, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
     bzero(ftd->multtable, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
@@ -815,93 +1243,98 @@ int gf_w8_table_init(gf_t *gf)
     fprintf(stderr, "Internal error in gf_w8_table_init\n");
     exit(0);
   }
-  
+
   for (a = 1; a < GF_FIELD_SIZE; a++) {
-    b = 1;
-    prod = a;
-    do {
+    for (b = 1; b < GF_FIELD_SIZE; b++) {
+      prod = gf_w8_shift_multiply(gf,a,b);
       switch (scase) {
-      case 0: 
-        ftd->multtable[a][b] = prod;
-        ftd->divtable[prod][b] = a;
-        break;
-      case 1:
-        dtd->div[prod][b] = a;
-        for (c = 0; c < GF_FIELD_SIZE; c++) {
-          dtd->mult[a][(c<<8)|b] |= prod;
-          dtd->mult[a][(b<<8)|c] |= (prod<<8);
-        }
-        break;
-      case 2:
-        ltd->div[prod][b] = a;
-        ltd->smult[a][b] = prod;
-        break;
-      case 3:
-        dd->multtable[a][b] = prod;
-        dd->divtable[prod][b] = a;
-        if ((b & 0xf) == b) dd->low[a][b] = prod;
-        if ((b & 0xf0) == b) dd->high[a][b>>4] = prod;
-        break;
+        case 0: 
+          ftd->multtable[a][b] = prod;
+          ftd->divtable[prod][b] = a;
+          break;
+        case 1:
+          dtd->div[prod][b] = a;
+          for (c = 0; c < GF_FIELD_SIZE; c++) {
+            dtd->mult[a][(c<<8)|b] |= prod;
+            dtd->mult[a][(b<<8)|c] |= (prod<<8);
+          }
+          break;
+        case 2:
+          ltd->div[prod][b] = a;
+          ltd->smult[a][b] = prod;
+          break;
+        case 3:
+          dd->multtable[a][b] = prod;
+          dd->divtable[prod][b] = a;
+          if ((b & 0xf) == b) { dd->low[a][b] = prod; }
+          if ((b & 0xf0) == b) { dd->high[a][b>>4] = prod; }
+          break;
       }
-      b <<= 1;
-      if (b & GF_FIELD_SIZE) b = b ^ h->prim_poly;
-      prod <<= 1;
-      if (prod & GF_FIELD_SIZE) prod = prod ^ h->prim_poly;
-      
-    } while (b != 1);
+    }
   }
 
   gf->inverse.w32 = NULL; /* Will set from divide */
   switch (scase) {
-  case 0: 
-    gf->divide.w32 = gf_w8_table_divide;
-    gf->multiply.w32 = gf_w8_table_multiply;
-    gf->multiply_region.w32 = gf_w8_table_multiply_region;
-    break;
-  case 1:
-    gf->divide.w32 = gf_w8_double_table_divide;
-    gf->multiply.w32 = gf_w8_double_table_multiply;
-    gf->multiply_region.w32 = gf_w8_double_table_multiply_region;
-    break;
-  case 2:
-    gf->divide.w32 = gf_w8_double_table_lazy_divide;
-    gf->multiply.w32 = gf_w8_double_table_lazy_multiply;
-    gf->multiply_region.w32 = gf_w8_double_table_multiply_region;
-    break;
-  case 3:
-    gf->divide.w32 = gf_w8_default_divide;
-    gf->multiply.w32 = gf_w8_default_multiply;
-    gf->multiply_region.w32 = gf_w8_split_multiply_region;
-#ifdef INTEL_SSE4
-    gf->multiply_region.w32 = gf_w8_split_multiply_region_sse;
+    case 0: 
+      gf->divide.w32 = gf_w8_table_divide;
+      gf->multiply.w32 = gf_w8_table_multiply;
+      gf->multiply_region.w32 = gf_w8_table_multiply_region;
+      break;
+    case 1:
+      gf->divide.w32 = gf_w8_double_table_divide;
+      gf->multiply.w32 = gf_w8_double_table_multiply;
+      gf->multiply_region.w32 = gf_w8_double_table_multiply_region;
+      break;
+    case 2:
+      gf->divide.w32 = gf_w8_double_table_lazy_divide;
+      gf->multiply.w32 = gf_w8_double_table_lazy_multiply;
+      gf->multiply_region.w32 = gf_w8_double_table_multiply_region;
+      break;
+    case 3:
+#ifdef INTEL_SSSE3
+      gf->divide.w32 = gf_w8_default_divide;
+      gf->multiply.w32 = gf_w8_default_multiply;
+      gf->multiply_region.w32 = gf_w8_split_multiply_region_sse;
 #endif
-    break;
+      break;
   }
   return 1;
 }
 
 static
-void
+  void
 gf_w8_composite_multiply_region_alt(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
   gf_t *base_gf = h->base_gf;
   uint8_t val0 = val & 0x0f;
   uint8_t val1 = (val & 0xf0) >> 4;
-  int sub_reg_size = bytes / 2;
+  gf_region_data rd;
+  int sub_reg_size;
 
-  if (bytes % 2 != 0) gf_alignment_error("gf_w8_composite_multiply_region_alt", 1);
+  if (val == 0) {
+    if (xor) return;
+    bzero(dest, bytes);
+    return;
+  }
 
-  base_gf->multiply_region.w32(base_gf, src, dest, val0, sub_reg_size, xor);
-  base_gf->multiply_region.w32(base_gf, src+sub_reg_size, dest, val1, sub_reg_size, 1);
-  base_gf->multiply_region.w32(base_gf, src, dest+sub_reg_size, val1, sub_reg_size, xor);
-  base_gf->multiply_region.w32(base_gf, src+sub_reg_size, dest+sub_reg_size, val0, sub_reg_size, 1);
-  base_gf->multiply_region.w32(base_gf, src+sub_reg_size, dest+sub_reg_size, base_gf->multiply.w32(base_gf, GF_S_GF_4_2, val1), sub_reg_size, 1);
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 32);
+  gf_do_initial_region_alignment(&rd);
+
+  sub_reg_size = (rd.d_top - rd.d_start) / 2;
+
+  base_gf->multiply_region.w32(base_gf, rd.s_start, rd.d_start, val0, sub_reg_size, xor);
+  base_gf->multiply_region.w32(base_gf, rd.s_start+sub_reg_size, rd.d_start, val1, sub_reg_size, 1);
+  base_gf->multiply_region.w32(base_gf, rd.s_start, rd.d_start+sub_reg_size, val1, sub_reg_size, xor);
+  base_gf->multiply_region.w32(base_gf, rd.s_start+sub_reg_size, rd.d_start+sub_reg_size, val0, sub_reg_size, 1);
+  base_gf->multiply_region.w32(base_gf, rd.s_start+sub_reg_size, rd.d_start+sub_reg_size, base_gf->multiply.w32(base_gf, h->prim_poly, val1), sub_reg_size, 1);
+
+   gf_do_final_region_alignment(&rd);
 }
 
 static
 gf_val_32_t
-gf_w8_composite_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
+gf_w8_composite_multiply_recursive(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
   gf_t *base_gf = h->base_gf;
@@ -912,8 +1345,35 @@ gf_w8_composite_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
   uint8_t a1b1;
 
   a1b1 = base_gf->multiply.w32(base_gf, a1, b1);
-  
-  return ((base_gf->multiply.w32(base_gf, a0, b0) ^ a1b1) | ((base_gf->multiply.w32(base_gf, a1, b0) ^ base_gf->multiply.w32(base_gf, a0, b1) ^ base_gf->multiply.w32(base_gf, a1b1, GF_S_GF_4_2)) << 4));
+
+  return ((base_gf->multiply.w32(base_gf, a0, b0) ^ a1b1) | 
+          ((base_gf->multiply.w32(base_gf, a1, b0) ^ 
+           base_gf->multiply.w32(base_gf, a0, b1) ^ 
+           base_gf->multiply.w32(base_gf, a1b1, h->prim_poly)) << 4));
+}
+
+static
+gf_val_32_t
+gf_w8_composite_multiply_inline(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
+{
+  gf_internal_t *h = (gf_internal_t *) gf->scratch;
+  gf_t *base_gf = h->base_gf;
+  uint8_t b0 = b & 0x0f; 
+  uint8_t b1 = (b & 0xf0) >> 4; 
+  uint8_t a0 = a & 0x0f; 
+  uint8_t a1 = (a & 0xf0) >> 4; 
+  uint8_t a1b1, *mt;
+  struct gf_w8_composite_data *cd;
+
+  cd = (struct gf_w8_composite_data *) h->private;
+  mt = cd->mult_table;
+
+  a1b1 = GF_W4_INLINE_MULTDIV(mt, a1, b1);
+
+  return ((GF_W4_INLINE_MULTDIV(mt, a0, b0) ^ a1b1) | 
+          ((GF_W4_INLINE_MULTDIV(mt, a1, b0) ^ 
+           GF_W4_INLINE_MULTDIV(mt, a0, b1) ^ 
+           GF_W4_INLINE_MULTDIV(mt, a1b1, h->prim_poly)) << 4));
 }
 
 /*
@@ -938,6 +1398,7 @@ gf_w8_composite_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
  * 
  * a / b = a * c
  */
+
 static
 gf_val_32_t
 gf_w8_composite_inverse(gf_t *gf, gf_val_32_t a)
@@ -949,10 +1410,9 @@ gf_w8_composite_inverse(gf_t *gf, gf_val_32_t a)
   uint8_t c0, c1, c, d, tmp;
   uint8_t a0inv, a1inv; 
 
-
   if (a0 == 0) {
     a1inv = base_gf->inverse.w32(base_gf, a1) & 0xf;
-    c0 = base_gf->multiply.w32(base_gf, a1inv, GF_S_GF_4_2);
+    c0 = base_gf->multiply.w32(base_gf, a1inv, h->prim_poly);
     c1 = a1inv;
   } else if (a1 == 0) {
     c0 = base_gf->inverse.w32(base_gf, a0);
@@ -963,49 +1423,36 @@ gf_w8_composite_inverse(gf_t *gf, gf_val_32_t a)
 
     d = base_gf->multiply.w32(base_gf, a1, a0inv) & 0xf;
 
-    tmp = (base_gf->multiply.w32(base_gf, a1, a0inv) ^ base_gf->multiply.w32(base_gf, a0, a1inv) ^ GF_S_GF_4_2) & 0xf;
+    tmp = (base_gf->multiply.w32(base_gf, a1, a0inv) ^ base_gf->multiply.w32(base_gf, a0, a1inv) ^ h->prim_poly) & 0xf;
     tmp = base_gf->inverse.w32(base_gf, tmp) & 0xf;
 
     d = base_gf->multiply.w32(base_gf, d, tmp) & 0xf;
- 
+
     c0 = base_gf->multiply.w32(base_gf, (d^1), a0inv) & 0xf; 
     c1 = base_gf->multiply.w32(base_gf, d, a1inv) & 0xf; 
   }
 
   c = c0 | (c1 << 4);
-  
+
   return c;
-}
-
-static
-gf_val_32_t
-gf_w8_composite_divide(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
-{
-  gf_val_32_t binv;
-
-  binv = gf_w8_composite_inverse(gf, b);
-
-  return gf_w8_composite_multiply(gf, a, binv);
 }
 
 static
 void
 gf_w8_composite_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-  unsigned long uls, uld;
+  gf_region_data rd;
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
   gf_t *base_gf = h->base_gf;
-  int i=0;
-  struct gf_w4_single_table_data * std;
   uint8_t b0 = val & 0x0f; 
   uint8_t b1 = (val & 0xf0) >> 4; 
-  uint8_t *s8 = (uint8_t *) src;
-  uint8_t *d8 = (uint8_t *) dest; 
+  uint8_t *s8;
+  uint8_t *d8; 
+  uint8_t *mt;
   uint8_t a0, a1, a1b1;
+  struct gf_w8_composite_data *cd;
 
-  uls = ((unsigned long) src) & 0xf;
-  uld = ((unsigned long) dest) & 0xf;
-  if ((uls & 0x7) != (uld & 0x7)) gf_alignment_error("gf_w8_composite_multiply_region", 1);
+  cd = (struct gf_w8_composite_data *) h->private;
 
   if (val == 0) {
     if (xor) return;
@@ -1013,124 +1460,115 @@ gf_w8_composite_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val
     return;
   }
 
-  std = (struct gf_w4_single_table_data *) h->private;
+  gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 1);
+  gf_do_initial_region_alignment(&rd);
+  
+  
+  s8 = (uint8_t *) rd.s_start;
+  d8 = (uint8_t *) rd.d_start;
 
-  if (xor) {
-    for (i = 0;i < bytes; i++) {
-      a0 = s8[i] & 0x0f; 
-      a1 = (s8[i] & 0xf0) >> 4; 
-      a1b1 = std->mult[a1][b1];
-
-      d8[i] ^= ((base_gf->multiply.w32(base_gf, a0, b0) ^ a1b1) | 
-                ((base_gf->multiply.w32(base_gf, a1, b0) ^ base_gf->multiply.w32(base_gf, a0, b1) ^ base_gf->multiply.w32(base_gf, a1b1, GF_S_GF_4_2)) << 4));
-      
+  mt = cd->mult_table;
+  if (mt == NULL) {
+    if (xor) {
+      while (d8 < (uint8_t *) rd.d_top) {
+        a0 = *s8 & 0x0f; 
+        a1 = (*s8 & 0xf0) >> 4; 
+        a1b1 = base_gf->multiply.w32(base_gf, a1, b1);
+  
+        *d8 ^= ((base_gf->multiply.w32(base_gf, a0, b0) ^ a1b1) | 
+               ((base_gf->multiply.w32(base_gf, a1, b0) ^ 
+                 base_gf->multiply.w32(base_gf, a0, b1) ^ 
+                 base_gf->multiply.w32(base_gf, a1b1, h->prim_poly)) << 4));
+        s8++;
+        d8++;
+      }
+    } else {
+      while (d8 < (uint8_t *) rd.d_top) {
+        a0 = *s8 & 0x0f; 
+        a1 = (*s8 & 0xf0) >> 4; 
+        a1b1 = base_gf->multiply.w32(base_gf, a1, b1);
+  
+        *d8 = ((base_gf->multiply.w32(base_gf, a0, b0) ^ a1b1) | 
+              ((base_gf->multiply.w32(base_gf, a1, b0) ^ 
+                base_gf->multiply.w32(base_gf, a0, b1) ^ 
+                base_gf->multiply.w32(base_gf, a1b1, h->prim_poly)) << 4));
+        s8++;
+        d8++;
+      }
     }
   } else {
-    for (i = 0;i < bytes; i++) {
-      a0 = s8[i] & 0x0f; 
-      a1 = (s8[i] & 0xf0) >> 4; 
-      a1b1 = std->mult[a1][b1];
-
-      d8[i] = ((base_gf->multiply.w32(base_gf, a0, b0) ^ a1b1) | 
-               ((base_gf->multiply.w32(base_gf, a1, b0) ^ base_gf->multiply.w32(base_gf, a0, b1) ^ base_gf->multiply.w32(base_gf, a1b1, GF_S_GF_4_2)) << 4));
+    if (xor) {
+      while (d8 < (uint8_t *) rd.d_top) {
+        a0 = *s8 & 0x0f; 
+        a1 = (*s8 & 0xf0) >> 4; 
+        a1b1 = GF_W4_INLINE_MULTDIV(mt, a1, b1);
+  
+        *d8 ^= ((GF_W4_INLINE_MULTDIV(mt, a0, b0) ^ a1b1) | 
+               ((GF_W4_INLINE_MULTDIV(mt, a1, b0) ^ 
+                 GF_W4_INLINE_MULTDIV(mt, a0, b1) ^ 
+                 GF_W4_INLINE_MULTDIV(mt, a1b1, h->prim_poly)) << 4));
+        s8++;
+        d8++;
+      }
+    } else {
+      while (d8 < (uint8_t *) rd.d_top) {
+        a0 = *s8 & 0x0f; 
+        a1 = (*s8 & 0xf0) >> 4; 
+        a1b1 = GF_W4_INLINE_MULTDIV(mt, a1, b1);
+  
+        *d8 = ((GF_W4_INLINE_MULTDIV(mt, a0, b0) ^ a1b1) | 
+              ((GF_W4_INLINE_MULTDIV(mt, a1, b0) ^ 
+                GF_W4_INLINE_MULTDIV(mt, a0, b1) ^ 
+                GF_W4_INLINE_MULTDIV(mt, a1b1, h->prim_poly)) << 4));
+        s8++;
+        d8++;
+      }
     }
   }
-  return;
-}
-
-static
-void
-gf_w8_composite_multiply_region_table(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
-{
-  unsigned long uls, uld;
-  gf_internal_t *h = (gf_internal_t *) gf->scratch;
-  gf_t *base_gf = h->base_gf;
-  int i=0;
-  struct gf_w4_single_table_data * std;
-  uint8_t b0 = val & 0x0f; 
-  uint8_t b1 = (val & 0xf0) >> 4; 
-  uint8_t *s8 = (uint8_t *) src;
-  uint8_t *d8 = (uint8_t *) dest; 
-  uint8_t a0, a1, a1b1;
-
-  uls = ((unsigned long) src) & 0xf;
-  uld = ((unsigned long) dest) & 0xf;
-  if ((uls & 0x7) != (uld & 0x7)) gf_alignment_error("gf_w8_composite_multiply_region", 1);
-
-  if (val == 0) {
-    if (xor) return;
-    bzero(dest, bytes);
-    return;
-  }
-
-  std = (struct gf_w4_single_table_data *) h->private;
-
-  if (xor) {
-    for (i = 0;i < bytes; i++) {
-      a0 = s8[i] & 0x0f; 
-      a1 = (s8[i] & 0xf0) >> 4; 
-      a1b1 = std->mult[a1][b1];
-
-      d8[i] ^= ((std->mult[a0][b0] ^ a1b1) | ((std->mult[a1][b0] ^ std->mult[a0][b1] ^ std->mult[a1b1][GF_S_GF_4_2]) << 4));
-      
-    }
-  } else {
-    for (i = 0;i < bytes; i++) {
-      a0 = s8[i] & 0x0f; 
-      a1 = (s8[i] & 0xf0) >> 4; 
-      a1b1 = std->mult[a1][b1];
-
-      d8[i] = ((std->mult[a0][b0] ^ a1b1) | ((std->mult[a1][b0] ^ std->mult[a0][b1] ^ std->mult[a1b1][GF_S_GF_4_2]) << 4));
-    }
-  }
+  gf_do_final_region_alignment(&rd);
   return;
 }
 
 static
 int gf_w8_composite_init(gf_t *gf)
 {
-  struct gf_w4_single_table_data * std;
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
-  gf_t *base_gf = h->base_gf;
-  uint8_t a, b;
+  struct gf_w8_composite_data *cd;
 
-  std = (struct gf_w4_single_table_data *) h->private;
+  if (h->base_gf == NULL) return 0;
 
-  for (a = 0; a < 16; a++) {
-    for (b = 0; b < 16; b++) {
-      std->mult[a][b] = base_gf->multiply.w32(base_gf, a, b);
-    }
-  }
-  
+  cd = (struct gf_w8_composite_data *) h->private;
+  cd->mult_table = gf_w4_get_mult_table(h->base_gf);
+
   if (h->region_type & GF_REGION_ALTMAP) {
     gf->multiply_region.w32 = gf_w8_composite_multiply_region_alt;
   } else {
-    if (h->region_type & GF_REGION_SINGLE_TABLE) {
-      gf->multiply_region.w32 = gf_w8_composite_multiply_region_table;
-    } else {
-      gf->multiply_region.w32 = gf_w8_composite_multiply_region;
-    }
+    gf->multiply_region.w32 = gf_w8_composite_multiply_region;
   }
 
-  gf->multiply.w32 = gf_w8_composite_multiply;
-  gf->divide.w32 = gf_w8_composite_divide;
+  if (cd->mult_table == NULL) {
+    gf->multiply.w32 = gf_w8_composite_multiply_recursive;
+  } else {
+    gf->multiply.w32 = gf_w8_composite_multiply_inline;
+  }
+  gf->divide.w32 = NULL;
   gf->inverse.w32 = gf_w8_composite_inverse;
-  
+
   return 1;
 }
 
 static
 inline
-gf_val_32_t
+  gf_val_32_t
 gf_w8_bytwo_p_multiply (gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   uint32_t prod, pp, pmask, amask;
   gf_internal_t *h;
-  
+
   h = (gf_internal_t *) gf->scratch;
   pp = h->prim_poly;
 
-  
+
   prod = 0;
   pmask = 0x80;
   amask = 0x80;
@@ -1149,12 +1587,12 @@ gf_w8_bytwo_p_multiply (gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 
 static
 inline
-gf_val_32_t
+  gf_val_32_t
 gf_w8_bytwo_b_multiply (gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   uint32_t prod, pp, bmask;
   gf_internal_t *h;
-  
+
   h = (gf_internal_t *) gf->scratch;
   pp = h->prim_poly;
 
@@ -1174,13 +1612,13 @@ gf_w8_bytwo_b_multiply (gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 }
 
 static
-void 
+  void 
 gf_w8_bytwo_p_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
   uint64_t *s64, *d64, t1, t2, ta, prod, amask;
   gf_region_data rd;
   struct gf_w8_bytwo_data *btd;
-    
+
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
   if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
@@ -1225,18 +1663,18 @@ gf_w8_bytwo_p_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t
 }
 
 #define BYTWO_P_ONESTEP {\
-      SSE_AB2(pp, m1 ,m2, prod, t1, t2); \
-      t1 = _mm_and_si128(v, one); \
-      t1 = _mm_sub_epi8(t1, one); \
-      t1 = _mm_and_si128(t1, ta); \
-      prod = _mm_xor_si128(prod, t1); \
-      v = _mm_srli_epi64(v, 1); }
+  SSE_AB2(pp, m1 ,m2, prod, t1, t2); \
+  t1 = _mm_and_si128(v, one); \
+  t1 = _mm_sub_epi8(t1, one); \
+  t1 = _mm_and_si128(t1, ta); \
+  prod = _mm_xor_si128(prod, t1); \
+  v = _mm_srli_epi64(v, 1); }
 
 static
-void 
+  void 
 gf_w8_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-#ifdef   INTEL_SSE4
+#ifdef INTEL_SSE2
   int i;
   uint8_t *s8, *d8;
   uint8_t vrev;
@@ -1244,7 +1682,7 @@ gf_w8_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t v
   __m128i pp, m1, m2, ta, prod, t1, t2, tp, one, v;
   struct gf_w8_bytwo_data *btd;
   gf_region_data rd;
-    
+
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
   if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
@@ -1289,10 +1727,10 @@ gf_w8_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t v
 }
 
 static
-void
+  void
 gf_w8_bytwo_b_sse_region_2_noxor(gf_region_data *rd, struct gf_w8_bytwo_data *btd)
 {
-#ifdef   INTEL_SSE4
+#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1315,10 +1753,10 @@ gf_w8_bytwo_b_sse_region_2_noxor(gf_region_data *rd, struct gf_w8_bytwo_data *bt
 }
 
 static
-void
+  void
 gf_w8_bytwo_b_sse_region_2_xor(gf_region_data *rd, struct gf_w8_bytwo_data *btd)
 {
-#ifdef   INTEL_SSE4
+#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1344,16 +1782,16 @@ gf_w8_bytwo_b_sse_region_2_xor(gf_region_data *rd, struct gf_w8_bytwo_data *btd)
 
 
 static
-void 
+  void 
 gf_w8_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-#ifdef   INTEL_SSE4
+#ifdef INTEL_SSE2
   int itb;
   uint8_t *d8, *s8;
   __m128i pp, m1, m2, t1, t2, va, vb;
   struct gf_w8_bytwo_data *btd;
   gf_region_data rd;
-    
+
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
   if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
 
@@ -1399,7 +1837,7 @@ gf_w8_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t v
 }
 
 static
-void 
+  void 
 gf_w8_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
   int i;
@@ -1419,349 +1857,349 @@ gf_w8_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t
   d64 = (uint64_t *) rd.d_start;
 
   switch (val) {
-  case 2:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= ta;
-        d64++;
-        s64++;
+    case 2:
+      if (xor) {
+        while (d64 < (uint64_t *) rd.d_top) {
+          ta = *s64;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          *d64 ^= ta;
+          d64++;
+          s64++;
+        }
+      } else {
+        while (d64 < (uint64_t *) rd.d_top) {
+          ta = *s64;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          *d64 = ta;
+          d64++;
+          s64++;
+        }
       }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = ta;
-        d64++;
-        s64++;
+      break; 
+    case 3:
+      if (xor) {
+        while (d64 < (uint64_t *) rd.d_top) {
+          ta = *s64;
+          prod = ta;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          *d64 ^= (ta ^ prod);
+          d64++;
+          s64++;
+        }
+      } else {
+        while (d64 < (uint64_t *) rd.d_top) {
+          ta = *s64;
+          prod = ta;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          *d64 = (ta ^ prod);
+          d64++;
+          s64++;
+        }
       }
+      break; 
+    case 4:
+      if (xor) {
+        while (d64 < (uint64_t *) rd.d_top) {
+          ta = *s64;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          *d64 ^= ta;
+          d64++;
+          s64++;
+        }
+      } else {
+        while (d64 < (uint64_t *) rd.d_top) {
+          ta = *s64;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          *d64 = ta;
+          d64++;
+          s64++;
+        }
+      }
+      break; 
+    case 5:
+      if (xor) {
+        while (d64 < (uint64_t *) rd.d_top) {
+          ta = *s64;
+          prod = ta;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          *d64 ^= (ta ^ prod);
+          d64++;
+          s64++;
+        }
+      } else {
+        while (d64 < (uint64_t *) rd.d_top) {
+          ta = *s64;
+          prod = ta;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          *d64 = ta ^ prod;
+          d64++;
+          s64++;
+        }
+      }
+    case 6:
+      if (xor) {
+        while (d64 < (uint64_t *) rd.d_top) {
+          ta = *s64;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          prod = ta;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          *d64 ^= (ta ^ prod);
+          d64++;
+          s64++;
+        }
+      } else {
+        while (d64 < (uint64_t *) rd.d_top) {
+          ta = *s64;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          prod = ta;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          *d64 = ta ^ prod;
+          d64++;
+          s64++;
+        }
+      }
+      /*
+         case 7:
+         if (xor) {
+         while (d64 < (uint64_t *) rd.d_top) {
+         ta = *s64;
+         prod = ta;
+         AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+         prod ^= ta;
+         AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       *d64 ^= (ta ^ prod);
+       d64++;
+       s64++;
+       }
+       } else {
+       while (d64 < (uint64_t *) rd.d_top) {
+       ta = *s64;
+       prod = ta;
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       prod ^= ta;
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       *d64 = ta ^ prod;
+       d64++;
+       s64++;
+       }
+       }
+       break; 
+       */
+    case 8:
+      if (xor) {
+        while (d64 < (uint64_t *) rd.d_top) {
+          ta = *s64;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          *d64 ^= ta;
+          d64++;
+          s64++;
+        }
+      } else {
+        while (d64 < (uint64_t *) rd.d_top) {
+          ta = *s64;
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+          *d64 = ta;
+          d64++;
+          s64++;
+        }
+      }
+      break; 
+      /*
+         case 9:
+         if (xor) {
+         while (d64 < (uint64_t *) rd.d_top) {
+         ta = *s64;
+         prod = ta;
+         AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+         AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+         AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       *d64 ^= (ta ^ prod);
+       d64++;
+       s64++;
+       }
+       } else {
+       while (d64 < (uint64_t *) rd.d_top) {
+       ta = *s64;
+       prod = ta;
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       *d64 = (ta ^ prod);
+       d64++;
+       s64++;
+       }
+       }
+       break; 
+       case 10:
+       if (xor) {
+       while (d64 < (uint64_t *) rd.d_top) {
+       ta = *s64;
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       prod = ta;
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       *d64 ^= (ta ^ prod);
+       d64++;
+       s64++;
+       }
+       } else {
+       while (d64 < (uint64_t *) rd.d_top) {
+       ta = *s64;
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       prod = ta;
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       *d64 = (ta ^ prod);
+       d64++;
+       s64++;
+       }
+       }
+       break; 
+       case 11:
+       if (xor) {
+       while (d64 < (uint64_t *) rd.d_top) {
+       ta = *s64;
+       prod = ta;
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       prod ^= ta;
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       *d64 ^= (ta ^ prod);
+       d64++;
+       s64++;
+       }
+       } else {
+       while (d64 < (uint64_t *) rd.d_top) {
+       ta = *s64;
+       prod = ta;
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+       prod ^= ta;
+       AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      *d64 = (ta ^ prod);
+      d64++;
+      s64++;
+      }
+  }
+  break; 
+    case 12:
+  if (xor) {
+    while (d64 < (uint64_t *) rd.d_top) {
+      ta = *s64;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      prod = ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      *d64 ^= (ta ^ prod);
+      d64++;
+      s64++;
     }
-    break; 
-  case 3:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = (ta ^ prod);
-        d64++;
-        s64++;
-      }
+  } else {
+    while (d64 < (uint64_t *) rd.d_top) {
+      ta = *s64;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      prod = ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      *d64 = (ta ^ prod);
+      d64++;
+      s64++;
     }
-    break; 
-  case 4:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= ta;
-        d64++;
-        s64++;
-      }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = ta;
-        d64++;
-        s64++;
-      }
+  }
+  break; 
+    case 13:
+  if (xor) {
+    while (d64 < (uint64_t *) rd.d_top) {
+      ta = *s64;
+      prod = ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      prod ^= ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      *d64 ^= (ta ^ prod);
+      d64++;
+      s64++;
     }
-    break; 
-  case 5:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = ta ^ prod;
-        d64++;
-        s64++;
-      }
+  } else {
+    while (d64 < (uint64_t *) rd.d_top) {
+      ta = *s64;
+      prod = ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      prod ^= ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      *d64 = (ta ^ prod);
+      d64++;
+      s64++;
     }
-  case 6:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = ta ^ prod;
-        d64++;
-        s64++;
-      }
+  }
+  break; 
+    case 14:
+  if (xor) {
+    while (d64 < (uint64_t *) rd.d_top) {
+      ta = *s64;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      prod = ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      prod ^= ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      *d64 ^= (ta ^ prod);
+      d64++;
+      s64++;
     }
-/*
-  case 7:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod ^= ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod ^= ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = ta ^ prod;
-        d64++;
-        s64++;
-      }
+  } else {
+    while (d64 < (uint64_t *) rd.d_top) {
+      ta = *s64;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      prod = ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      prod ^= ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      *d64 = (ta ^ prod);
+      d64++;
+      s64++;
     }
-    break; 
- */
-  case 8:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= ta;
-        d64++;
-        s64++;
-      }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = ta;
-        d64++;
-        s64++;
-      }
+  }
+  break; 
+    case 15:
+  if (xor) {
+    while (d64 < (uint64_t *) rd.d_top) {
+      ta = *s64;
+      prod = ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      prod ^= ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      prod ^= ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      *d64 ^= (ta ^ prod);
+      d64++;
+      s64++;
     }
-    break; 
-/*
-  case 9:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = (ta ^ prod);
-        d64++;
-        s64++;
-      }
+  } else {
+    while (d64 < (uint64_t *) rd.d_top) {
+      ta = *s64;
+      prod = ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      prod ^= ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      prod ^= ta;
+      AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
+      *d64 = (ta ^ prod);
+      d64++;
+      s64++;
     }
-    break; 
-  case 10:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    }
-    break; 
-  case 11:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod ^= ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod ^= ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    }
-    break; 
-  case 12:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    }
-    break; 
-  case 13:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod ^= ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod ^= ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    }
-    break; 
-  case 14:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod ^= ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod ^= ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    }
-    break; 
-  case 15:
-    if (xor) {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod ^= ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod ^= ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 ^= (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    } else {
-      while (d64 < (uint64_t *) rd.d_top) {
-        ta = *s64;
-        prod = ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod ^= ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        prod ^= ta;
-        AB2(btd->prim_poly, btd->mask1, btd->mask2, ta, t1, t2);
-        *d64 = (ta ^ prod);
-        d64++;
-        s64++;
-      }
-    }
-    break; 
-*/
-  default:
+  }
+  break; 
+  */
+    default:
     if (xor) {
       while (d64 < (uint64_t *) rd.d_top) {
         prod = *d64 ;
@@ -1798,7 +2236,7 @@ gf_w8_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t
   gf_do_final_region_alignment(&rd);
 }
 
-static
+  static
 int gf_w8_bytwo_init(gf_t *gf)
 {
   gf_internal_t *h;
@@ -1825,48 +2263,54 @@ int gf_w8_bytwo_init(gf_t *gf)
 
   if (h->mult_type == GF_MULT_BYTWO_p) {
     gf->multiply.w32 = gf_w8_bytwo_p_multiply;
-    if (h->region_type == GF_REGION_SSE) {
-      gf->multiply_region.w32 = gf_w8_bytwo_p_sse_multiply_region;
-    } else {
+#ifdef INTEL_SSE2
+    if (h->region_type & GF_REGION_NOSSE)
       gf->multiply_region.w32 = gf_w8_bytwo_p_nosse_multiply_region;
-    }
+    else
+      gf->multiply_region.w32 = gf_w8_bytwo_p_sse_multiply_region;
+#else
+    gf->multiply_region.w32 = gf_w8_bytwo_p_nosse_multiply_region;
+    if(h->region_type & GF_REGION_SSE)
+      return 0;
+#endif
   } else {
     gf->multiply.w32 = gf_w8_bytwo_b_multiply;
-    if (h->region_type == GF_REGION_SSE) {
-      gf->multiply_region.w32 = gf_w8_bytwo_b_sse_multiply_region;
-    } else {
+#ifdef INTEL_SSE2
+    if (h->region_type & GF_REGION_NOSSE)
       gf->multiply_region.w32 = gf_w8_bytwo_b_nosse_multiply_region;
-    }
+    else
+      gf->multiply_region.w32 = gf_w8_bytwo_b_sse_multiply_region;
+#else
+    gf->multiply_region.w32 = gf_w8_bytwo_b_nosse_multiply_region;
+    if(h->region_type & GF_REGION_SSE)
+      return 0;
+#endif
   }
-  gf->inverse.w32 = gf_w8_euclid;
   return 1;
 }
 
 
 /* ------------------------------------------------------------
    General procedures.
+   You don't need to error check here on in init, because it's done
+   for you in gf_error_check().
  */
 
 int gf_w8_scratch_size(int mult_type, int region_type, int divide_type, int arg1, int arg2)
 {
-  int sse;
-
-  sse = (GF_REGION_SSE | GF_REGION_NOSSE);
-
   switch(mult_type)
   {
     case GF_MULT_DEFAULT:
-      if (arg1 != 0 || arg2 != 0 || region_type != 0) return -1;
+#ifdef INTEL_SSSE3
       return sizeof(gf_internal_t) + sizeof(struct gf_w8_default_data) + 64;
+#endif
+      return sizeof(gf_internal_t) + sizeof(struct gf_w8_single_table_data) + 64;
     case GF_MULT_TABLE:
-      if (arg1 != 0 || arg2 != 0) return -1;
-      if (region_type == GF_REGION_CAUCHY || region_type == (GF_REGION_CAUCHY | GF_REGION_SINGLE_TABLE)) {
+      if (region_type == GF_REGION_CAUCHY) {
         return sizeof(gf_internal_t) + sizeof(struct gf_w8_single_table_data) + 64;
       }
 
-      if (region_type == 0) region_type = GF_REGION_SINGLE_TABLE;
-      if (region_type & GF_REGION_SINGLE_TABLE) {
-        if (region_type != GF_REGION_SINGLE_TABLE) return 0;
+      if (region_type == GF_REGION_DEFAULT) {
         return sizeof(gf_internal_t) + sizeof(struct gf_w8_single_table_data) + 64;
       } 
       if (region_type & GF_REGION_DOUBLE_TABLE) {
@@ -1875,62 +2319,62 @@ int gf_w8_scratch_size(int mult_type, int region_type, int divide_type, int arg1
         } else if (region_type == (GF_REGION_DOUBLE_TABLE | GF_REGION_LAZY)) {
           return sizeof(gf_internal_t) + sizeof(struct gf_w8_double_table_lazy_data) + 64;
         } else {
-          return -1;
+          return 0;
         }
       }
-      return -1;
+      return 0;
       break;
     case GF_MULT_BYTWO_p:
     case GF_MULT_BYTWO_b:
-      if (arg1 != 0 || arg2 != 0) return -1;
-      if (region_type != GF_REGION_CAUCHY) {
-        if ((region_type | sse) != sse || (region_type & sse) == sse) return -1;
-      }
       return sizeof(gf_internal_t) + sizeof(struct gf_w8_bytwo_data);
       break;
     case GF_MULT_SPLIT_TABLE:
       if ((arg1 == 4 && arg2 == 8) || (arg1 == 8 && arg2 == 4)) {
-        if (region_type == GF_REGION_CAUCHY) {
-          return sizeof(gf_internal_t) + sizeof(struct gf_w8_half_table_data) + 64;
-        }
-        if (region_type == 0) region_type = GF_REGION_SSE;
-        if ((region_type | sse) != sse) return -1;
-        if ((region_type & sse) == sse) return -1;
         return sizeof(gf_internal_t) + sizeof(struct gf_w8_half_table_data) + 64;
       }
-      return -1;
       break;
     case GF_MULT_LOG_TABLE:
-      if ((arg1 != 0 && arg1 != 1 && arg1 != 2) || arg2 != 0) return -1;
-      if (region_type != 0 && region_type != GF_REGION_CAUCHY) return -1;
-      if (arg1 == 0) return sizeof(gf_internal_t) + sizeof(struct gf_w8_logtable_data) + 64;
-      if (arg1 == 1) return sizeof(gf_internal_t) + sizeof(struct gf_w8_logzero_small_table_data) + 64;
+      return sizeof(gf_internal_t) + sizeof(struct gf_w8_logtable_data) + 64;
+      break;
+    case GF_MULT_LOG_ZERO:
+      return sizeof(gf_internal_t) + sizeof(struct gf_w8_logzero_small_table_data) + 64;
+      break;
+    case GF_MULT_LOG_ZERO_EXT:
       return sizeof(gf_internal_t) + sizeof(struct gf_w8_logzero_table_data) + 64;
       break;
+    case GF_MULT_CARRY_FREE:
+      return sizeof(gf_internal_t);
+      break;
     case GF_MULT_SHIFT:
-      if (arg1 != 0 || arg2 != 0) return -1;
-      if (region_type != 0 && region_type != GF_REGION_CAUCHY) return -1;
       return sizeof(gf_internal_t);
       break;
     case GF_MULT_COMPOSITE:
-      if (region_type & ~(GF_REGION_SINGLE_TABLE | GF_REGION_ALTMAP | GF_REGION_STDMAP)) return -1;
-      if ((region_type & (GF_REGION_SINGLE_TABLE | GF_REGION_ALTMAP)) == (GF_REGION_SINGLE_TABLE | GF_REGION_ALTMAP)) return -1;
-      if (arg1 == 2 && arg2 == 4) {
-        return sizeof(gf_internal_t) + sizeof(struct gf_w4_single_table_data) + 64;
-      } else {
-        return -1;
-      }
+      return sizeof(gf_internal_t) + sizeof(struct gf_w8_composite_data) + 64;
     default:
-      return -1;
-   }
+      return 0;
+  }
+  return 0;
 }
 
 int gf_w8_init(gf_t *gf)
 {
-  gf_internal_t *h;
+  gf_internal_t *h, *h_base;
 
   h = (gf_internal_t *) gf->scratch;
-  if (h->prim_poly == 0) h->prim_poly = 0x11d;
+
+  /* Allen: set default primitive polynomial / irreducible polynomial if needed */
+
+  if (h->prim_poly == 0) {
+    if (h->mult_type == GF_MULT_COMPOSITE) { 
+      h->prim_poly = gf_composite_get_default_poly(h->base_gf);
+      if (h->prim_poly == 0) return 0;   /* JSP: This shouldn't happen, but just in case. */
+    } else {             
+      h->prim_poly = 0x11d;
+    } 
+  }
+  if (h->mult_type != GF_MULT_COMPOSITE) { 
+    h->prim_poly |= 0x100;
+  }
 
   gf->multiply.w32 = NULL;
   gf->divide.w32 = NULL;
@@ -1939,16 +2383,20 @@ int gf_w8_init(gf_t *gf)
   gf->extract_word.w32 = gf_w8_extract_word;
 
   switch(h->mult_type) {
-    case GF_MULT_DEFAULT: if (gf_w8_table_init(gf) == 0) return 0; break;
-    case GF_MULT_TABLE:     if (gf_w8_table_init(gf) == 0) return 0; break;
+    case GF_MULT_DEFAULT:      
+    case GF_MULT_TABLE:        if (gf_w8_table_init(gf) == 0) return 0; break;
     case GF_MULT_BYTWO_p:
-    case GF_MULT_BYTWO_b:   if (gf_w8_bytwo_init(gf) == 0) return 0; break;
-    case GF_MULT_LOG_TABLE: if (gf_w8_log_init(gf) == 0) return 0; break;
-    case GF_MULT_SHIFT:     if (gf_w8_shift_init(gf) == 0) return 0; break;
-    case GF_MULT_SPLIT_TABLE: if (gf_w8_split_init(gf) == 0) return 0; break;
-    case GF_MULT_COMPOSITE: if (gf_w8_composite_init(gf) == 0) return 0; break;
+    case GF_MULT_BYTWO_b:      if (gf_w8_bytwo_init(gf) == 0) return 0; break;
+    case GF_MULT_LOG_ZERO:
+    case GF_MULT_LOG_ZERO_EXT:
+    case GF_MULT_LOG_TABLE:    if (gf_w8_log_init(gf) == 0) return 0; break;
+    case GF_MULT_CARRY_FREE:   if (gf_w8_cfm_init(gf) == 0) return 0; break;
+    case GF_MULT_SHIFT:        if (gf_w8_shift_init(gf) == 0) return 0; break;
+    case GF_MULT_SPLIT_TABLE:  if (gf_w8_split_init(gf) == 0) return 0; break;
+    case GF_MULT_COMPOSITE:    if (gf_w8_composite_init(gf) == 0) return 0; break;
     default: return 0;
   }
+
   if (h->divide_type == GF_DIVIDE_EUCLID) {
     gf->divide.w32 = gf_w8_divide_from_inverse;
     gf->inverse.w32 = gf_w8_euclid;
@@ -1957,16 +2405,24 @@ int gf_w8_init(gf_t *gf)
     gf->inverse.w32 = gf_w8_matrix;
   }
 
-  if (gf->inverse.w32 != NULL && gf->divide.w32 == NULL) {
+  if (gf->divide.w32 == NULL) {
     gf->divide.w32 = gf_w8_divide_from_inverse;
+    if (gf->inverse.w32 == NULL) gf->inverse.w32 = gf_w8_euclid;
   }
-  if (gf->inverse.w32 == NULL && gf->divide.w32 != NULL) {
-    gf->inverse.w32 = gf_w8_inverse_from_divide;
+
+  if (gf->inverse.w32 == NULL)  gf->inverse.w32 = gf_w8_inverse_from_divide;
+
+  if (h->mult_type == GF_MULT_COMPOSITE && (h->region_type & GF_REGION_ALTMAP)) {
+    gf->extract_word.w32 = gf_w8_composite_extract_word;
   }
 
   if (h->region_type == GF_REGION_CAUCHY) {
     gf->multiply_region.w32 = gf_wgen_cauchy_region;
     gf->extract_word.w32 = gf_wgen_extract_word;
+  }
+
+  if (gf->multiply_region.w32 == NULL) {
+    gf->multiply_region.w32 = gf_w8_multiply_region_from_single;
   }
 
   return 1;
@@ -2001,7 +2457,7 @@ uint8_t *gf_w8_get_div_table(gf_t *gf)
   h = (gf_internal_t *) gf->scratch;
   if (gf->multiply.w32 == gf_w8_default_multiply) {
     ftd = (struct gf_w8_default_data *) ((gf_internal_t *) gf->scratch)->private;
-    return (uint8_t *) std->divtable;
+    return (uint8_t *) ftd->divtable;
   } else if (gf->multiply.w32 == gf_w8_table_multiply) {
     std = (struct gf_w8_single_table_data *) ((gf_internal_t *) gf->scratch)->private;
     return (uint8_t *) std->divtable;

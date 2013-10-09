@@ -32,10 +32,12 @@ int gf_general_is_zero(gf_general_t *v, int w);
 int gf_general_is_one(gf_general_t *v, int w);
 int gf_general_are_equal(gf_general_t *v1, gf_general_t *v2, int w);
 
-void gf_general_val_to_s(gf_general_t *v, int w, char *s);
+void gf_general_val_to_s(gf_general_t *v, int w, char *s, int hex);
+int  gf_general_s_to_val(gf_general_t *v, int w, char *s, int hex);
 
 void gf_general_set_random(gf_general_t *v, int w, int zero_ok);
 
+void gf_general_add(gf_t *gf, gf_general_t *a, gf_general_t *b, gf_general_t *c);
 void gf_general_multiply(gf_t *gf, gf_general_t *a, gf_general_t *b, gf_general_t *c);
 void gf_general_divide(gf_t *gf, gf_general_t *a, gf_general_t *b, gf_general_t *c);
 void gf_general_inverse(gf_t *gf, gf_general_t *a, gf_general_t *b);

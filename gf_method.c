@@ -11,179 +11,172 @@
 #include <time.h>
 
 #include "gf_complete.h"
+#include "gf_int.h"
 #include "gf_method.h"
-
-void methods_to_stderr()
-{
-  fprintf(stderr, "To specify the methods, do one of the following: \n");
-  fprintf(stderr, "       - leave empty to use defaults\n");
-  fprintf(stderr, "       - use a single dash to use defaults\n");
-  fprintf(stderr, "       - specify MULTIPLY REGION DIVIDE\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Legal values of MULTIPLY:\n");
-  fprintf(stderr, "       SHIFT: shift\n");
-  fprintf(stderr, "       GROUP g_mult g_reduce: the Group technique - see the paper\n");
-  fprintf(stderr, "       BYTWO_p: BYTWO doubling the product.\n");
-  fprintf(stderr, "       BYTWO_b: BYTWO doubling b (more efficient thatn BYTWO_p)\n");
-  fprintf(stderr, "       TABLE: Full multiplication table\n");
-  fprintf(stderr, "       LOG:   Discrete logs\n");
-  fprintf(stderr, "       LOG_ZERO: Discrete logs with a large table for zeros\n");
-  fprintf(stderr, "       LOG_ZERO_EXT: Discrete logs with an extra large table for zeros\n");
-  fprintf(stderr, "       SPLIT g_a g_b: Split tables defined by g_a and g_b\n");
-  fprintf(stderr, "       COMPOSITE k rec METHOD: Composite field.  GF((2^l)^k), l=w/k.\n");
-  fprintf(stderr, "                               rec = 0 means inline single multiplication\n");
-  fprintf(stderr, "                               rec = 1 means recursive single multiplication\n");
-  fprintf(stderr, "                               METHOD is the method of the base field in GF(2^l)\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Legal values of REGION: Specify multiples with commas e.g. 'DOUBLE,LAZY'\n");
-  fprintf(stderr, "       -: Use defaults\n");
-  fprintf(stderr, "       SINGLE/DOUBLE/QUAD: Expand tables\n");
-  fprintf(stderr, "       LAZY: Lazily create table (only applies to TABLE and SPLIT)\n");
-  fprintf(stderr, "       SSE/NOSSE: Use 128-bit SSE instructions if you can\n");
-  fprintf(stderr, "       CAUCHY/ALTMAP/STDMAP: Use different memory mappings\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Legal values of DIVIDE:\n");
-  fprintf(stderr, "       -: Use defaults\n");
-  fprintf(stderr, "       MATRIX: Use matrix inversion\n");
-  fprintf(stderr, "       EUCLID: Use the extended Euclidian algorithm.\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "See the user's manual for more information.\n");
-  fprintf(stderr, "There are many restrictions, so it is better to simply use defaults in most cases.\n");
-}
 
 int create_gf_from_argv(gf_t *gf, int w, int argc, char **argv, int starting)
 {
   int mult_type, divide_type, region_type;
-  uint32_t prim_poly = 0;
   int arg1, arg2, subrg_size;
+  uint64_t prim_poly;
   gf_t *base;
   char *crt, *x, *y;
 
-  if (argc <= starting || strcmp(argv[starting], "-") == 0) {
-    if (!gf_init_easy(gf, w)) return 0;
-    return (argc <= starting) ? starting : starting+1;
-  }
-
+  mult_type = GF_MULT_DEFAULT;
   region_type = GF_REGION_DEFAULT;
   divide_type = GF_DIVIDE_DEFAULT;
-
-  arg1 = 0;
-  arg2 = 0;
   prim_poly = 0;
   base = NULL;
-  subrg_size = 0;
-  
-  if (argc < starting+3) return 0;
-
-  if (strcmp(argv[starting], "SHIFT") == 0) {
-    mult_type = GF_MULT_SHIFT;
-    starting++;
-  } else if (strcmp(argv[starting], "GROUP") == 0) {
-    mult_type = GF_MULT_GROUP;
-    if (argc < starting+5) return 0;
-    if (sscanf(argv[starting+1], "%d", &arg1) == 0 ||
-        sscanf(argv[starting+2], "%d", &arg2) == 0 ||
-        arg1 <= 0 || arg2 <= 0 || arg1 >= w || arg2 >= w) return 0;
-    starting += 3;
-  } else if (strcmp(argv[starting], "BYTWO_p") == 0) {
-    mult_type = GF_MULT_BYTWO_p;
-    starting++;
-  } else if (strcmp(argv[starting], "BYTWO_b") == 0) {
-    mult_type = GF_MULT_BYTWO_b;
-    starting++;
-  } else if (strcmp(argv[starting], "TABLE") == 0) {
-    mult_type = GF_MULT_TABLE;
-    starting++;
-  } else if (strcmp(argv[starting], "LOG") == 0) {
-    mult_type = GF_MULT_LOG_TABLE;
-    starting++;
-  } else if (strcmp(argv[starting], "LOG_ZERO") == 0) {
-    mult_type = GF_MULT_LOG_TABLE;
-    arg1 = 1;
-    starting++;
-  } else if (strcmp(argv[starting], "LOG_ZERO_EXT") == 0) {
-    mult_type = GF_MULT_LOG_TABLE;
-    arg1 = 2;
-    starting++;
-  } else if (strcmp(argv[starting], "SPLIT") == 0) {
-    mult_type = GF_MULT_SPLIT_TABLE;
-    if (argc < starting+5) return 0;
-    if (sscanf(argv[starting+1], "%d", &arg1) == 0 ||
-        sscanf(argv[starting+2], "%d", &arg2) == 0 ||
-        arg1 <= 0 || arg2 <= 0 || w % arg1 != 0 || w % arg2 != 0) return 0;
-    starting += 3;
-  } else if (strcmp(argv[starting], "COMPOSITE") == 0) {
-    mult_type = GF_MULT_COMPOSITE;
-    if (argc < starting+6) return 0;
-    if (sscanf(argv[starting+1], "%d", &arg1) == 0 ||
-        sscanf(argv[starting+2], "%d", &arg2) == 0 ||
-        arg1 <= 1 || w %arg1 != 0 || ((arg2 | 1) != 1)) return 0;
-    base = (gf_t *) malloc(sizeof(gf_t));
-    starting = create_gf_from_argv(base, w/arg1, argc, argv, starting+3);
-    if (starting == 0) { free(base); return 0; }
-  } else {
-    return 0;
-  }
-
-  if (argc < starting+2) {
-    if (base != NULL) gf_free(base, 1);
-    return 0;
-  }
-
-  if (strcmp(argv[starting], "-") == 0) {
-    region_type = GF_REGION_DEFAULT;
-  } else {
-    crt = strdup(argv[starting]);
-    region_type = 0;
-    x = crt;
-    do { 
-      y = strchr(x, ','); 
-      if (y != NULL) *y = '\0';
-      if (strcmp(x, "DOUBLE") == 0) {
-        region_type |= GF_REGION_DOUBLE_TABLE;
-      } else if (strcmp(x, "QUAD") == 0) {
-        region_type |= GF_REGION_QUAD_TABLE;
-      } else if (strcmp(x, "SINGLE") == 0) {
-        region_type |= GF_REGION_SINGLE_TABLE;
-      } else if (strcmp(x, "LAZY") == 0) {
-        region_type |= GF_REGION_LAZY;
-      } else if (strcmp(x, "SSE") == 0) {
-        region_type |= GF_REGION_SSE;
-      } else if (strcmp(x, "NOSSE") == 0) {
-        region_type |= GF_REGION_NOSSE;
-      } else if (strcmp(x, "CAUCHY") == 0) {
-        region_type |= GF_REGION_CAUCHY;
-      } else if (strcmp(x, "ALTMAP") == 0) {
-        region_type |= GF_REGION_ALTMAP;
-      } else if (strcmp(x, "STDMAP") == 0) {
-        region_type |= GF_REGION_STDMAP;
+  arg1 = 0;
+  arg2 = 0;
+  while (1) {
+    if (argc > starting) {
+      if (strcmp(argv[starting], "-m") == 0) {
+        starting++;
+        if (mult_type != GF_MULT_DEFAULT) {
+          if (base != NULL) gf_free(base, 1);
+          _gf_errno = GF_E_TWOMULT;
+          return 0;
+        }
+        if (strcmp(argv[starting], "SHIFT") == 0) {
+          mult_type = GF_MULT_SHIFT;
+          starting++;
+        } else if (strcmp(argv[starting], "CARRY_FREE") == 0) {
+          mult_type = GF_MULT_CARRY_FREE;
+          starting++;
+        } else if (strcmp(argv[starting], "GROUP") == 0) {
+          mult_type = GF_MULT_GROUP;
+          if (argc < starting + 3) {
+            _gf_errno = GF_E_GROUPAR;
+            return 0;
+          }
+          if (sscanf(argv[starting+1], "%d", &arg1) == 0 ||
+              sscanf(argv[starting+2], "%d", &arg2) == 0) {
+            _gf_errno = GF_E_GROUPNU;
+            return 0;
+          }
+          starting += 3;
+        } else if (strcmp(argv[starting], "BYTWO_p") == 0) {
+          mult_type = GF_MULT_BYTWO_p;
+          starting++;
+        } else if (strcmp(argv[starting], "BYTWO_b") == 0) {
+          mult_type = GF_MULT_BYTWO_b;
+          starting++;
+        } else if (strcmp(argv[starting], "TABLE") == 0) {
+          mult_type = GF_MULT_TABLE;
+          starting++;
+        } else if (strcmp(argv[starting], "LOG") == 0) {
+          mult_type = GF_MULT_LOG_TABLE;
+          starting++;
+        } else if (strcmp(argv[starting], "LOG_ZERO") == 0) {
+          mult_type = GF_MULT_LOG_ZERO;
+          starting++;
+        } else if (strcmp(argv[starting], "LOG_ZERO_EXT") == 0) {
+          mult_type = GF_MULT_LOG_ZERO_EXT;
+          starting++;
+        } else if (strcmp(argv[starting], "SPLIT") == 0) {
+          mult_type = GF_MULT_SPLIT_TABLE;
+          if (argc < starting + 3) {
+            _gf_errno = GF_E_SPLITAR;
+            return 0;
+          }
+          if (sscanf(argv[starting+1], "%d", &arg1) == 0 ||
+              sscanf(argv[starting+2], "%d", &arg2) == 0) {
+            _gf_errno = GF_E_SPLITNU;
+            return 0;
+          }
+          starting += 3;
+        } else if (strcmp(argv[starting], "COMPOSITE") == 0) {
+          mult_type = GF_MULT_COMPOSITE;
+          if (argc < starting + 2) { _gf_errno = GF_E_FEWARGS; return 0; }
+          if (sscanf(argv[starting+1], "%d", &arg1) == 0) {
+            _gf_errno = GF_E_COMP_A2;
+            return 0;
+          }
+          starting += 2;
+          base = (gf_t *) malloc(sizeof(gf_t));
+          starting = create_gf_from_argv(base, w/arg1, argc, argv, starting);
+          if (starting == 0) {
+            free(base);
+            return 0;
+          }
+        } else {
+          if (base != NULL) gf_free(base, 1);
+          _gf_errno = GF_E_UNKNOWN;
+          return 0;
+        }
+      } else if (strcmp(argv[starting], "-r") == 0) {
+        starting++;
+        if (strcmp(argv[starting], "DOUBLE") == 0) {
+          region_type |= GF_REGION_DOUBLE_TABLE;
+          starting++;
+        } else if (strcmp(argv[starting], "QUAD") == 0) {
+          region_type |= GF_REGION_QUAD_TABLE;
+          starting++;
+        } else if (strcmp(argv[starting], "LAZY") == 0) {
+          region_type |= GF_REGION_LAZY;
+          starting++;
+        } else if (strcmp(argv[starting], "SSE") == 0) {
+          region_type |= GF_REGION_SSE;
+          starting++;
+        } else if (strcmp(argv[starting], "NOSSE") == 0) {
+          region_type |= GF_REGION_NOSSE;
+          starting++;
+        } else if (strcmp(argv[starting], "CAUCHY") == 0) {
+          region_type |= GF_REGION_CAUCHY;
+          starting++;
+        } else if (strcmp(argv[starting], "ALTMAP") == 0) {
+          region_type |= GF_REGION_ALTMAP;
+          starting++;
+        } else {
+          if (base != NULL) gf_free(base, 1);
+          _gf_errno = GF_E_UNK_REG;
+          return 0;
+        }
+      } else if (strcmp(argv[starting], "-p") == 0) {
+        starting++;
+        if (sscanf(argv[starting], "%llx", (long long unsigned int *)(&prim_poly)) == 0) {
+          if (base != NULL) gf_free(base, 1);
+          _gf_errno = GF_E_POLYSPC;
+          return 0;
+        }
+        starting++;
+      } else if (strcmp(argv[starting], "-d") == 0) {
+        starting++;
+        if (divide_type != GF_DIVIDE_DEFAULT) {
+          if (base != NULL) gf_free(base, 1);
+          _gf_errno = GF_E_TWO_DIV;
+          return 0;
+        } else if (strcmp(argv[starting], "EUCLID") == 0) {
+          divide_type = GF_DIVIDE_EUCLID;
+          starting++;
+        } else if (strcmp(argv[starting], "MATRIX") == 0) {
+          divide_type = GF_DIVIDE_MATRIX;
+          starting++;
+        } else {
+          _gf_errno = GF_E_UNK_DIV;
+          return 0;
+        }
+      } else if (strcmp(argv[starting], "-") == 0) {
+         /*
+         printf("Scratch size: %d\n", gf_scratch_size(w, 
+                                      mult_type, region_type, divide_type, arg1, arg2));
+         */
+        if (gf_init_hard(gf, w, mult_type, region_type, divide_type, 
+                         prim_poly, arg1, arg2, base, NULL) == 0) {
+          if (base != NULL) gf_free(base, 1);
+          return 0;
+        } else
+          return starting + 1;
       } else {
         if (base != NULL) gf_free(base, 1);
-        free(crt);
+        _gf_errno = GF_E_UNKFLAG;
         return 0;
       }
-      if (y != NULL) x = y+1;
-    } while (y != NULL);
-    free(crt);
+    } else {
+      if (base != NULL) gf_free(base, 1);
+      _gf_errno = GF_E_FEWARGS;
+      return 0;
+    }
   }
-
-  starting++;
-
-  if (strcmp(argv[starting], "-") == 0) {
-    divide_type = GF_DIVIDE_DEFAULT;
-  } else if (strcmp(argv[starting], "MATRIX") == 0) {
-    divide_type = GF_DIVIDE_MATRIX;
-  } else if (strcmp(argv[starting], "EUCLID") == 0) {
-    divide_type = GF_DIVIDE_EUCLID;
-  } else {
-    if (base != NULL) gf_free(base, 1);
-    return 0;
-  }
-  starting++;
-
-  if (!gf_init_hard(gf, w, mult_type, region_type, divide_type, prim_poly, arg1, arg2, base, NULL)) {
-    if (base != NULL) gf_free(base, 1);
-    return 0;
-  }
-  return starting;
 }

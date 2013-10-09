@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "gf_complete.h"
 #include "gf_method.h"
@@ -43,9 +43,13 @@ void problem(char *s)
   exit(1);
 }
 
+char *BM = "Bad Method: ";
+
 void usage(char *s)
 {
   fprintf(stderr, "usage: gf_time w tests seed size(bytes) iterations [method [params]] - does timing\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "does unit testing in GF(2^w)\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "Legal w are: 1 - 32, 64 and 128\n");
   fprintf(stderr, "\n");
@@ -63,9 +67,12 @@ void usage(char *s)
   fprintf(stderr, "\n");
   fprintf(stderr, "Use -1 for time(0) as a seed.\n");
   fprintf(stderr, "\n");
-  fprintf(stderr, "For method specification, type gf_methods\n");
-  fprintf(stderr, "\n");
-  if (s != NULL) fprintf(stderr, "%s\n", s);
+  if (s == BM) {
+    fprintf(stderr, "%s", BM);
+    gf_error();
+  } else if (s != NULL) {
+    fprintf(stderr, "%s\n", s);
+  }
   exit(1);
 }
 
@@ -84,9 +91,15 @@ int main(int argc, char **argv)
   time_t t0;
   uint8_t *ra, *rb;
   gf_general_t a;
+
   
   if (argc < 6) usage(NULL);
-  if (sscanf(argv[1], "%d", &w) == 0) usage("Bad w\n");
+  
+  if (sscanf(argv[1], "%d", &w) == 0){
+    usage("Bad w[-pp]\n");
+  }
+
+  
   if (sscanf(argv[3], "%ld", &t0) == 0) usage("Bad seed\n");
   if (sscanf(argv[4], "%d", &size) == 0) usage("Bad size\n");
   if (sscanf(argv[5], "%d", &iterations) == 0) usage("Bad iterations\n");
@@ -99,7 +112,7 @@ int main(int argc, char **argv)
   if ((w > 32 && w != 64 && w != 128) || w < 0) usage("Bad w");
   if ((size * 8) % w != 0) usage ("Bad size -- must be a multiple of w*8\n");
   
-  if (!create_gf_from_argv(&gf, w, argc, argv, 6)) usage("Bad Method");
+  if (!create_gf_from_argv(&gf, w, argc, argv, 6)) usage(BM);
 
   strcpy(tests, "");
   for (i = 0; i < argv[2][i] != '\0'; i++) {

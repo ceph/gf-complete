@@ -8,8 +8,9 @@
 
 #include "gf_complete.h"
 
-/* This prints out the error string defining the methods that you can put on argv*/
-extern void methods_to_stderr();
+/* Parses argv starting at "starting".  
+   
+   Returns 0 on failure.
+   On success, it returns one past the last argument it read in argv. */
 
-/* Parses argv starting at "starting" */
 extern int create_gf_from_argv(gf_t *gf, int w, int argc, char **argv, int starting);
