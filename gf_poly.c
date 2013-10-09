@@ -1,45 +1,48 @@
 /*
-   gf_poly.c - program to help find irreducible polynomials in composite fields,
-   using the Ben-Or algorithm.  
-  
-   James S. Plank
-  
-   Please see the following paper for a 
-   description of the Ben-Or algorithm:
-
-   author    S. Gao and D. Panario
-   title     Tests and Constructions of Irreducible Polynomials over Finite Fields
-   booktitle Foundations of Computational Mathematics
-   year      1997
-   publisher Springer Verlag
-   pages     346-361
-
-  The basic technique is this.  You have a polynomial f(x) whose coefficients are
-  in a base field GF(2^w).  The polynomial is of degree n.  You need to do the 
-  following for all i from 1 to n/2:
-
-  Construct x^(2^w)^i modulo f.  That will be a polynomial of maximum degree n-1
-  with coefficients in GF(2^w).  You construct that polynomial by starting with x
-  and doubling it w times, each time taking the result modulo f.  Then you 
-  multiply that by itself i times, again each time taking the result modulo f.
-
-  When you're done, you need to "subtract" x -- since addition = subtraction = 
-  XOR, that means XOR x.  
-
-  Now, find the GCD of that last polynomial and f, using Euclid's algorithm.  If
-  the GCD is not one, then f is reducible.  If it is not reducible for each of
-  those i, then it is irreducible.
-
-  In this code, I am using a gf_general_t to represent elements of GF(2^w).  This
-  is so that I can use base fields that are GF(2^64) or GF(2^128). 
-   
-  I have two main procedures.  The first is x_to_q_to_i_minus_x, which calculates
-  x^(2^w)^i - x, putting the result into a gf_general_t * called retval.
-
-  The second is gcd_one, which takes a polynomial of degree n and a second one
-  of degree n-1, and uses Euclid's algorithm to decide if their GCD == 1.
-
-  These can be made faster (e.g. calculate x^(2^w) once and store it).
+ * GF-Complete: A Comprehensive Open Source Library for Galois Field Arithmetic
+ * James S. Plank, Ethan L. Miller, Kevin M. Greenan,
+ * Benjamin A. Arnold, John A. Burnum, Adam W. Disney, Allen C. McBride.
+ *
+ * gf_poly.c - program to help find irreducible polynomials in composite fields,
+ * using the Ben-Or algorithm.  
+ * 
+ * (This one was written by Jim) 
+ * 
+ * Please see the following paper for a description of the Ben-Or algorithm:
+ * 
+ * author    S. Gao and D. Panario
+ * title     Tests and Constructions of Irreducible Polynomials over Finite Fields
+ * booktitle Foundations of Computational Mathematics
+ * year      1997
+ * publisher Springer Verlag
+ * pages     346-361
+ * 
+ * The basic technique is this.  You have a polynomial f(x) whose coefficients are
+ * in a base field GF(2^w).  The polynomial is of degree n.  You need to do the 
+ * following for all i from 1 to n/2:
+ * 
+ * Construct x^(2^w)^i modulo f.  That will be a polynomial of maximum degree n-1
+ * with coefficients in GF(2^w).  You construct that polynomial by starting with x
+ * and doubling it w times, each time taking the result modulo f.  Then you 
+ * multiply that by itself i times, again each time taking the result modulo f.
+ * 
+ * When you're done, you need to "subtract" x -- since addition = subtraction = 
+ * XOR, that means XOR x.  
+ * 
+ * Now, find the GCD of that last polynomial and f, using Euclid's algorithm.  If
+ * the GCD is not one, then f is reducible.  If it is not reducible for each of
+ * those i, then it is irreducible.
+ * 
+ * In this code, I am using a gf_general_t to represent elements of GF(2^w).  This
+ * is so that I can use base fields that are GF(2^64) or GF(2^128). 
+ * 
+ * I have two main procedures.  The first is x_to_q_to_i_minus_x, which calculates
+ * x^(2^w)^i - x, putting the result into a gf_general_t * called retval.
+ * 
+ * The second is gcd_one, which takes a polynomial of degree n and a second one
+ * of degree n-1, and uses Euclid's algorithm to decide if their GCD == 1.
+ * 
+ * These can be made faster (e.g. calculate x^(2^w) once and store it).
  */
 
 #include "gf_complete.h"

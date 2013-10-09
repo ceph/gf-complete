@@ -1,7 +1,11 @@
 /*
+ * GF-Complete: A Comprehensive Open Source Library for Galois Field Arithmetic
+ * James S. Plank, Ethan L. Miller, Kevin M. Greenan,
+ * Benjamin A. Arnold, John A. Burnum, Adam W. Disney, Allen C. McBride.
+ *
  * gf_methods.c
  *
- * Lists supported methods (incomplete w.r.t. GROUP and COMPOSITE 
+ * Lists supported methods (incomplete w.r.t. GROUP and COMPOSITE)
  */
 
 #include <stdio.h>

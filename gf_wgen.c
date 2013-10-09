@@ -1,4 +1,8 @@
 /*
+ * GF-Complete: A Comprehensive Open Source Library for Galois Field Arithmetic
+ * James S. Plank, Ethan L. Miller, Kevin M. Greenan,
+ * Benjamin A. Arnold, John A. Burnum, Adam W. Disney, Allen C. McBride.
+ *
  * gf_wgen.c
  *
  * Routines for Galois fields for general w < 32.  For specific w, 

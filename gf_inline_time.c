@@ -1,4 +1,8 @@
 /*
+ * GF-Complete: A Comprehensive Open Source Library for Galois Field Arithmetic
+ * James S. Plank, Ethan L. Miller, Kevin M. Greenan,
+ * Benjamin A. Arnold, John A. Burnum, Adam W. Disney, Allen C. McBride.
+ *
  * gf_inline_time.c
  *
  * Times inline single multiplication when w = 4, 8 or 16

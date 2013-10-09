@@ -1,4 +1,8 @@
 /*
+ * GF-Complete: A Comprehensive Open Source Library for Galois Field Arithmetic
+ * James S. Plank, Ethan L. Miller, Kevin M. Greenan,
+ * Benjamin A. Arnold, John A. Burnum, Adam W. Disney, Allen C. McBride.
+ *
  * gf_example_2.c
  *
  * Demonstrates using the procedures for examples in GF(2^w) for w <= 32.
