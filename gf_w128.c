@@ -601,6 +601,105 @@ gf_w128_split_4_128_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_
 
 static
 void
+gf_w128_split_4_128_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
+{
+#ifdef INTEL_SSSE3
+  gf_internal_t *h;
+  int i, m, j, k, tindex;
+  uint64_t pp, v[2], s, *s64, *d64, *top;
+  __m128i p, tables[32][16];
+  struct gf_w128_split_4_128_data *ld;
+  gf_region_data rd;
+
+  if (val[0] == 0) {
+    if (val[1] == 0) { gf_multby_zero(dest, bytes, xor); return; }
+    if (val[1] == 1) { gf_multby_one(src, dest, bytes, xor); return; }
+  }
+
+  h = (gf_internal_t *) gf->scratch;
+  pp = h->prim_poly;
+  
+  /* We only do this to check on alignment. */
+  gf_set_region_data(&rd, gf, src, dest, bytes, 0, xor, 16);
+
+  /* Doing this instead of gf_do_initial_region_alignment() because that doesn't hold 128-bit vals */
+
+  gf_w128_multiply_region_from_single(gf, src, dest, val, (rd.s_start-src), xor);
+
+  s64 = (uint64_t *) rd.s_start;
+  d64 = (uint64_t *) rd.d_start;
+  top = (uint64_t *) rd.d_top;
+ 
+  ld = (struct gf_w128_split_4_128_data *) h->private;
+
+  if (val[0] != ld->last_value[0] || val[1] != ld->last_value[1]) {
+    v[0] = val[0];
+    v[1] = val[1];
+    for (i = 0; i < 32; i++) {
+      ld->tables[0][i][0] = 0;
+      ld->tables[1][i][0] = 0;
+      for (j = 1; j < 16; j <<= 1) {
+        for (k = 0; k < j; k++) {
+          ld->tables[0][i][k^j] = (v[0] ^ ld->tables[0][i][k]);
+          ld->tables[1][i][k^j] = (v[1] ^ ld->tables[1][i][k]);
+        }
+        pp = (v[0] & (1ULL << 63));
+        v[0] <<= 1;
+        if (v[1] & (1ULL << 63)) v[0] ^= 1;
+        v[1] <<= 1;
+        if (pp) v[1] ^= h->prim_poly;
+      }
+    }
+  }
+
+  ld->last_value[0] = val[0];
+  ld->last_value[1] = val[1];
+
+  for (i = 0; i < 32; i++) {
+    for (j = 0; j < 16; j++) {
+      v[0] = ld->tables[0][i][j];
+      v[1] = ld->tables[1][i][j];
+      tables[i][j] = _mm_loadu_si128((__m128i *) v);
+
+/*
+      printf("%2d %2d: ", i, j);
+      MM_PRINT8("", tables[i][j]); */
+    }
+  }
+
+  while (d64 != top) {
+
+    if (xor) {
+      p = _mm_load_si128 ((__m128i *) d64);
+    } else {
+      p = _mm_setzero_si128();
+    }
+    s = *s64;
+    s64++;
+    for (i = 0; i < 16; i++) {
+      j = (s&0xf);
+      s >>= 4;
+      p = _mm_xor_si128(p, tables[16+i][j]);
+    }
+    s = *s64;
+    s64++;
+    for (i = 0; i < 16; i++) {
+      j = (s&0xf);
+      s >>= 4;
+      p = _mm_xor_si128(p, tables[i][j]);
+    }
+    _mm_store_si128((__m128i *) d64, p);
+    d64 += 2;
+  }
+
+  /* Doing this instead of gf_do_final_region_alignment() because that doesn't hold 128-bit vals */
+
+  gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, (src+bytes)-rd.s_top, xor);
+#endif
+}
+
+static
+void
 gf_w128_split_4_128_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
 {
 #ifdef INTEL_SSSE3
@@ -1744,7 +1843,14 @@ int gf_w128_split_init(gf_t *gf)
       #endif
     }
     else {
+      #ifdef INTEL_SSE4
+        if(!(h->region_type & GF_REGION_NOSSE))
+          gf->multiply_region.w128 = gf_w128_split_4_128_sse_multiply_region;
+        else
+          gf->multiply_region.w128 = gf_w128_split_4_128_multiply_region;
+      #else
       gf->multiply_region.w128 = gf_w128_split_4_128_multiply_region;
+      #endif
     }
   }
   return 1;

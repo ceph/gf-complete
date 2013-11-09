@@ -384,7 +384,6 @@ int gf_error_check(int w, int mult_type, int region_type, int divide_type,
         if (rsse && !sse3)                      { _gf_errno = GF_E_SP_SSE3; return 0; }
         if (raltmap && !sse3)                   { _gf_errno = GF_E_SP128AS; return 0; }
         if (raltmap && rnosse)                  { _gf_errno = GF_E_SP128AS; return 0; }
-        if (!raltmap && rsse)                   { _gf_errno = GF_E_SP128AL; return 0; }
       } else                                    { _gf_errno = GF_E_SP128AR; return 0; }
     } else                                      { _gf_errno = GF_E_SPLIT_W; return 0; }
     return 1;
