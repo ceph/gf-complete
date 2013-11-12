@@ -1,4 +1,4 @@
-This is GF-Complete, Revision 1.0.  
+This is GF-Complete, Revision 1.01.  
 
 The user's manual is in the file Manual.pdf.  
 
