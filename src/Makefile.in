@@ -15,8 +15,8 @@
 
 @SET_MAKE@
 
-# GF-Complete AM file
-# Only creates library and distributes header files
+# GF-Complete 'core' AM file
+# Creates the library
 
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@

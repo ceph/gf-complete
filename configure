@@ -10972,6 +10972,10 @@ ac_config_headers="$ac_config_headers include/config.h"
 
 
 
+# Override default CFLAGS
+CFLAGS="-O3 -g"
+CXXFLAGS="-O3 -g"
+
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'

@@ -1,5 +1,5 @@
-# GF-Complete AM file
-# Only creates library and distributes header files
+# GF-Complete 'core' AM file
+# Creates the library
 
 INCLUDES=-I./ -I../include
 AM_CFLAGS = -O3 $(SIMD_FLAGS) -fPIC $(INCLUDES)

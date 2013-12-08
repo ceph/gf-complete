@@ -1,5 +1,5 @@
-# GF-Complete AM file
-# Only creates library and distributes header files
+# Top-level GF-Complete AM file
+# Distributes headers
 
 SUBDIRS = src tools test examples
 ACLOCAL_AMFLAGS = -I m4

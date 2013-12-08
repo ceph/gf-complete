@@ -13,6 +13,10 @@ AC_CONFIG_HEADER(include/config.h)
 dnl Needed when reconfiguring with 'autoreconf -i -s'
 AC_CONFIG_MACRO_DIR([m4])
 
+# Override default CFLAGS
+CFLAGS="-O3 -g"
+CXXFLAGS="-O3 -g"
+
 dnl Compiling with per-target flags requires AM_PROG_CC_C_O.
 AC_PROG_CC
 
