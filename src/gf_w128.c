@@ -1880,7 +1880,7 @@ int gf_w128_group_init(gf_t *gf)
   gf->inverse.w128 = gf_w128_euclid;
   gf->multiply_region.w128 = gf_w128_group_multiply_region;
 
-  #ifdef INTEL_SSE4
+  #if defined(INTEL_SSE4) && defined(ARCH_64)
     if(!(scratch->region_type & GF_REGION_NOSSE))
     {
       if ((g_m != 4) && ((g_r != 4) || (g_r != 8)))
