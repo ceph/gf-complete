@@ -22,7 +22,7 @@
 #include "gf_rand.h"
 #include "gf_general.h"
 
-#define REGION_SIZE (16384) 
+#define REGION_SIZE (16384)
 #define RMASK (0x00000000ffffffffLL)
 #define LMASK (0xffffffff00000000LL)
 
@@ -38,7 +38,7 @@ char *BM = "Bad Method: ";
 void usage(char *s)
 {
   fprintf(stderr, "usage: gf_unit w tests seed [method] - does unit testing in GF(2^w)\n");
-  fprintf(stderr, "\n");    
+  fprintf(stderr, "\n");
   fprintf(stderr, "Legal w are: 1 - 32, 64 and 128\n");
   fprintf(stderr, "           128 is hex only (i.e. '128' will be an error - do '128h')\n");
   fprintf(stderr, "\n");
@@ -95,9 +95,16 @@ int main(int argc, char **argv)
   MOA_Seed(t0);
 
   if (w > 32 && w != 64 && w != 128) usage("Bad w");
-  
-  if (create_gf_from_argv(&gf, w, argc, argv, 4) == 0) usage(BM);
-  printf("Size (bytes): %d\n", gf_size(&gf));
+
+  if (create_gf_from_argv(&gf, w, argc, argv, 4) == 0) {
+    usage(BM);
+  }
+
+  printf("Args: ");
+  for (i = 1; i < argc; i++) {
+    printf ("%s ", argv[i]);
+  }
+  printf("/ size (bytes): %d\n", gf_size(&gf));
 
   for (i = 0; i < strlen(argv[2]); i++) {
     if (strchr("ASRV", argv[2][i]) == NULL) usage("Bad test\n");

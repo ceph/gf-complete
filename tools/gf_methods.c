@@ -29,18 +29,27 @@ static char *regions[NREGIONS] = { "DOUBLE", "QUAD", "LAZY", "SSE", "NOSSE",
 #define NDIVS (2)
 static char *divides[NDIVS] = { "MATRIX", "EUCLID" }; 
 
-int main() 
+
+int main(int argc, char *argv[])
 {
   int m, r, d, w, i, sa, j, k, reset;
-  char *argv[50];
+  char *gf_argv[50];
   gf_t gf;
   char divs[200], ks[10], ls[10];
-  
+  char * w_str = "w=%d:";
+
+  if (argc == 2) {
+    if (!strcmp (argv[1], "-U")) {
+      w_str = "%d A -1";
+    }
+  }
+
   for (i = 2; i < 8; i++) {
     w = (1 << i);
-    argv[0] = "-";
-    if (create_gf_from_argv(&gf, w, 1, argv, 0) > 0) {
-      printf("w=%d: -\n", w);
+    gf_argv[0] = "-";
+    if (create_gf_from_argv(&gf, w, 1, gf_argv, 0) > 0) {
+      printf(w_str, w);
+      printf(" - \n");
       gf_free(&gf, 1);
     } else if (_gf_errno == GF_E_DEFAULT) {
       fprintf(stderr, "Unlabeled failed method: w=%d: -\n", 2);
@@ -49,83 +58,83 @@ int main()
 
     for (m = 0; m < NMULTS; m++) {
       sa = 0;
-      argv[sa++] = "-m";
+      gf_argv[sa++] = "-m";
       if (strcmp(mults[m], "GROUP44") == 0) {
-        argv[sa++] = "GROUP";
-        argv[sa++] = "4";
-        argv[sa++] = "4";
+        gf_argv[sa++] = "GROUP";
+        gf_argv[sa++] = "4";
+        gf_argv[sa++] = "4";
       } else if (strcmp(mults[m], "GROUP48") == 0) {
-        argv[sa++] = "GROUP";
-        argv[sa++] = "4";
-        argv[sa++] = "8";
+        gf_argv[sa++] = "GROUP";
+        gf_argv[sa++] = "4";
+        gf_argv[sa++] = "8";
       } else if (strcmp(mults[m], "SPLIT2") == 0) {
-        argv[sa++] = "SPLIT";
+        gf_argv[sa++] = "SPLIT";
         sprintf(ls, "%d", w);
-        argv[sa++] = ls;
-        argv[sa++] = "2";
+        gf_argv[sa++] = ls;
+        gf_argv[sa++] = "2";
       } else if (strcmp(mults[m], "SPLIT4") == 0) {
-        argv[sa++] = "SPLIT";
+        gf_argv[sa++] = "SPLIT";
         sprintf(ls, "%d", w);
-        argv[sa++] = ls;
-        argv[sa++] = "4";
+        gf_argv[sa++] = ls;
+        gf_argv[sa++] = "4";
       } else if (strcmp(mults[m], "SPLIT8") == 0) {
-        argv[sa++] = "SPLIT";
+        gf_argv[sa++] = "SPLIT";
         sprintf(ls, "%d", w);
-        argv[sa++] = ls;
-        argv[sa++] = "8";
+        gf_argv[sa++] = ls;
+        gf_argv[sa++] = "8";
       } else if (strcmp(mults[m], "SPLIT16") == 0) {
-        argv[sa++] = "SPLIT";
+        gf_argv[sa++] = "SPLIT";
         sprintf(ls, "%d", w);
-        argv[sa++] = ls;
-        argv[sa++] = "16";
+        gf_argv[sa++] = ls;
+        gf_argv[sa++] = "16";
       } else if (strcmp(mults[m], "SPLIT88") == 0) {
-        argv[sa++] = "SPLIT";
-        argv[sa++] = "8";
-        argv[sa++] = "8";
+        gf_argv[sa++] = "SPLIT";
+        gf_argv[sa++] = "8";
+        gf_argv[sa++] = "8";
       } else if (strcmp(mults[m], "COMPOSITE") == 0) {
-        argv[sa++] = "COMPOSITE";
-        argv[sa++] = "2";
-        argv[sa++] = "-";
+        gf_argv[sa++] = "COMPOSITE";
+        gf_argv[sa++] = "2";
+        gf_argv[sa++] = "-";
       } else {
-        argv[sa++] = mults[m];
+        gf_argv[sa++] = mults[m];
       }
       reset = sa;
       for (r = 0; r < (1 << NREGIONS); r++) {
         sa = reset;
         for (k = 0; k < NREGIONS; k++) {
           if (r & 1 << k) {
-            argv[sa++] = "-r";
-            argv[sa++] = regions[k];
+            gf_argv[sa++] = "-r";
+            gf_argv[sa++] = regions[k];
           }
         }
-        argv[sa++] = "-";
-        if (create_gf_from_argv(&gf, w, sa, argv, 0) > 0) {
-          printf("w=%d:", w);
-          for (j = 0; j < sa; j++) printf(" %s", argv[j]);
+        gf_argv[sa++] = "-";
+        if (create_gf_from_argv(&gf, w, sa, gf_argv, 0) > 0) {
+          printf(w_str, w);
+          for (j = 0; j < sa; j++) printf(" %s", gf_argv[j]);
           printf("\n");
           gf_free(&gf, 1);
         } else if (_gf_errno == GF_E_DEFAULT) {
           fprintf(stderr, "Unlabeled failed method: w=%d:", w);
-          for (j = 0; j < sa; j++) fprintf(stderr, " %s", argv[j]);
+          for (j = 0; j < sa; j++) fprintf(stderr, " %s", gf_argv[j]);
           fprintf(stderr, "\n");
           exit(1);
         }
         sa--;
         for (d = 0; d < NDIVS; d++) {
-          argv[sa++] = "-d";
-          argv[sa++] = divides[d];
+          gf_argv[sa++] = "-d";
+          gf_argv[sa++] = divides[d];
           /*          printf("w=%d:", w);
-                      for (j = 0; j < sa; j++) printf(" %s", argv[j]);
+                      for (j = 0; j < sa; j++) printf(" %s", gf_argv[j]);
                       printf("\n"); */
-          argv[sa++] = "-";
-          if (create_gf_from_argv(&gf, w, sa, argv, 0) > 0) {
-            printf("w=%d:", w);
-            for (j = 0; j < sa; j++) printf(" %s", argv[j]);
+          gf_argv[sa++] = "-";
+          if (create_gf_from_argv(&gf, w, sa, gf_argv, 0) > 0) {
+            printf(w_str, w);
+            for (j = 0; j < sa; j++) printf(" %s", gf_argv[j]);
             printf("\n");
             gf_free(&gf, 1);
           } else if (_gf_errno == GF_E_DEFAULT) {
             fprintf(stderr, "Unlabeled failed method: w=%d:", w);
-            for (j = 0; j < sa; j++) fprintf(stderr, " %s", argv[j]);
+            for (j = 0; j < sa; j++) fprintf(stderr, " %s", gf_argv[j]);
             fprintf(stderr, "\n");
             exit(1);
           } 

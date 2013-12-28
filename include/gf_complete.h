@@ -8,16 +8,15 @@
  * The main include file for gf_complete. 
  */
 
-#pragma once
+#ifndef _GF_COMPLETE_H_
+#define _GF_COMPLETE_H_
 #include <stdint.h>
 
 #ifdef INTEL_SSE4
-  #define INTEL_SSSE3
   #include <nmmintrin.h>
 #endif
 
 #ifdef INTEL_SSSE3
-  #define INTEL_SSE2
   #include <tmmintrin.h>
 #endif
 
@@ -196,3 +195,4 @@ uint16_t *gf_w16_get_div_alog_table(GFP gf);
 
 #define GF_W16_INLINE_MULT(log, alog, a, b) ((a) == 0 || (b) == 0) ? 0 : (alog[(uint32_t)log[a]+(uint32_t)log[b]])
 #define GF_W16_INLINE_DIV(log, alog, a, b) ((a) == 0 || (b) == 0) ? 0 : (alog[(int)log[a]-(int)log[b]])
+#endif
