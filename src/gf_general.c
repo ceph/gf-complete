@@ -142,23 +142,23 @@ int gf_general_s_to_val(gf_general_t *v, int w, char *s, int hex)
     if (v->w32 & ~((1 << w)-1)) return 0;
     return 1;
   } else if (w <= 64) {
-    if (hex) return (sscanf(s, "%llx", &(v->w64)) == 1);
-    return (sscanf(s, "%lld", &(v->w64)) == 1);
+    if (hex) return (sscanf(s, "%llx", (long long unsigned int *) (&(v->w64))) == 1);
+    return (sscanf(s, "%lld", (long long int *) (&(v->w64))) == 1);
   } else {
     if (!hex) return 0;
     l = strlen(s);
     if (l <= 16) {
       v->w128[0] = 0;
-      return (sscanf(s, "%llx", &(v->w128[1])) == 1);
+      return (sscanf(s, "%llx", (long long unsigned int *) (&(v->w128[1]))) == 1);
     } else {
       if (l > 32) return 0;
       save = s[l-16];
       s[l-16] = '\0';
-      if (sscanf(s, "%llx", &(v->w128[0])) == 0) {
+      if (sscanf(s, "%llx", (long long unsigned int *) (&(v->w128[0]))) == 0) {
         s[l-16] = save;
         return 0;
       }
-      return (sscanf(s+(l-16), "%llx", &(v->w128[1])) == 1);
+      return (sscanf(s+(l-16), "%llx", (long long unsigned int *) (&(v->w128[1]))) == 1);
     }
   }
 }
