@@ -98,6 +98,14 @@ AC_DEFUN([AX_EXT],
           ax_cv_have_sse3_ext=yes
         fi
       ])
+      
+      AC_CACHE_CHECK([whether pclmuldq is supported], [ax_cv_have_pclmuldq_ext],
+      [
+        ax_cv_have_pclmuldq_ext=no
+        if test "$((0x$ecx>>1&0x01))" = 1; then
+          ax_cv_have_pclmuldq_ext=yes
+        fi
+      ])
 
       AC_CACHE_CHECK([whether ssse3 is supported], [ax_cv_have_ssse3_ext],
       [
@@ -195,6 +203,16 @@ AC_DEFUN([AX_EXT],
           AC_DEFINE(HAVE_SSE3,,[Support SSE3 (Streaming SIMD Extensions 3) instructions])
         else
           AC_MSG_WARN([Your processor supports sse3 instructions but not your compiler, can you try another compiler?])
+        fi
+      fi
+      
+      if test "$ax_cv_have_pclmuldq_ext" = yes; then
+        AX_CHECK_COMPILE_FLAG(-mpclmuldq, ax_cv_support_pclmuldq_ext=yes, [])
+        if test x"$ax_cv_support_pclmuldq_ext" = x"yes"; then
+          SIMD_FLAGS="$SIMD_FLAGS -mpclmuldq -DINTEL_SSE4_PCLMUL"
+          AC_DEFINE(HAVE_PCLMULDQ,,[Support (PCLMULDQ) Carry-Free Muliplication])
+        else
+          AC_MSG_WARN([Your processor supports pclmuldq instructions but not your compiler, can you try another compiler?])
         fi
       fi
 
