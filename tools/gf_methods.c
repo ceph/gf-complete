@@ -17,10 +17,10 @@
 #include "gf_method.h"
 #include "gf_int.h"
 
-#define BNMULTS (7)
+#define BNMULTS (8)
 static char *BMULTS[BNMULTS] = { "CARRY_FREE", "GROUP48", 
-                               "TABLE", "LOG", "SPLIT4", "SPLIT88", "COMPOSITE" };
-#define NMULTS (16)
+                               "TABLE", "LOG", "SPLIT4", "SPLIT8", "SPLIT88", "COMPOSITE" };
+#define NMULTS (15)
 static char *MULTS[NMULTS] = { "CARRY_FREE", "GROUP44", "GROUP48", "BYTWO_p", "BYTWO_b",
                                "TABLE", "LOG", "LOG_ZERO", "LOG_ZERO_EXT", "SPLIT2",
                                "SPLIT4", "SPLIT8", "SPLIT16", "SPLIT88", "COMPOSITE" };
@@ -39,7 +39,7 @@ static char *divides[NDIVS] = { "MATRIX", "EUCLID" };
 
 void usage(char *s)
 {
-   fprintf(stderr, "usage: gf_methods w -BADCM -LUMDRB\n");
+   fprintf(stderr, "usage: gf_methods w -BADC -LUMDRB\n");
    fprintf(stderr, "\n");
    fprintf(stderr, "       w can be 1-32, 64, 128\n");
    fprintf(stderr, "\n");
@@ -173,6 +173,7 @@ int main(int argc, char *argv[])
     }
     reset = sa;
 
+
     for (r = 0; r < (1 << nregions); r++) {
       sa = reset;
       for (k = 0; k < nregions; k++) {
@@ -182,10 +183,10 @@ int main(int argc, char *argv[])
         }
       }
       gf_argv[sa++] = "-";
-      /*
-      printf("Hmmmm. %s", gf_argv[0]);
+
+      /* printf("Hmmmm. %s", gf_argv[0]);
       for (j = 0; j < sa; j++) printf(" %s", gf_argv[j]);
-      printf("\n"); */
+      printf("\n");  */
   
       if (create_gf_from_argv(&gf, w, sa, gf_argv, 0) > 0) {
         printf(w_str, w);

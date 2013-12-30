@@ -47,7 +47,7 @@ fi
 if [ $op = M -o $op = D ]; then
   iter=1
   c1=`./gf_time $w $op -1 $bsize $iter $method`
-  t=`echo $c1 | awk '{ printf "%d\n", $4*1000 }'`
+  t=`echo $c1 | awk '{ printf "%d\n", $4*100 }'`
   s=`echo $c1 | awk '{ print $8 }'`
   bs=$s
   
@@ -55,11 +55,12 @@ if [ $op = M -o $op = D ]; then
     bs=$s
     iter=`echo $iter | awk '{ print $1*2 }'`
     c1=`./gf_time $w $op -1 $bsize $iter $method`
-    t=`echo $c1 | awk '{ printf "%d\n", $4*1000 }'`
+    t=`echo $c1 | awk '{ printf "%d\n", $4*100 }'`
     s=`echo $c1 | awk '{ print $8 }'`
   done
   
-  echo "$op speed (MB/s): " $bs "    W-Method:" $w $method 
+  echo $op $bs | awk '{ printf "%s speed (MB/s): %8.2lf   W-Method: ", $1, $2 }'
+  echo $w $method 
   exit 0
 fi
   
@@ -70,7 +71,7 @@ best=0
 while [ $bsize -le 4194304 ]; do
   iter=1
   c1=`./gf_time $w G -1 $bsize $iter $method`
-  t=`echo $c1 | awk '{ printf "%d\n", $6*1000 }'`
+  t=`echo $c1 | awk '{ printf "%d\n", $6*500 }'`
   s=`echo $c1 | awk '{ print $10 }'`
   bs=$s
 
@@ -78,7 +79,7 @@ while [ $bsize -le 4194304 ]; do
     bs=$s
     iter=`echo $iter | awk '{ print $1*2 }'`
     c1=`./gf_time $w G -1 $bsize $iter $method`
-    t=`echo $c1 | awk '{ printf "%d\n", $6*1000 }'`
+    t=`echo $c1 | awk '{ printf "%d\n", $6*500 }'`
     s=`echo $c1 | awk '{ print $10 }'`
   done
   if [ $bsize -lt 1048576 ]; then
@@ -87,9 +88,11 @@ while [ $bsize -le 4194304 ]; do
     str=`echo $bsize | awk '{ printf "%3dM\n", $1/1024/1024 }'`
   fi
   if [ $op = R ]; then
-    echo "Region Buffer-Size: $str (MB/s): " $bs "    W-Method:" $w $method 
+    echo $str $bs | awk '{ printf "Region Buffer-Size: %4s (MB/s): %8.2lf   W-Method: ", $1, $2 }'
+    echo $w $method 
   fi
   best=`echo $best $bs | awk '{ print ($1 > $2) ? $1 : $2 }'`
   bsize=`echo $bsize | awk '{ print $1 * 2 }'`
 done
-echo "Region Best (MB/s): "$best "    W-Method:" $w $method 
+echo $best | awk '{ printf "Region Best (MB/s): %8.2lf   W-Method: ", $1 }'
+echo $w $method 
