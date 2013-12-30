@@ -1,11 +1,14 @@
-This is GF-Complete, Revision 1.01.  
+This is GF-Complete, Revision 1.02.  
 
 The user's manual is in the file Manual.pdf.  
 
-There are two online homes for GF-Complete:
+The online home for GF-Complete is:
 
   - https://bitbucket.org/jimplank/gf-complete
-  - http://www.cs.utk.edu/~plank/plank/papers/CS-13-716.html
+
+The technical report version in http://www.cs.utk.edu/~plank/plank/papers/CS-13-716.html
+is good for citing, but you will want to grab the most up to date version and documentation
+on the bitbucket site.
 
 To compile, do:
 
