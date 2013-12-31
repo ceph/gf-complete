@@ -182,7 +182,7 @@ gf_w4_clm_multiply (gf_t *gf, gf_val_32_t a4, gf_val_32_t b4)
 {
   gf_val_32_t rv = 0;
 
-#ifdef INTEL_SSE4_PCLMUL
+#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
 
   __m128i         a, b;
   __m128i         result;
@@ -1967,7 +1967,7 @@ int gf_w4_cfm_init(gf_t *gf)
 
   h = (gf_internal_t *) gf->scratch;
 
-#ifdef INTEL_SSE4_PCLMUL
+#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
   gf->multiply.w32 = gf_w4_clm_multiply;
   return 1;
 #endif
