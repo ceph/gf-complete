@@ -13,6 +13,9 @@ AC_CONFIG_HEADER(include/config.h)
 dnl Needed when reconfiguring with 'autoreconf -i -s'
 AC_CONFIG_MACRO_DIR([m4])
 
+# This prevents './configure; make' from trying to run autotools.
+AM_MAINTAINER_MODE([disable])
+
 # Override default CFLAGS
 CFLAGS="-O3 -g"
 CXXFLAGS="-O3 -g"

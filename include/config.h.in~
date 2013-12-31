@@ -18,6 +18,9 @@
 /* Support mmx instructions */
 #undef HAVE_MMX
 
+/* Support (PCLMULDQ) Carry-Free Muliplication */
+#undef HAVE_PCLMULDQ
+
 /* Support SSE (Streaming SIMD Extensions) instructions */
 #undef HAVE_SSE
 
