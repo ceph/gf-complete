@@ -1706,7 +1706,7 @@ int gf_w128_composite_init(gf_t *gf)
 static
 int gf_w128_cfm_init(gf_t *gf)
 {
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#ifdef INTEL_SSE4_PCLMUL
   gf->inverse.w128 = gf_w128_euclid;
   gf->multiply.w128 = gf_w128_clm_multiply;
   gf->multiply_region.w128 = gf_w128_clm_multiply_region_from_single;
@@ -1814,7 +1814,7 @@ int gf_w128_split_init(gf_t *gf)
   h = (gf_internal_t *) gf->scratch;
 
   gf->multiply.w128 = gf_w128_bytwo_p_multiply;
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#ifdef INTEL_SSE4_PCLMUL
   if (!(h->region_type & GF_REGION_NOSSE)){
     gf->multiply.w128 = gf_w128_clm_multiply;
   }

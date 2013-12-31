@@ -133,7 +133,7 @@ gf_w16_clm_multiply_region_from_single_2(gf_t *gf, void *src, void *dest, gf_val
   uint16_t *s16;
   uint16_t *d16;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#ifdef INTEL_SSE4_PCLMUL
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
@@ -197,7 +197,7 @@ gf_w16_clm_multiply_region_from_single_3(gf_t *gf, void *src, void *dest, gf_val
   uint16_t *s16;
   uint16_t *d16;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#ifdef INTEL_SSE4_PCLMUL
 
   __m128i         a, b;
   __m128i         result;
@@ -266,7 +266,7 @@ gf_w16_clm_multiply_region_from_single_4(gf_t *gf, void *src, void *dest, gf_val
   uint16_t *s16;
   uint16_t *d16;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#ifdef INTEL_SSE4_PCLMUL
 
   __m128i         a, b;
   __m128i         result;
@@ -448,7 +448,7 @@ gf_w16_clm_multiply_2 (gf_t *gf, gf_val_32_t a16, gf_val_32_t b16)
 {
   gf_val_32_t rv = 0;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#ifdef INTEL_SSE4_PCLMUL
 
   __m128i         a, b;
   __m128i         result;
@@ -495,7 +495,7 @@ gf_w16_clm_multiply_3 (gf_t *gf, gf_val_32_t a16, gf_val_32_t b16)
 {
   gf_val_32_t rv = 0;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#ifdef INTEL_SSE4_PCLMUL
 
   __m128i         a, b;
   __m128i         result;
@@ -535,7 +535,7 @@ gf_w16_clm_multiply_4 (gf_t *gf, gf_val_32_t a16, gf_val_32_t b16)
 {
   gf_val_32_t rv = 0;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#ifdef INTEL_SSE4_PCLMUL
 
   __m128i         a, b;
   __m128i         result;
@@ -611,7 +611,7 @@ int gf_w16_cfm_init(gf_t *gf)
   
   /*Ben: Determining how many reductions to do */
   
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#ifdef INTEL_SSE4_PCLMUL
   if ((0xfe00 & h->prim_poly) == 0) {
     gf->multiply.w32 = gf_w16_clm_multiply_2;
     gf->multiply_region.w32 = gf_w16_clm_multiply_region_from_single_2;
@@ -739,7 +739,7 @@ int gf_w16_log_init(gf_t *gf)
   if (check) {
     if (h->mult_type != GF_MULT_LOG_TABLE) {
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#ifdef INTEL_SSE4_PCLMUL
       return gf_w16_cfm_init(gf);
 #endif
       return gf_w16_shift_init(gf);

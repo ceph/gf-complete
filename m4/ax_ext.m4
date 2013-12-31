@@ -207,9 +207,9 @@ AC_DEFUN([AX_EXT],
       fi
       
       if test "$ax_cv_have_pclmuldq_ext" = yes; then
-        AX_CHECK_COMPILE_FLAG(-mpclmul, ax_cv_support_pclmuldq_ext=yes, [])
+        AX_CHECK_COMPILE_FLAG(-mpclmuldq, ax_cv_support_pclmuldq_ext=yes, [])
         if test x"$ax_cv_support_pclmuldq_ext" = x"yes"; then
-          SIMD_FLAGS="$SIMD_FLAGS -mpclmul -DINTEL_PCLMUL"
+          SIMD_FLAGS="$SIMD_FLAGS -mpclmuldq -DINTEL_SSE4_PCLMUL"
           AC_DEFINE(HAVE_PCLMULDQ,,[Support (PCLMULDQ) Carry-Free Muliplication])
         else
           AC_MSG_WARN([Your processor supports pclmuldq instructions but not your compiler, can you try another compiler?])
