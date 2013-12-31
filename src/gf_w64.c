@@ -96,7 +96,7 @@ xor)
   gf_val_64_t *s64, *d64, *top;
   gf_region_data rd;
 
-#ifdef INTEL_SSE4_PCLMUL
+#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
   __m128i         a, b;
   __m128i         result, r1;
   __m128i         prim_poly;
@@ -187,7 +187,7 @@ xor)
   gf_val_64_t *s64, *d64, *top;
   gf_region_data rd;
 
-#ifdef INTEL_SSE4_PCLMUL
+#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
   __m128i         a, b;
   __m128i         result, r1;
   __m128i         prim_poly;
@@ -385,7 +385,7 @@ gf_w64_clm_multiply_2 (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
 {
        gf_val_64_t rv = 0;
 
-#ifdef INTEL_SSE4_PCLMUL
+#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
 
         __m128i         a, b;
         __m128i         result;
@@ -427,7 +427,7 @@ gf_w64_clm_multiply_4 (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
 {
   gf_val_64_t rv = 0;
 
-#ifdef INTEL_SSE4_PCLMUL
+#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
 
   __m128i         a, b;
   __m128i         result;
@@ -466,7 +466,7 @@ gf_w64_clm_multiply_4 (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
   void
 gf_w64_clm_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSE4_PCLMUL
+#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
   gf_internal_t *h;
   int i, j, k;
   uint8_t *s8, *d8, *dtop;
@@ -759,7 +759,7 @@ int gf_w64_cfm_init(gf_t *gf)
   gf->inverse.w64 = gf_w64_euclid;
   gf->multiply_region.w64 = gf_w64_multiply_region_from_single;
 
-#ifdef INTEL_SSE4_PCLMUL
+#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
   if ((0xfffffffe00000000ULL & h->prim_poly) == 0){ 
     gf->multiply.w64 = gf_w64_clm_multiply_2;
     gf->multiply_region.w64 = gf_w64_clm_multiply_region_from_single_2; 
@@ -2030,7 +2030,7 @@ int gf_w64_split_init(gf_t *gf)
 
   gf->multiply.w64 = gf_w64_bytwo_p_multiply; 
 
-#ifdef INTEL_SSE4_PCLMUL
+#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
   if ((!(h->region_type & GF_REGION_NOSSE) &&
      (h->arg1 == 64 || h->arg2 == 64)) ||
      h->mult_type == GF_MULT_DEFAULT){
