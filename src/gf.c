@@ -219,7 +219,7 @@ int gf_error_check(int w, int mult_type, int region_type, int divide_type,
   sse4 = 1;
 #endif
 
-#ifdef INTEL_PCLMUL
+#ifdef INTEL_SSE4_PCLMUL
   pclmul = 1;
 #endif
 
