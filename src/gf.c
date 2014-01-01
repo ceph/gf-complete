@@ -75,7 +75,6 @@ void gf_error()
     case GF_E_GR_W_48: s = "With -m GROUP, w cannot be 4 or 8."; break;
     case GF_E_GR_W_16: s = "With -m GROUP, w == 16, arg1 and arg2 must be 4."; break;
     case GF_E_GR_128A: s = "With -m GROUP, w == 128, arg1 must be 4, and arg2 in { 4,8,16 }."; break;
-    case GF_E_GR_SSE4: s = "With -m GROUP, w == 128, you need SSE4."; break;
     case GF_E_GR_A_27: s = "With -m GROUP, arg1 and arg2 must be <= 27."; break;
     case GF_E_GR_AR_W: s = "With -m GROUP, arg1 and arg2 must be <= w."; break;
     case GF_E_GR____J: s = "Cannot use GROUP with -r ALTMAP|SSE|NOSSE."; break;
@@ -320,7 +319,6 @@ int gf_error_check(int w, int mult_type, int region_type, int divide_type,
     if (w == 16 && (arg1 != 4 || arg2 != 4))     { _gf_errno = GF_E_GR_W_16; return 0; }
     if (w == 128 && (arg1 != 4 || 
        (arg2 != 4 && arg2 != 8 && arg2 != 16))) { _gf_errno = GF_E_GR_128A; return 0; }
-    if (w == 128 && !sse4)                      { _gf_errno = GF_E_GR_SSE4; return 0; }
     if (arg1 > 27 || arg2 > 27)                 { _gf_errno = GF_E_GR_A_27; return 0; }
     if (arg1 > w || arg2 > w)                   { _gf_errno = GF_E_GR_AR_W; return 0; }
     if (raltmap || rsse || rnosse)              { _gf_errno = GF_E_GR____J; return 0; }

@@ -20,8 +20,8 @@
 #define BNMULTS (8)
 static char *BMULTS[BNMULTS] = { "CARRY_FREE", "GROUP48", 
                                "TABLE", "LOG", "SPLIT4", "SPLIT8", "SPLIT88", "COMPOSITE" };
-#define NMULTS (15)
-static char *MULTS[NMULTS] = { "CARRY_FREE", "GROUP44", "GROUP48", "BYTWO_p", "BYTWO_b",
+#define NMULTS (16)
+static char *MULTS[NMULTS] = { "SHIFT", "CARRY_FREE", "GROUP44", "GROUP48", "BYTWO_p", "BYTWO_b",
                                "TABLE", "LOG", "LOG_ZERO", "LOG_ZERO_EXT", "SPLIT2",
                                "SPLIT4", "SPLIT8", "SPLIT16", "SPLIT88", "COMPOSITE" };
 

@@ -144,7 +144,6 @@ typedef enum {GF_E_MDEFDIV, /* Dev != Default && Mult == Default */
               GF_E_GR_W_48, /* Mult == GROUP, w \in { 4, 8 } */
               GF_E_GR_W_16, /* Mult == GROUP, w == 16, arg1 != 4 || arg2 != 4 */
               GF_E_GR_128A, /* Mult == GROUP, w == 128, bad args */
-              GF_E_GR_SSE4, /* Mult == GROUP, w == 128, No SSE4  */
               GF_E_GR_A_27, /* Mult == GROUP, either arg > 27 */
               GF_E_GR_AR_W, /* Mult == GROUP, either arg > w  */
               GF_E_GR____J, /* Mult == GROUP, Reg == SSE|ALTMAP|NOSSE */
