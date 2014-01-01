@@ -211,7 +211,7 @@ gf_w8_clm_multiply_2 (gf_t *gf, gf_val_32_t a8, gf_val_32_t b8)
 {
   gf_val_32_t rv = 0;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
 
   __m128i         a, b;
   __m128i         result;
@@ -257,7 +257,7 @@ gf_w8_clm_multiply_3 (gf_t *gf, gf_val_32_t a8, gf_val_32_t b8)
 {
   gf_val_32_t rv = 0;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
 
   __m128i         a, b;
   __m128i         result;
@@ -296,7 +296,7 @@ gf_w8_clm_multiply_4 (gf_t *gf, gf_val_32_t a8, gf_val_32_t b8)
 {
   gf_val_32_t rv = 0;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
 
   __m128i         a, b;
   __m128i         result;
@@ -373,7 +373,7 @@ gf_w8_clm_multiply_region_from_single_2(gf_t *gf, void *src, void *dest, gf_val_
   uint8_t *s8;
   uint8_t *d8;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
 
   __m128i         a, b;
   __m128i         result;
@@ -432,7 +432,7 @@ gf_w8_clm_multiply_region_from_single_3(gf_t *gf, void *src, void *dest, gf_val_
   uint8_t *s8;
   uint8_t *d8;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
 
   __m128i         a, b;
   __m128i         result;
@@ -495,7 +495,7 @@ gf_w8_clm_multiply_region_from_single_4(gf_t *gf, void *src, void *dest, gf_val_
   uint8_t *s8;
   uint8_t *d8;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
 
   __m128i         a, b;
   __m128i         result;
@@ -592,7 +592,7 @@ int gf_w8_cfm_init(gf_t *gf)
 
   h = (gf_internal_t *) gf->scratch;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
     if ((0xe0 & h->prim_poly) == 0){
       gf->multiply.w32 = gf_w8_clm_multiply_2;
       gf->multiply_region.w32 = gf_w8_clm_multiply_region_from_single_2;

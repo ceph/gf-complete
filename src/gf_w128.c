@@ -91,7 +91,7 @@ int xor)
     gf_val_128_t d128;
     uint64_t c128[2];
     gf_region_data rd;
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
     __m128i     a,b;
     __m128i     result0,result1;
     __m128i     prim_poly;
@@ -296,7 +296,7 @@ gf_w128_shift_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_12
 void
 gf_w128_clm_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_t c128)
 {
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
 
     __m128i     a,b;
     __m128i     result0,result1;
@@ -382,7 +382,7 @@ gf_w128_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_
 void
 gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_t c128)
 {
-#if defined(INTEL_SSE4) && defined(ARCH_64)
+#if defined(INTEL_SSE4)
   int i;
   __m128i a, b, pp, one, prod, amask, l_middle_one, u_middle_one; 
   /*John: pmask is always the highest bit set, and the rest zeros. amask changes, it's a countdown.*/
@@ -440,7 +440,7 @@ gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
 void
 gf_w128_sse_bytwo_b_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_t c128)
 {
-#if defined(INTEL_SSE4) && defined(ARCH_64)
+#if defined(INTEL_SSE4)
   __m128i a, b, lmask, hmask, pp, c, middle_one;
   gf_internal_t *h;
   uint64_t topbit, middlebit;
@@ -987,7 +987,7 @@ void gf_w128_group_m_init(gf_t *gf, gf_val_128_t b128)
 static
 void gf_w128_group_m_sse_init(gf_t *gf, gf_val_128_t b128)
 {
-#if defined(INTEL_SSE4) && defined(ARCH_64)
+#if defined(INTEL_SSE4)
   int i, j;
   int g_m;
   uint64_t lbit, middlebit;
@@ -1277,7 +1277,7 @@ static
 void
 gf_w128_group_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
 {
-#if defined(INTEL_SSE4) && defined(ARCH_64)
+#if defined(INTEL_SSE4)
   int i;
   int i_r, i_m, t_m;
   int mask_m, mask_r, mask_s;
@@ -1706,7 +1706,7 @@ int gf_w128_composite_init(gf_t *gf)
 static
 int gf_w128_cfm_init(gf_t *gf)
 {
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
   gf->inverse.w128 = gf_w128_euclid;
   gf->multiply.w128 = gf_w128_clm_multiply;
   gf->multiply_region.w128 = gf_w128_clm_multiply_region_from_single;
@@ -1779,7 +1779,7 @@ void gf_w128_group_r_init(gf_t *gf)
   static
 void gf_w128_group_r_sse_init(gf_t *gf)
 {
-#if defined(INTEL_SSE4) && defined(ARCH_64)
+#if defined(INTEL_SSE4)
   int i, j;
   int g_r;
   uint64_t pp;
@@ -1814,7 +1814,7 @@ int gf_w128_split_init(gf_t *gf)
   h = (gf_internal_t *) gf->scratch;
 
   gf->multiply.w128 = gf_w128_bytwo_p_multiply;
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
   if (!(h->region_type & GF_REGION_NOSSE)){
     gf->multiply.w128 = gf_w128_clm_multiply;
   }
@@ -1879,6 +1879,9 @@ int gf_w128_group_init(gf_t *gf)
   gf->multiply.w128 = gf_w128_group_multiply;
   gf->inverse.w128 = gf_w128_euclid;
   gf->multiply_region.w128 = gf_w128_group_multiply_region;
+
+  /* JSP: I've got a problem compiling here -- something about "vmovq", and
+     I don't have the time to chase it down right now. */
 
   #if defined(INTEL_SSE4) && defined(ARCH_64)
     if(!(scratch->region_type & GF_REGION_NOSSE))

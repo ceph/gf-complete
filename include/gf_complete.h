@@ -24,14 +24,8 @@
   #include <emmintrin.h>
 #endif
 
-#ifdef INTEL_PCLMUL
+#ifdef INTEL_SSE4_PCLMUL
   #include <wmmintrin.h>
-  #ifdef INTEL_SSE4
-    #define INTEL_SSE4_PCLMUL
-  #endif
-  #ifdef INTEL_SSSE3
-    #define INTEL_SSSE3_PCLMUL
-  #endif
 #endif
 
 

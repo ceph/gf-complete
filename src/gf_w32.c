@@ -125,7 +125,7 @@ void
 gf_w32_clm_multiply_region_from_single_2(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
 
   int i;
   uint32_t *s32;
@@ -175,7 +175,7 @@ void
 gf_w32_clm_multiply_region_from_single_3(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL) 
 
   int i;
   uint32_t *s32;
@@ -229,7 +229,7 @@ static
 void
 gf_w32_clm_multiply_region_from_single_4(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
   int i;
   uint32_t *s32;
   uint32_t *d32;
@@ -409,7 +409,7 @@ gf_w32_clm_multiply_2 (gf_t *gf, gf_val_32_t a32, gf_val_32_t b32)
 {
   gf_val_32_t rv = 0;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
 
   __m128i         a, b;
   __m128i         result;
@@ -453,7 +453,7 @@ gf_w32_clm_multiply_3 (gf_t *gf, gf_val_32_t a32, gf_val_32_t b32)
 {
   gf_val_32_t rv = 0;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
 
   __m128i         a, b;
   __m128i         result;
@@ -492,7 +492,7 @@ gf_w32_clm_multiply_4 (gf_t *gf, gf_val_32_t a32, gf_val_32_t b32)
 {
   gf_val_32_t rv = 0;
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
 
   __m128i         a, b;
   __m128i         result;
@@ -565,7 +565,7 @@ int gf_w32_cfm_init(gf_t *gf)
   /*Ben: We also check to see if the prim poly will work for pclmul */
   /*Ben: Check to see how many reduction steps it will take*/
 
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
   if ((0xfffe0000 & h->prim_poly) == 0){ 
     gf->multiply.w32 = gf_w32_clm_multiply_2;
     gf->multiply_region.w32 = gf_w32_clm_multiply_region_from_single_2;
@@ -2176,7 +2176,7 @@ int gf_w32_split_init(gf_t *gf)
   int i, j, exp, ispclmul, issse3;
 
   ispclmul = 0;
-#if defined(INTEL_SSE4_PCLMUL) && defined(ARCH_64)
+#if defined(INTEL_SSE4_PCLMUL)
   ispclmul = 1;
 #endif
 
