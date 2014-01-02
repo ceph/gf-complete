@@ -200,7 +200,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = src tools test examples
 ACLOCAL_AMFLAGS = -I m4
-include_HEADERS = include/gf_complete.h
+include_HEADERS = include/gf_complete.h include/gf_method.h include/gf_rand.h include/gf_general.h
 all: all-recursive
 
 .SUFFIXES:
