@@ -105,7 +105,7 @@ void gf_general_val_to_s(gf_general_t *v, int w, char *s, int hex)
     if (hex) {
       sprintf(s, "%x", v->w32);
     } else {
-      sprintf(s, "%d", v->w32);
+      sprintf(s, "%u", v->w32);
     }
   } else if (w <= 64) {
     if (hex) {
@@ -132,7 +132,7 @@ int gf_general_s_to_val(gf_general_t *v, int w, char *s, int hex)
     if (hex) {
       if (sscanf(s, "%x", &(v->w32)) == 0) return 0;
     } else {
-      if (sscanf(s, "%d", &(v->w32)) == 0) return 0;
+      if (sscanf(s, "%u", &(v->w32)) == 0) return 0;
     }
     if (w == 32) return 1;
     if (w == 31) {
