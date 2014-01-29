@@ -1,16 +1,18 @@
 This is GF-Complete, Revision 1.02.   January 1, 2014.
 
-The user's manual is in the file Manual.pdf.  
+The user's manual is in the file Manual.pdf.  You may also get a copy of that
+manual at http://www.cs.utk.edu/~plank/plank/papers/GF-Complete-Manual-1.02.pdf.
 
 The online home for GF-Complete is:
 
   - https://bitbucket.org/jimplank/gf-complete
 
-The technical report version in http://www.cs.utk.edu/~plank/plank/papers/CS-13-716.html
-is good for citing, but you will want to grab the most up to date version and documentation
-on the bitbucket site.
+If you want to cite GF-Complete in a paper, I suggest citing the 
+technical report version.  The precise citation information for that
+is in http://www.cs.utk.edu/~plank/plank/papers/CS-13-716.html.
 
 To compile, do:
 
    ./configure
    make
+   sudo make install
