@@ -6,6 +6,7 @@ manual at http://www.cs.utk.edu/~plank/plank/papers/GF-Complete-Manual-1.02.pdf.
 The online home for GF-Complete is:
 
   - https://bitbucket.org/jimplank/gf-complete
+
 If you want to cite GF-Complete in a paper, I suggest citing the 
 technical report version.  The precise citation information for that 
 is in http://www.cs.utk.edu/~plank/plank/papers/CS-13-716.html.
