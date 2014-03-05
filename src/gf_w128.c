@@ -886,7 +886,7 @@ gf_w128_split_8_128_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_
 void
 gf_w128_bytwo_b_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
 {
-  uint64_t bmask, pp, vmask;
+  uint64_t bmask, pp;
   gf_internal_t *h;
   uint64_t a[2], c[2], b[2], *s64, *d64, *top;
   gf_region_data rd;
@@ -987,7 +987,7 @@ void gf_w128_group_m_init(gf_t *gf, gf_val_128_t b128)
 void
 gf_w128_group_multiply(GFP gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_t c128)
 {
-  int i,j;
+  int i;
   /* index_r, index_m, total_m (if g_r > g_m) */
   int i_r, i_m, t_m;
   int mask_m, mask_r;
@@ -1162,7 +1162,6 @@ gf_w128_euclid(GFP gf, gf_val_128_t a128, gf_val_128_t b128)
   uint64_t c_i[2];
   uint64_t *b;
   uint64_t one = 1;
-  uint64_t buf, buf1;
 
   /* This needs to return some sort of error (in b128?) */
   if (a128[0] == 0 && a128[1] == 0) return;
@@ -1326,7 +1325,6 @@ static
   void
 gf_w128_composite_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
 {
-  unsigned long uls, uld;
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
   gf_t *base_gf = h->base_gf;
   uint64_t b0 = val[1];
@@ -1381,7 +1379,6 @@ gf_w128_composite_multiply_region_alt(gf_t *gf, void *src, void *dest, gf_val_12
   gf_internal_t *h = (gf_internal_t *) gf->scratch;  gf_t *base_gf = h->base_gf;
   gf_val_64_t val0 = val[1];
   gf_val_64_t val1 = val[0];
-  uint64_t *l, *hi;
   uint8_t *slow, *shigh;
   uint8_t *dlow, *dhigh, *top;
   int sub_reg_size;
@@ -1419,8 +1416,6 @@ int gf_w128_composite_init(gf_t *gf)
     gf->multiply_region.w128 = gf_w128_composite_multiply_region;
   }
 
-  gf_internal_t *base_h = (gf_internal_t *) h->base_gf->scratch;
-
   gf->multiply.w128 = gf_w128_composite_multiply;
   gf->divide.w128 = gf_w128_divide_from_inverse;
   gf->inverse.w128 = gf_w128_composite_inverse;
@@ -1444,8 +1439,6 @@ int gf_w128_cfm_init(gf_t *gf)
 static
 int gf_w128_shift_init(gf_t *gf)
 {
-  gf_internal_t *h;
-  h = (gf_internal_t*) gf->scratch;
   gf->multiply.w128 = gf_w128_shift_multiply;
   gf->inverse.w128 = gf_w128_euclid;
   gf->multiply_region.w128 = gf_w128_multiply_region_from_single;
@@ -1587,12 +1580,10 @@ int gf_w128_group_init(gf_t *gf)
 {
   gf_internal_t *scratch;
   gf_group_tables_t *gt;
-  int g_m, g_r, size_r;
-  long tmp;
+  int g_r, size_r;
 
   scratch = (gf_internal_t *) gf->scratch;
   gt = scratch->private;
-  g_m = scratch->arg1;
   g_r = scratch->arg2;
   size_r = (1 << g_r);
 
@@ -1690,7 +1681,6 @@ void gf_w128_composite_extract_word(gf_t *gf, void *start, int bytes, int index,
 int gf_w128_scratch_size(int mult_type, int region_type, int divide_type, int arg1, int arg2)
 {
   int size_m, size_r;
-  int w = 128;
   if (divide_type==GF_DIVIDE_MATRIX) return 0;
 
   switch(mult_type)
@@ -1739,7 +1729,7 @@ int gf_w128_scratch_size(int mult_type, int region_type, int divide_type, int ar
 
 int gf_w128_init(gf_t *gf)
 {
-  gf_internal_t *h, *h_base, *h_base_base, *h_base_base_base;
+  gf_internal_t *h;
   int no_default_flag = 0;
 
   h = (gf_internal_t *) gf->scratch;

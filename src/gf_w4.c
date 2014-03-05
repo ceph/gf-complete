@@ -468,7 +468,7 @@ int gf_w4_single_table_init(gf_t *gf)
 {
   gf_internal_t *h;
   struct gf_single_table_data *std;
-  int a, b, prod, loga, logb;
+  int a, b, prod;
 
 
   h = (gf_internal_t *) gf->scratch;
@@ -531,7 +531,6 @@ static
 void 
 gf_w4_double_table_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-  unsigned long uls, uld;
   int i;
   uint8_t *s8, *d8, *base;
   gf_region_data rd;
@@ -560,7 +559,7 @@ int gf_w4_double_table_init(gf_t *gf)
 {
   gf_internal_t *h;
   struct gf_double_table_data *std;
-  int a, b, c, prod, loga, logb, ab;
+  int a, b, c, prod, ab;
   uint8_t mult[GF_FIELD_SIZE][GF_FIELD_SIZE];
 
   h = (gf_internal_t *) gf->scratch;
@@ -687,7 +686,7 @@ int gf_w4_quad_table_init(gf_t *gf)
 {
   gf_internal_t *h;
   struct gf_quad_table_data *std;
-  int prod, loga, logb, ab, val, a, b, c, d, va, vb, vc, vd;
+  int prod, val, a, b, c, d, va, vb, vc, vd;
   uint8_t mult[GF_FIELD_SIZE][GF_FIELD_SIZE];
 
   h = (gf_internal_t *) gf->scratch;
@@ -731,10 +730,9 @@ int gf_w4_quad_table_lazy_init(gf_t *gf)
 {
   gf_internal_t *h;
   struct gf_quad_table_lazy_data *std;
-  int a, b, c, prod, loga, logb, ab;
+  int a, b, prod, loga, logb;
   uint8_t log_tbl[GF_FIELD_SIZE];
   uint8_t antilog_tbl[GF_FIELD_SIZE*2];
-  uint8_t mult[GF_FIELD_SIZE][GF_FIELD_SIZE];
 
   h = (gf_internal_t *) gf->scratch;
   std = (struct gf_quad_table_lazy_data *)h->private;
@@ -1498,9 +1496,6 @@ static
 void 
 gf_w4_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-  unsigned long uls, uld;
-  int i;
-  uint8_t *s8, *d8, *top;
   uint64_t *s64, *d64, t1, t2, ta, tb, prod;
   struct gf_bytwo_data *btd;
   gf_region_data rd;
@@ -1963,10 +1958,6 @@ int gf_w4_bytwo_init(gf_t *gf)
 static 
 int gf_w4_cfm_init(gf_t *gf)
 {
-  gf_internal_t *h;
-
-  h = (gf_internal_t *) gf->scratch;
-
 #if defined(INTEL_SSE4_PCLMUL)
   gf->multiply.w32 = gf_w4_clm_multiply;
   return 1;
@@ -1987,7 +1978,6 @@ int gf_w4_shift_init(gf_t *gf)
 int gf_w4_scratch_size(int mult_type, int region_type, int divide_type, int arg1, int arg2)
 {
   int region_tbl_size;
-  int ss;
   int issse3 = 0;
 
 #ifdef INTEL_SSSE3

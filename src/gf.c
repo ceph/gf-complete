@@ -179,13 +179,11 @@ uint64_t gf_composite_get_default_poly(gf_t *base)
 int gf_error_check(int w, int mult_type, int region_type, int divide_type,
                    int arg1, int arg2, uint64_t poly, gf_t *base)
 {
-  int sse4 = 0;
   int sse3 = 0;
   int sse2 = 0;
   int pclmul = 0;
   int rdouble, rquad, rlazy, rsse, rnosse, raltmap, rcauchy, tmp;
-  uint64_t pp;
-  gf_internal_t *sub, *subsub, *subsubsub;
+  gf_internal_t *sub;
 
   rdouble = (region_type & GF_REGION_DOUBLE_TABLE);
   rquad   = (region_type & GF_REGION_QUAD_TABLE);
@@ -212,10 +210,6 @@ int gf_error_check(int w, int mult_type, int region_type, int divide_type,
 
 #ifdef INTEL_SSSE3
   sse3 = 1;
-#endif
-
-#ifdef INTEL_SSE4
-  sse4 = 1;
 #endif
 
 #ifdef INTEL_SSE4_PCLMUL
@@ -525,7 +519,7 @@ void gf_alignment_error(char *s, int a)
 
 static 
 void gf_invert_binary_matrix(uint32_t *mat, uint32_t *inv, int rows) {
-  int cols, i, j, k;
+  int cols, i, j;
   uint32_t tmp;
 
   cols = rows;
@@ -594,7 +588,7 @@ uint32_t gf_bitmatrix_inverse(uint32_t y, int w, uint32_t pp)
 void gf_two_byte_region_table_multiply(gf_region_data *rd, uint16_t *base)
 {
   uint64_t a, prod;
-  int j, xor;
+  int xor;
   uint64_t *s64, *d64, *top;
 
   s64 = rd->s_start;
@@ -773,7 +767,6 @@ void gf_set_region_data(gf_region_data *rd,
   int xor,
   int align)
 {
-  uint8_t *s8, *d8;
   gf_internal_t *h;
   int wb;
   uint32_t a;
@@ -897,9 +890,8 @@ void gf_multby_one(void *src, void *dest, int bytes, int xor)
   __m128i ms, md;
 #endif
   unsigned long uls, uld;
-  uint8_t *s8, *d8, *dtop8;
+  uint8_t *s8, *d8;
   uint64_t *s64, *d64, *dtop64;
-  int abytes;
   gf_region_data rd;
 
   if (!xor) {
@@ -910,6 +902,7 @@ void gf_multby_one(void *src, void *dest, int bytes, int xor)
   uld = (unsigned long) dest;
 
 #ifdef   INTEL_SSE2
+  int abytes;
   s8 = (uint8_t *) src;
   d8 = (uint8_t *) dest;
   if (uls % 16 == uld % 16) {

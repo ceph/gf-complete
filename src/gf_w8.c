@@ -731,7 +731,7 @@ static
 gf_w8_log_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
   int i;
-  uint8_t lv, b, c;
+  uint8_t lv;
   uint8_t *s8, *d8;
   struct gf_w8_logtable_data *ltd;
 
@@ -760,7 +760,7 @@ static
 gf_w8_logzero_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
   int i;
-  uint8_t lv, b, c;
+  uint8_t lv;
   uint8_t *s8, *d8;
   struct gf_w8_logzero_table_data *ltd;
   struct gf_w8_logzero_small_table_data *std;
@@ -976,7 +976,7 @@ static
 gf_w8_double_table_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
   uint16_t *base;
-  uint32_t b, c, prod, vc, vb;
+  uint32_t b, c, vc, vb;
   gf_internal_t *h;
   struct gf_w8_double_table_data  *dtd;
   struct gf_w8_double_table_lazy_data  *ltd;
@@ -1033,7 +1033,6 @@ static
 gf_w8_table_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
   int i;
-  uint8_t lv, b, c;
   uint8_t *s8, *d8;
   struct gf_w8_single_table_data *ftd;
 
@@ -1137,9 +1136,7 @@ static
   void
 gf_w8_split_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-  unsigned long uls, uld;
   int i;
-  uint8_t lv, b, c;
   uint8_t *s8, *d8;
   struct gf_w8_half_table_data *htd;
 
@@ -1167,11 +1164,10 @@ int gf_w8_split_init(gf_t *gf)
 {
   gf_internal_t *h;
   struct gf_w8_half_table_data *htd;
-  int a, b, pp;
+  int a, b;
 
   h = (gf_internal_t *) gf->scratch;
   htd = (struct gf_w8_half_table_data *)h->private;
-  pp = h->prim_poly;
 
   bzero(htd->high, sizeof(uint8_t)*GF_FIELD_SIZE*GF_HALF_SIZE);
   bzero(htd->low, sizeof(uint8_t)*GF_FIELD_SIZE*GF_HALF_SIZE);
@@ -1361,7 +1357,6 @@ gf_val_32_t
 gf_w8_composite_multiply_inline(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
-  gf_t *base_gf = h->base_gf;
   uint8_t b0 = b & 0x0f; 
   uint8_t b1 = (b & 0xf0) >> 4; 
   uint8_t a0 = a & 0x0f; 
@@ -1844,8 +1839,6 @@ static
   void 
 gf_w8_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-  int i;
-  uint8_t *s8, *d8, *top;
   uint64_t *s64, *d64, t1, t2, ta, tb, prod;
   struct gf_w8_bytwo_data *btd;
   gf_region_data rd;
@@ -2362,7 +2355,7 @@ int gf_w8_scratch_size(int mult_type, int region_type, int divide_type, int arg1
 
 int gf_w8_init(gf_t *gf)
 {
-  gf_internal_t *h, *h_base;
+  gf_internal_t *h;
 
   h = (gf_internal_t *) gf->scratch;
 
@@ -2454,11 +2447,9 @@ uint8_t *gf_w8_get_mult_table(gf_t *gf)
 
 uint8_t *gf_w8_get_div_table(gf_t *gf)
 {
-  gf_internal_t *h;
   struct gf_w8_default_data *ftd;
   struct gf_w8_single_table_data *std;
 
-  h = (gf_internal_t *) gf->scratch;
   if (gf->multiply.w32 == gf_w8_default_multiply) {
     ftd = (struct gf_w8_default_data *) ((gf_internal_t *) gf->scratch)->private;
     return (uint8_t *) ftd->divtable;

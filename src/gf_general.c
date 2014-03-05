@@ -267,7 +267,6 @@ void gf_general_do_region_check(gf_t *gf, gf_general_t *a, void *orig_a, void *o
   int w, words, i;
   gf_general_t oa, ot, ft, sb;
   char sa[50], soa[50], sot[50], sft[50], ssb[50];
-  uint8_t *p;
 
   h = (gf_internal_t *) gf->scratch;
   w = h->w;
