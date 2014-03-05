@@ -555,10 +555,6 @@ gf_w32_shift_multiply (gf_t *gf, uint32_t a32, uint32_t b32)
   static 
 int gf_w32_cfm_init(gf_t *gf)
 {
-  gf_internal_t *h;
-
-  h = (gf_internal_t *) gf->scratch;
-
   gf->inverse.w32 = gf_w32_euclid;
   gf->multiply_region.w32 = gf_w32_multiply_region_from_single;
   
@@ -566,6 +562,10 @@ int gf_w32_cfm_init(gf_t *gf)
   /*Ben: Check to see how many reduction steps it will take*/
 
 #if defined(INTEL_SSE4_PCLMUL)
+  gf_internal_t *h;
+
+  h = (gf_internal_t *) gf->scratch;
+
   if ((0xfffe0000 & h->prim_poly) == 0){ 
     gf->multiply.w32 = gf_w32_clm_multiply_2;
     gf->multiply_region.w32 = gf_w32_clm_multiply_region_from_single_2;
@@ -616,9 +616,8 @@ gf_w32_group_set_shift_tables(uint32_t *shift, uint32_t val, gf_internal_t *h)
   static
 void gf_w32_group_s_equals_r_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-  int i;
   int leftover, rs;
-  uint32_t p, l, ind, r, a32;
+  uint32_t p, l, ind, a32;
   int bits_left;
   int g_s;
   gf_region_data rd;
@@ -741,9 +740,8 @@ inline
 gf_val_32_t
 gf_w32_group_s_equals_r_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
-  int i;
   int leftover, rs;
-  uint32_t p, l, ind, r, a32;
+  uint32_t p, l, ind, a32;
   int bits_left;
   int g_s;
 
@@ -781,8 +779,7 @@ inline
 gf_val_32_t
 gf_w32_group_4_4_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
-  int i;
-  uint32_t p, l, ind, r, a32;
+  uint32_t p, l, ind, a32;
 
   struct gf_w32_group_data *d44;
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
@@ -832,7 +829,7 @@ gf_w32_group_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   int i;
   int leftover;
-  uint64_t p, l, r, mask;
+  uint64_t p, l, r;
   uint32_t a32, ind;
   int g_s, g_r;
   struct gf_w32_group_data *gd;
@@ -1046,7 +1043,6 @@ static
 void
 gf_w32_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-  int i;
   uint64_t *s64, *d64, t1, t2, ta, tb, prod;
   struct gf_w32_bytwo_data *btd;
   gf_region_data rd;
@@ -2378,7 +2374,6 @@ uint32_t
 gf_w32_composite_multiply_inline(gf_t *gf, uint32_t a, uint32_t b)
 {
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
-  gf_t *base_gf = h->base_gf;
   uint32_t b0 = b & 0x0000ffff;
   uint32_t b1 = b >> 16;
   uint32_t a0 = a & 0x0000ffff;
@@ -2620,10 +2615,7 @@ int gf_w32_composite_init(gf_t *gf)
 
 int gf_w32_scratch_size(int mult_type, int region_type, int divide_type, int arg1, int arg2)
 {
-  int ss;
   int issse3 = 0;
-
-  ss = (GF_REGION_SSE | GF_REGION_NOSSE);
 
 #ifdef INTEL_SSSE3
   issse3 = 1;

@@ -774,9 +774,8 @@ static
 void
 gf_w16_split_4_16_lazy_nosse_altmap_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-  uint64_t i, j, a, b, c, prod;
+  uint64_t i, j, c, prod;
   uint8_t *s8, *d8, *top;
-  gf_internal_t *h;
   uint16_t table[4][16];
   gf_region_data rd;
 
@@ -785,8 +784,6 @@ gf_w16_split_4_16_lazy_nosse_altmap_multiply_region(gf_t *gf, void *src, void *d
 
   gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 32);
   gf_do_initial_region_alignment(&rd);    
-
-  h = (gf_internal_t *) gf->scratch;
 
   /*Ben: Constructs lazy multiplication table*/
 
@@ -840,7 +837,6 @@ gf_w16_split_4_16_lazy_multiply_region(gf_t *gf, void *src, void *dest, gf_val_3
 {
   uint64_t i, j, a, c, prod;
   uint16_t *s16, *d16, *top;
-  gf_internal_t *h;
   uint16_t table[4][16];
   gf_region_data rd;
 
@@ -849,8 +845,6 @@ gf_w16_split_4_16_lazy_multiply_region(gf_t *gf, void *src, void *dest, gf_val_3
 
   gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 2);
   gf_do_initial_region_alignment(&rd);    
-
-  h = (gf_internal_t *) gf->scratch;
 
   for (j = 0; j < 16; j++) {
     for (i = 0; i < 4; i++) {
@@ -880,7 +874,7 @@ static
 void
 gf_w16_split_8_16_lazy_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-  uint64_t j, k, v, a, c, prod, *s64, *d64, *top64;
+  uint64_t j, k, v, a, prod, *s64, *d64, *top64;
   gf_internal_t *h;
   uint64_t htable[256], ltable[256];
   gf_region_data rd;
@@ -966,7 +960,7 @@ gf_w16_split_8_16_lazy_multiply_region(gf_t *gf, void *src, void *dest, gf_val_3
 static void
 gf_w16_table_lazy_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-  uint64_t j, a, c, pp;
+  uint64_t c;
   gf_internal_t *h;
   struct gf_w16_lazytable_data *ltd;
   gf_region_data rd;
@@ -1358,10 +1352,7 @@ issse3 = 0;
 static 
 int gf_w16_table_init(gf_t *gf)
 {
-  gf_internal_t *h;
   gf_w16_log_init(gf);
-
-  h = (gf_internal_t *) gf->scratch;
 
   gf->multiply_region.w32 = gf_w16_table_lazy_multiply_region; 
   return 1;
@@ -1735,7 +1726,6 @@ static
 void 
 gf_w16_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-  int i;
   uint64_t *s64, *d64, t1, t2, ta, tb, prod;
   struct gf_w16_bytwo_data *btd;
   gf_region_data rd;
@@ -1988,7 +1978,6 @@ gf_val_32_t
 gf_w16_composite_multiply_inline(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
-  gf_t *base_gf = h->base_gf;
   uint8_t b0 = b & 0x00ff;
   uint8_t b1 = (b & 0xff00) >> 8;
   uint8_t a0 = a & 0x00ff;
@@ -2072,7 +2061,6 @@ static
 void
 gf_w16_composite_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-  unsigned long uls, uld;
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
   gf_t *base_gf = h->base_gf;
   uint8_t b0 = val & 0x00ff;
@@ -2080,7 +2068,6 @@ gf_w16_composite_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t va
   uint16_t *s16, *d16, *top;
   uint8_t a0, a1, a1b1, *mt;
   gf_region_data rd;
-  struct gf_w16_logtable_data *ltd;
   struct gf_w16_composite_data *cd;
 
   cd = (struct gf_w16_composite_data *) h->private;
@@ -2237,7 +2224,6 @@ inline
 gf_val_32_t
 gf_w16_group_4_4_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
-  int i;
   uint16_t p, l, ind, r, a16;
 
   struct gf_w16_group_4_4_data *d44;
@@ -2270,7 +2256,6 @@ gf_w16_group_4_4_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 static
 void gf_w16_group_4_4_region_multiply(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-  int i;
   uint16_t p, l, ind, r, a16, p16;
   struct gf_w16_group_4_4_data *d44;
   gf_region_data rd;
@@ -2475,10 +2460,8 @@ int gf_w16_init(gf_t *gf)
 
 uint16_t *gf_w16_get_log_table(gf_t *gf)
 {
-  gf_internal_t *h;
   struct gf_w16_logtable_data *ltd;
 
-  h = (gf_internal_t *) gf->scratch;
   if (gf->multiply.w32 == gf_w16_log_multiply) {
     ltd = (struct gf_w16_logtable_data *) ((gf_internal_t *) gf->scratch)->private;
     return (uint16_t *) ltd->log_tbl;
