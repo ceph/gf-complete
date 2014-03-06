@@ -1491,7 +1491,7 @@ void gf_w128_group_r_init(gf_t *gf)
   return;
 }
 
-#if defined(INTEL_SSE4)
+#if 0 // defined(INTEL_SSE4)
   static
 void gf_w128_group_r_sse_init(gf_t *gf)
 {
