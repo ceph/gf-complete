@@ -795,7 +795,7 @@ void gf_set_region_data(gf_region_data *rd,
 
   if (align == -1) { /* JSP: This is cauchy.  Error check bytes, then set up the pointers
                         so that there are no alignment regions. */
-    if (bytes % h->w != 0) {
+    if (h != NULL && bytes % h->w != 0) {
       fprintf(stderr, "Error in region multiply operation.\n");
       fprintf(stderr, "The size must be a multiple of %d bytes.\n", h->w);
       exit(1);
