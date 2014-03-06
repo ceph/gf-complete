@@ -163,8 +163,8 @@ int main(int argc, char **argv)
   for (i = 0; i < 3; i++) {
     test = single_tests[i];
     if (strchr(tests, test) != NULL) {
-      if (tmethods[test] == NULL) {
-        printf("No %s method.\n", tstrings[test]);
+      if (tmethods[(int)test] == NULL) {
+        printf("No %s method.\n", tstrings[(int)test]);
       } else {
         elapsed = 0;
         dnum = 0;
@@ -176,7 +176,7 @@ int main(int argc, char **argv)
           elapsed += timer_split(&timer);
         }
         printf("%14s:           %10.6lf s   Mops: %10.3lf    %10.3lf Mega-ops/s\n", 
-               tstrings[test], elapsed, 
+               tstrings[(int)test], elapsed, 
                dnum/1024.0/1024.0, dnum/1024.0/1024.0/elapsed);
       }
     }
@@ -185,8 +185,8 @@ int main(int argc, char **argv)
   for (i = 0; i < 4; i++) {
     test = region_tests[i];
     if (strchr(tests, test) != NULL) {
-      if (tmethods[test] == NULL) {
-        printf("No %s method.\n", tstrings[test]);
+      if (tmethods[(int)test] == NULL) {
+        printf("No %s method.\n", tstrings[(int)test]);
       } else {
         elapsed = 0;
 
@@ -204,10 +204,11 @@ int main(int argc, char **argv)
             elapsed += timer_split(&timer);
           }
           printf("%14s: XOR: %d    %10.6lf s     MB: %10.3lf    %10.3lf MB/s\n", 
-               tstrings[test], xor, elapsed, 
+               tstrings[(int)test], xor, elapsed, 
                ds*di/1024.0/1024.0, ds*di/1024.0/1024.0/elapsed);
         }
       }
     }
   }
+  return 0;
 }
