@@ -119,7 +119,7 @@ int main(int argc, char **argv)
   if (!create_gf_from_argv(&gf, w, argc, argv, 6)) usage(BM);
 
   strcpy(tests, "");
-  for (i = 0; i < argv[2][i] != '\0'; i++) {
+  for (i = 0; argv[2][i] != '\0'; i++) {
     switch(argv[2][i]) {
       case 'A': strcat(tests, single_tests); 
                 strcat(tests, region_tests); 
