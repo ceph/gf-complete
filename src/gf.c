@@ -767,7 +767,7 @@ void gf_set_region_data(gf_region_data *rd,
   int xor,
   int align)
 {
-  gf_internal_t *h;
+  gf_internal_t *h = NULL;
   int wb;
   uint32_t a;
   unsigned long uls, uld;

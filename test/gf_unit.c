@@ -80,6 +80,9 @@ int main(int argc, char **argv)
   uint16_t a16, b16, c16, d16, *log16, *alog16;
   char as[50], bs[50], cs[50], ds[50], ais[50], bis[50];
   uint32_t mask;
+  uint8_t a8, b8, c8, *mult4 = NULL, *mult8 = NULL;
+  uint16_t a16, b16, c16, *log16 = NULL, *alog16 = NULL;
+  uint32_t mask = 0;
   char *ra, *rb, *rc, *rd, *target;
   int align;
 

@@ -799,9 +799,9 @@ gf_w8_logzero_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int
 int gf_w8_log_init(gf_t *gf)
 {
   gf_internal_t *h;
-  struct gf_w8_logtable_data *ltd;
-  struct gf_w8_logzero_table_data *ztd;
-  struct gf_w8_logzero_small_table_data *std;
+  struct gf_w8_logtable_data *ltd = NULL;
+  struct gf_w8_logzero_table_data *ztd = NULL;
+  struct gf_w8_logzero_small_table_data *std = NULL;
   uint8_t *alt;
   uint8_t *inv;
   int i, b;
