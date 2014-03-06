@@ -482,7 +482,7 @@ int gf_init_hard(gf_t *gf, int w, int mult_type,
   h->arg2 = arg2;
   h->base_gf = base_gf;
   h->private = (void *) gf->scratch;
-  h->private += (sizeof(gf_internal_t));
+  h->private = (char*)h->private + (sizeof(gf_internal_t));
   gf->extract_word.w32 = NULL;
 
   switch(w) {
@@ -687,8 +687,8 @@ static void gf_slow_multiply_region(gf_region_data *rd, void *src, void *dest, v
       fprintf(stderr, "Error: gf_slow_multiply_region: w=%d not implemented.\n", h->w);
       exit(1);
     }
-    src += wb;
-    dest += wb;
+    src = (char*)src + wb;
+    dest = (char*)dest + wb;
   }
 }
 
@@ -803,8 +803,8 @@ void gf_set_region_data(gf_region_data *rd,
   
     rd->s_start = src;
     rd->d_start = dest;
-    rd->s_top = src + bytes;
-    rd->d_top = src + bytes;
+    rd->s_top = (char*)src + bytes;
+    rd->d_top = (char*)src + bytes;
     return;
   }
 
@@ -833,12 +833,12 @@ void gf_set_region_data(gf_region_data *rd,
 
   uls %= a;
   if (uls != 0) uls = (a-uls);
-  rd->s_start = rd->src + uls;
-  rd->d_start = rd->dest + uls;
+  rd->s_start = (char*)rd->src + uls;
+  rd->d_start = (char*)rd->dest + uls;
   bytes -= uls;
   bytes -= (bytes % align);
-  rd->s_top = rd->s_start + bytes;
-  rd->d_top = rd->d_start + bytes;
+  rd->s_top = (char*)rd->s_start + bytes;
+  rd->d_top = (char*)rd->d_start + bytes;
 
 }
 
@@ -849,7 +849,7 @@ void gf_do_initial_region_alignment(gf_region_data *rd)
 
 void gf_do_final_region_alignment(gf_region_data *rd)
 {
-  gf_slow_multiply_region(rd, rd->s_top, rd->d_top, rd->src+rd->bytes);
+  gf_slow_multiply_region(rd, rd->s_top, rd->d_top, (char*)rd->src+rd->bytes);
 }
 
 void gf_multby_zero(void *dest, int bytes, int xor) 
@@ -1018,7 +1018,7 @@ static void gf_unaligned_xor(void *src, void *dest, int bytes)
   }
   
   d8 = (uint8_t *) d64;
-  while (d8 < (uint8_t *) (dest+bytes)) {
+  while (d8 < (uint8_t *) ((char*)dest+bytes)) {
     *d8 ^= *s8;
     d8++;
     s8++;
