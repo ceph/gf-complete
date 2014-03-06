@@ -422,4 +422,5 @@ int main(int argc, char **argv)
       gf_general_do_region_check(&gf, a, rc+s_start, rd+d_start, target+d_start, bytes, xor);
     }
   }
+  return 0;
 }

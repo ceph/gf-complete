@@ -179,7 +179,7 @@ void x_to_q_to_i_minus_x(gf_t *gf, int w, int n, gf_general_t *poly, int logq, i
   free(x_to_q);
 }
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
   int w, i, power, n, ap, success;
   gf_t gf;

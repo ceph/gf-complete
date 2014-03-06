@@ -74,4 +74,5 @@ int main(int argc, char **argv)
            gf.extract_word.w32(&gf, a, 30*2, i+15),
            gf.extract_word.w32(&gf, b, 30*2, i+15));
   }
+  return 0;
 }
