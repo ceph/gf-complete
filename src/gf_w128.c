@@ -90,7 +90,6 @@ int xor)
     int i;
     gf_val_128_t s128;
     gf_val_128_t d128;
-    uint64_t c128[2];
     gf_region_data rd;
     __m128i     a,b;
     __m128i     result0,result1;
@@ -105,8 +104,6 @@ int xor)
       if (val[1] == 0) { gf_multby_zero(dest, bytes, xor); return; }
       if (val[1] == 1) { gf_multby_one(src, dest, bytes, xor); return; }
     }
-
-    set_zero(c128, 0);
 
     s128 = (gf_val_128_t) src;
     d128 = (gf_val_128_t) dest;
@@ -384,7 +381,7 @@ gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
 {
 #if defined(INTEL_SSE4)
   int i;
-  __m128i a, b, pp, one, prod, amask, l_middle_one, u_middle_one; 
+  __m128i a, b, pp, prod, amask, u_middle_one; 
   /*John: pmask is always the highest bit set, and the rest zeros. amask changes, it's a countdown.*/
   uint32_t topbit, middlebit, pmask; /* this is used as a boolean value */
   gf_internal_t *h;
@@ -400,7 +397,6 @@ gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
   pmask = 0x80000000;
   amask = _mm_insert_epi32(prod, 0x80000000, 0x3);
   u_middle_one = _mm_insert_epi32(prod, 1, 0x2);
-  l_middle_one = _mm_insert_epi32(prod, 1 << 31, 0x1);
   
   for (i = 0; i < 64; i++) {
     topbit = (_mm_extract_epi32(prod, 0x3) & pmask);
@@ -605,7 +601,7 @@ void
 gf_w128_split_4_128_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
 {
   gf_internal_t *h;
-  int i, m, j, k, tindex;
+  int i, j, k;
   uint64_t pp, v[2], s, *s64, *d64, *top;
   __m128i p, tables[32][16];
   struct gf_w128_split_4_128_data *ld;
@@ -704,8 +700,8 @@ void
 gf_w128_split_4_128_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
 {
   gf_internal_t *h;
-  int i, m, j, k, tindex;
-  uint64_t pp, v[2], s, *s64, *d64, *top;
+  int i, j, k;
+  uint64_t pp, v[2], *s64, *d64, *top;
   __m128i si, tables[32][16], p[16], v0, mask1;
   struct gf_w128_split_4_128_data *ld;
   uint8_t btable[16];
