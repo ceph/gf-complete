@@ -17,8 +17,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_MAINTAINER_MODE([disable])
 
 # Override default CFLAGS
-CFLAGS="-O3 -g"
-CXXFLAGS="-O3 -g"
+CFLAGS="-Wall -O3 -g"
 
 dnl Compiling with per-target flags requires AM_PROG_CC_C_O.
 AC_PROG_CC
