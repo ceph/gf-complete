@@ -84,7 +84,6 @@ int gcd_one(gf_t *gf, int w, int n, gf_general_t *poly, gf_general_t *prod)
 {
   gf_general_t *a, *b, zero, factor, p;
   int i, j, da, db;
-  char buf[30];
 
   gf_general_set_zero(&zero, w);
 
@@ -123,7 +122,6 @@ void x_to_q_to_i_minus_x(gf_t *gf, int w, int n, gf_general_t *poly, int logq, i
   gf_general_t *product;
   gf_general_t p, zero, factor;
   int j, k, lq;
-  char buf[20];
 
   gf_general_set_zero(&zero, w);
   product = (gf_general_t *) malloc(sizeof(gf_general_t) * n*2);
@@ -183,7 +181,7 @@ void x_to_q_to_i_minus_x(gf_t *gf, int w, int n, gf_general_t *poly, int logq, i
 
 main(int argc, char **argv)
 {
-  int w, i, power, n, ap, success, j;
+  int w, i, power, n, ap, success;
   gf_t gf;
   gf_general_t *poly, *prod;
   char *string, *ptr;

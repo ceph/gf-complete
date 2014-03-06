@@ -450,7 +450,7 @@ gf_w16_clm_multiply_2 (gf_t *gf, gf_val_32_t a16, gf_val_32_t b16)
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
-  __m128i         v, w;
+  __m128i         w;
   gf_internal_t * h = gf->scratch;
 
   a = _mm_insert_epi32 (_mm_setzero_si128(), a16, 0);
@@ -497,7 +497,7 @@ gf_w16_clm_multiply_3 (gf_t *gf, gf_val_32_t a16, gf_val_32_t b16)
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
-  __m128i         v, w;
+  __m128i         w;
   gf_internal_t * h = gf->scratch;
 
   a = _mm_insert_epi32 (_mm_setzero_si128(), a16, 0);
@@ -537,7 +537,7 @@ gf_w16_clm_multiply_4 (gf_t *gf, gf_val_32_t a16, gf_val_32_t b16)
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
-  __m128i         v, w;
+  __m128i         w;
   gf_internal_t * h = gf->scratch;
 
   a = _mm_insert_epi32 (_mm_setzero_si128(), a16, 0);
@@ -1001,12 +1001,12 @@ gf_w16_split_4_16_lazy_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_v
 {
 #ifdef INTEL_SSSE3
   uint64_t i, j, *s64, *d64, *top64;;
-  uint64_t a, c, prod;
+  uint64_t c, prod;
   uint8_t low[4][16];
   uint8_t high[4][16];
   gf_region_data rd;
 
-  __m128i  mask, ta, tb, ti, tpl, tph, tlow[4], thigh[4], tta, ttb, shuffler, unshuffler, lmask;
+  __m128i  mask, ta, tb, ti, tpl, tph, tlow[4], thigh[4], tta, ttb, lmask;
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
   if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
@@ -1138,7 +1138,6 @@ gf_w16_split_4_16_lazy_sse_altmap_multiply_region(gf_t *gf, void *src, void *des
   uint8_t low[4][16];
   uint8_t high[4][16];
   gf_region_data rd;
-  struct gf_single_table_data *std;
   __m128i  mask, ta, tb, ti, tpl, tph, tlow[4], thigh[4];
 
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
@@ -1553,7 +1552,6 @@ gf_w16_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t 
   int i;
   uint8_t *s8, *d8;
   uint32_t vrev;
-  uint64_t amask;
   __m128i pp, m1, m2, ta, prod, t1, t2, tp, one, v;
   struct gf_w16_bytwo_data *btd;
   gf_region_data rd;
@@ -1614,9 +1612,8 @@ static
 void
 gf_w16_bytwo_b_sse_region_2_noxor(gf_region_data *rd, struct gf_w16_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, m2, t1, t2, va;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
@@ -1640,8 +1637,7 @@ static
 void
 gf_w16_bytwo_b_sse_region_2_xor(gf_region_data *rd, struct gf_w16_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
+  uint8_t *d8, *s8;
   __m128i pp, m1, m2, t1, t2, va, vb;
 
   s8 = (uint8_t *) rd->s_start;

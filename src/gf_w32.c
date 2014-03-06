@@ -414,7 +414,7 @@ gf_w32_clm_multiply_2 (gf_t *gf, gf_val_32_t a32, gf_val_32_t b32)
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
-  __m128i         v, w;
+  __m128i         w;
   gf_internal_t * h = gf->scratch;
 
 
@@ -458,7 +458,7 @@ gf_w32_clm_multiply_3 (gf_t *gf, gf_val_32_t a32, gf_val_32_t b32)
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
-  __m128i         v, w;
+  __m128i         w;
   gf_internal_t * h = gf->scratch;
 
 
@@ -497,7 +497,7 @@ gf_w32_clm_multiply_4 (gf_t *gf, gf_val_32_t a32, gf_val_32_t b32)
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
-  __m128i         v, w;
+  __m128i         w;
   gf_internal_t * h = gf->scratch;
 
 
@@ -991,7 +991,6 @@ gf_w32_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t 
   int i;
   uint8_t *s8, *d8;
   uint32_t vrev;
-  uint64_t amask;
   __m128i pp, m1, m2, ta, prod, t1, t2, tp, one, v;
   struct gf_w32_bytwo_data *btd;
   gf_region_data rd;
@@ -1182,9 +1181,8 @@ static
 void
 gf_w32_bytwo_b_sse_region_2_noxor(gf_region_data *rd, struct gf_w32_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, m2, t1, t2, va;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
@@ -1208,8 +1206,7 @@ static
 void
 gf_w32_bytwo_b_sse_region_2_xor(gf_region_data *rd, struct gf_w32_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
+  uint8_t *d8, *s8;
   __m128i pp, m1, m2, t1, t2, va, vb;
 
   s8 = (uint8_t *) rd->s_start;
@@ -1558,8 +1555,8 @@ void
 gf_w32_split_2_32_lazy_sse_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
   gf_internal_t *h;
-  int i, m, j, tindex;
-  uint32_t pp, v, v2, s, *s32, *d32, *top;
+  int i, tindex;
+  uint32_t pp, v, v2, *s32, *d32, *top;
   __m128i vi, si, pi, shuffler, tables[16], adder, xi, mask1, mask2;
   gf_region_data rd;
  
@@ -1695,8 +1692,8 @@ gf_w32_split_4_32_lazy_sse_altmap_multiply_region(gf_t *gf, void *src, void *des
 {
 #ifdef INTEL_SSSE3
   gf_internal_t *h;
-  int i, m, j, k, tindex;
-  uint32_t pp, v, s, *s32, *d32, *top, *realtop;
+  int i, j, k;
+  uint32_t pp, v, *s32, *d32, *top;
   __m128i si, tables[8][4], p0, p1, p2, p3, mask1, v0, v1, v2, v3;
   struct gf_split_4_32_lazy_data *ld;
   uint8_t btable[16];
@@ -1887,9 +1884,9 @@ gf_w32_split_4_32_lazy_sse_multiply_region(gf_t *gf, void *src, void *dest, uint
 {
 #ifdef INTEL_SSSE3
   gf_internal_t *h;
-  int i, m, j, k, tindex;
-  uint32_t pp, v, s, *s32, *d32, *top, tmp_table[16];
-  __m128i vi, si, tables[8][4], p0, p1, p2, p3, mask1, v0, v1, v2, v3, mask8;
+  int i, j, k;
+  uint32_t pp, v, *s32, *d32, *top, tmp_table[16];
+  __m128i si, tables[8][4], p0, p1, p2, p3, mask1, v0, v1, v2, v3, mask8;
   __m128i tv1, tv2, tv3, tv0;
   uint8_t btable[16];
   gf_region_data rd;

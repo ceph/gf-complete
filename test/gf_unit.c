@@ -70,18 +70,15 @@ int main(int argc, char **argv)
 {
   signal(SIGSEGV, SigHandler);
 
-  int w, i, verbose, single, region, tested, top;
+  int w, i, verbose, single, region, top;
   int s_start, d_start, bytes, xor, alignment_test;
   gf_t   gf, gf_def;
   time_t t0;
   gf_internal_t *h;
-  gf_general_t *a, *b, *c, *d, *ai, *bi;
-  uint8_t a8, b8, c8, *mult4, *div4, *mult8, *div8;
-  uint16_t a16, b16, c16, d16, *log16, *alog16;
-  char as[50], bs[50], cs[50], ds[50], ais[50], bis[50];
-  uint32_t mask;
+  gf_general_t *a, *b, *c, *d;
   uint8_t a8, b8, c8, *mult4 = NULL, *mult8 = NULL;
   uint16_t a16, b16, c16, *log16 = NULL, *alog16 = NULL;
+  char as[50], bs[50], cs[50], ds[50];
   uint32_t mask = 0;
   char *ra, *rb, *rc, *rd, *target;
   int align;
@@ -118,8 +115,6 @@ int main(int argc, char **argv)
   b = (gf_general_t *) malloc(sizeof(gf_general_t));
   c = (gf_general_t *) malloc(sizeof(gf_general_t));
   d = (gf_general_t *) malloc(sizeof(gf_general_t));
-  ai = (gf_general_t *) malloc(sizeof(gf_general_t));
-  bi = (gf_general_t *) malloc(sizeof(gf_general_t));
 
   //15 bytes extra to make sure it's 16byte aligned
   ra = (char *) malloc(sizeof(char)*REGION_SIZE+15);
@@ -148,12 +143,10 @@ int main(int argc, char **argv)
     problem("No default for this value of w");
   if (w == 4) {
     mult4 = gf_w4_get_mult_table(&gf);
-    div4 = gf_w4_get_div_table(&gf);
   }
 
   if (w == 8) {
     mult8 = gf_w8_get_mult_table(&gf);
-    div8 = gf_w8_get_div_table(&gf);
   }
 
   if (w == 16) {
@@ -243,7 +236,6 @@ int main(int argc, char **argv)
         }
       }
 
-      tested = 0;
       gf_general_multiply(&gf, a, b, c);
       
       /* If w is 4, 8 or 16, then there are inline multiplication/division methods.  
@@ -288,7 +280,6 @@ int main(int argc, char **argv)
       /* If this is not composite, then first test against the default: */
 
       if (h->mult_type != GF_MULT_COMPOSITE) {
-        tested = 1;
         gf_general_multiply(&gf_def, a, b, d);
 
         if (!gf_general_are_equal(c, d, w)) {
@@ -309,7 +300,6 @@ int main(int argc, char **argv)
 
       if (gf_general_is_zero(a, w) || gf_general_is_zero(b, w) || 
           gf_general_is_one(a, w)  || gf_general_is_one(b, w)) {
-        tested = 1;
         if (((gf_general_is_zero(a, w) || gf_general_is_zero(b, w)) && !gf_general_is_zero(c, w)) ||
             (gf_general_is_one(a, w) && !gf_general_are_equal(b, c, w)) ||
             (gf_general_is_one(b, w) && !gf_general_are_equal(a, c, w))) {

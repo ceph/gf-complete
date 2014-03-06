@@ -93,14 +93,13 @@ void
 gf_w64_clm_multiply_region_from_single_2(gf_t *gf, void *src, void *dest, gf_val_64_t val, int bytes, int
 xor)
 {
-  int i, size;
   gf_val_64_t *s64, *d64, *top;
   gf_region_data rd;
 
   __m128i         a, b;
   __m128i         result, r1;
   __m128i         prim_poly;
-  __m128i         v, w;
+  __m128i         w;
   __m128i         m1, m2, m3, m4;
   gf_internal_t * h = gf->scratch;
   
@@ -121,7 +120,6 @@ xor)
   s64 = (gf_val_64_t *) rd.s_start;
   d64 = (gf_val_64_t *) rd.d_start;
   top = (gf_val_64_t *) rd.d_top;
-  size = bytes/sizeof(gf_val_64_t);
 
   if (xor) {
     while (d64 != top) {
@@ -184,7 +182,6 @@ void
 gf_w64_clm_multiply_region_from_single_4(gf_t *gf, void *src, void *dest, gf_val_64_t val, int bytes, int
 xor)
 {
-  int i, size;
   gf_val_64_t *s64, *d64, *top;
   gf_region_data rd;
 
@@ -210,7 +207,6 @@ xor)
   s64 = (gf_val_64_t *) rd.s_start;
   d64 = (gf_val_64_t *) rd.d_start;
   top = (gf_val_64_t *) rd.d_top;
-  size = bytes/sizeof(gf_val_64_t);
 
   if (xor) {
     while (d64 != top) {
@@ -468,9 +464,7 @@ gf_w64_clm_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int by
 {
 #if defined(INTEL_SSE4_PCLMUL) 
   gf_internal_t *h;
-  int i, j, k;
   uint8_t *s8, *d8, *dtop;
-  uint64_t *s64, *d64;
   gf_region_data rd;
   __m128i  v, b, m, prim_poly, c, fr, w, result;
 
@@ -492,7 +486,6 @@ gf_w64_clm_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int by
 
   if (xor) {
     while (d8 != dtop) {
-      s64 = (uint64_t *) s8;
       b = _mm_load_si128((__m128i *) s8);
       result = _mm_clmulepi64_si128 (b, v, 0);
       c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 0);
@@ -521,7 +514,6 @@ gf_w64_clm_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int by
     }
   } else {
     while (d8 < dtop) {
-      s64 = (uint64_t *) s8;
       b = _mm_load_si128((__m128i *) s8);
       result = _mm_clmulepi64_si128 (b, v, 0);
       c = _mm_insert_epi32 (_mm_srli_si128 (result, 8), 0, 0);
@@ -1374,9 +1366,8 @@ static
 void
 gf_w64_bytwo_b_sse_region_2_xor(gf_region_data *rd)
 {
-  int i;
   uint64_t one64, amask;
-  uint8_t *d8, *s8, tb;
+  uint8_t *d8, *s8;
   __m128i pp, m1, m2, t1, t2, va, vb;
   gf_internal_t *h;
 
@@ -1408,9 +1399,8 @@ static
 void
 gf_w64_bytwo_b_sse_region_2_noxor(gf_region_data *rd)
 {
-  int i;
   uint64_t one64, amask;
-  uint8_t *d8, *s8, tb;
+  uint8_t *d8, *s8;
   __m128i pp, m1, m2, t1, t2, va;
   gf_internal_t *h;
 
@@ -1443,7 +1433,6 @@ gf_w64_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_64_t 
   uint64_t itb, amask, one64;
   uint8_t *d8, *s8;
   __m128i pp, m1, m2, t1, t2, va, vb;
-  struct gf_w32_bytwo_data *btd;
   gf_region_data rd;
   gf_internal_t *h;
 
@@ -1718,8 +1707,8 @@ static
 gf_w64_split_4_64_lazy_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
 {
   gf_internal_t *h;
-  int i, m, j, k, tindex;
-  uint64_t pp, v, s, *s64, *d64, *top;
+  int i, j, k;
+  uint64_t pp, v, *s64, *d64, *top;
   __m128i si, tables[16][8], p[8], v0, mask1;
   struct gf_split_4_64_lazy_data *ld;
   uint8_t btable[16];
@@ -1802,9 +1791,9 @@ static
 gf_w64_split_4_64_lazy_sse_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
 {
   gf_internal_t *h;
-  int i, m, j, k, tindex;
-  uint64_t pp, v, s, *s64, *d64, *top;
-  __m128i si, tables[16][8], p[8], st[8], mask1, mask8, mask16, t1, t2;
+  int i, j, k;
+  uint64_t pp, v, *s64, *d64, *top;
+  __m128i si, tables[16][8], p[8], st[8], mask1, mask8, mask16, t1;
   struct gf_split_4_64_lazy_data *ld;
   uint8_t btable[16];
   gf_region_data rd;

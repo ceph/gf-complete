@@ -421,7 +421,7 @@ gf_w4_single_table_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_3
 {
   gf_region_data rd;
   uint8_t *base, *sptr, *dptr, *top;
-  __m128i  tl, loset, h4, r, va, th;
+  __m128i  tl, loset, r, va, th;
   
   struct gf_single_table_data *std;
     
@@ -924,8 +924,7 @@ gf_w4_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t v
   int i;
   uint8_t *s8, *d8;
   uint8_t vrev;
-  uint64_t amask;
-  __m128i pp, m1, m2, ta, prod, t1, t2, tp, one, v;
+  __m128i pp, m1, ta, prod, t1, t2, tp, one, v;
   struct gf_bytwo_data *btd;
   gf_region_data rd;
 
@@ -948,7 +947,6 @@ gf_w4_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t v
 
   pp = _mm_set1_epi8(btd->prim_poly&0xff);
   m1 = _mm_set1_epi8((btd->mask1)&0xff);
-  m2 = _mm_set1_epi8((btd->mask2)&0xff);
   one = _mm_set1_epi8(1);
 
   while (d8 < (uint8_t *) rd.d_top) {
@@ -1039,16 +1037,14 @@ static
 void
 gf_w4_bytwo_b_sse_region_2_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, t1, t2, va;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
 
   pp = _mm_set1_epi8(btd->prim_poly&0xff);
   m1 = _mm_set1_epi8((btd->mask1)&0xff);
-  m2 = _mm_set1_epi8((btd->mask2)&0xff);
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
@@ -1065,16 +1061,14 @@ static
 void
 gf_w4_bytwo_b_sse_region_2_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, t1, t2, va, vb;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
 
   pp = _mm_set1_epi8(btd->prim_poly&0xff);
   m1 = _mm_set1_epi8((btd->mask1)&0xff);
-  m2 = _mm_set1_epi8((btd->mask2)&0xff);
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
@@ -1093,16 +1087,14 @@ static
 void
 gf_w4_bytwo_b_sse_region_4_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, t1, t2, va;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
 
   pp = _mm_set1_epi8(btd->prim_poly&0xff);
   m1 = _mm_set1_epi8((btd->mask1)&0xff);
-  m2 = _mm_set1_epi8((btd->mask2)&0xff);
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
@@ -1120,16 +1112,14 @@ static
 void
 gf_w4_bytwo_b_sse_region_4_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, t1, t2, va, vb;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
 
   pp = _mm_set1_epi8(btd->prim_poly&0xff);
   m1 = _mm_set1_epi8((btd->mask1)&0xff);
-  m2 = _mm_set1_epi8((btd->mask2)&0xff);
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
@@ -1150,16 +1140,14 @@ static
 void
 gf_w4_bytwo_b_sse_region_3_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, t1, t2, va, vb;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
 
   pp = _mm_set1_epi8(btd->prim_poly&0xff);
   m1 = _mm_set1_epi8((btd->mask1)&0xff);
-  m2 = _mm_set1_epi8((btd->mask2)&0xff);
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
@@ -1178,16 +1166,14 @@ static
 void
 gf_w4_bytwo_b_sse_region_3_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, t1, t2, va, vb;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
 
   pp = _mm_set1_epi8(btd->prim_poly&0xff);
   m1 = _mm_set1_epi8((btd->mask1)&0xff);
-  m2 = _mm_set1_epi8((btd->mask2)&0xff);
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
@@ -1206,16 +1192,14 @@ static
 void
 gf_w4_bytwo_b_sse_region_5_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, t1, t2, va, vb;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
 
   pp = _mm_set1_epi8(btd->prim_poly&0xff);
   m1 = _mm_set1_epi8((btd->mask1)&0xff);
-  m2 = _mm_set1_epi8((btd->mask2)&0xff);
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
@@ -1235,16 +1219,14 @@ static
 void
 gf_w4_bytwo_b_sse_region_5_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, t1, t2, va, vb;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
 
   pp = _mm_set1_epi8(btd->prim_poly&0xff);
   m1 = _mm_set1_epi8((btd->mask1)&0xff);
-  m2 = _mm_set1_epi8((btd->mask2)&0xff);
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
@@ -1264,16 +1246,14 @@ static
 void
 gf_w4_bytwo_b_sse_region_7_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, t1, t2, va, vb;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
 
   pp = _mm_set1_epi8(btd->prim_poly&0xff);
   m1 = _mm_set1_epi8((btd->mask1)&0xff);
-  m2 = _mm_set1_epi8((btd->mask2)&0xff);
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
@@ -1294,16 +1274,14 @@ static
 void
 gf_w4_bytwo_b_sse_region_7_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, t1, t2, va, vb;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
 
   pp = _mm_set1_epi8(btd->prim_poly&0xff);
   m1 = _mm_set1_epi8((btd->mask1)&0xff);
-  m2 = _mm_set1_epi8((btd->mask2)&0xff);
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
@@ -1324,16 +1302,14 @@ static
 void
 gf_w4_bytwo_b_sse_region_6_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, t1, t2, va, vb;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
 
   pp = _mm_set1_epi8(btd->prim_poly&0xff);
   m1 = _mm_set1_epi8((btd->mask1)&0xff);
-  m2 = _mm_set1_epi8((btd->mask2)&0xff);
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
@@ -1353,16 +1329,14 @@ static
 void
 gf_w4_bytwo_b_sse_region_6_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-  int i;
-  uint8_t *d8, *s8, tb;
-  __m128i pp, m1, m2, t1, t2, va, vb;
+  uint8_t *d8, *s8;
+  __m128i pp, m1, t1, t2, va, vb;
 
   s8 = (uint8_t *) rd->s_start;
   d8 = (uint8_t *) rd->d_start;
 
   pp = _mm_set1_epi8(btd->prim_poly&0xff);
   m1 = _mm_set1_epi8((btd->mask1)&0xff);
-  m2 = _mm_set1_epi8((btd->mask2)&0xff);
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
@@ -1977,7 +1951,6 @@ int gf_w4_shift_init(gf_t *gf)
 
 int gf_w4_scratch_size(int mult_type, int region_type, int divide_type, int arg1, int arg2)
 {
-  int region_tbl_size;
   int issse3 = 0;
 
 #ifdef INTEL_SSSE3
