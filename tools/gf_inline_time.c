@@ -164,4 +164,5 @@ int main(int argc, char **argv)
     printf("Inline mult:   %10.6lf s   Mops: %10.3lf    %10.3lf Mega-ops/s\n",
            elapsed, dnum/1024.0/1024.0, dnum/1024.0/1024.0/elapsed);
   }
+  return 0;
 }
