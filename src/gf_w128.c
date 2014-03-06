@@ -81,6 +81,7 @@ int xor)
     }
 }
 
+#if defined(INTEL_SSE4_PCLMUL)
 static
 void
 gf_w128_clm_multiply_region_from_single(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes,
@@ -91,7 +92,6 @@ int xor)
     gf_val_128_t d128;
     uint64_t c128[2];
     gf_region_data rd;
-#if defined(INTEL_SSE4_PCLMUL)
     __m128i     a,b;
     __m128i     result0,result1;
     __m128i     prim_poly;
@@ -184,8 +184,8 @@ int xor)
         d128[i+1] = (uint64_t)_mm_extract_epi64(result1,0);
       }
     }
-#endif
 }
+#endif
 
 /*
  * Some w128 notes:
@@ -599,11 +599,11 @@ gf_w128_split_4_128_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_
   }
 }
 
+#ifdef INTEL_SSSE3
 static
 void
 gf_w128_split_4_128_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSSE3
   gf_internal_t *h;
   int i, m, j, k, tindex;
   uint64_t pp, v[2], s, *s64, *d64, *top;
@@ -695,14 +695,14 @@ gf_w128_split_4_128_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_
   /* Doing this instead of gf_do_final_region_alignment() because that doesn't hold 128-bit vals */
 
   gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, ((char*)src+bytes)-(char*)rd.s_top, xor);
-#endif
 }
+#endif
 
+#ifdef INTEL_SSSE3
 static
 void
 gf_w128_split_4_128_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSSE3
   gf_internal_t *h;
   int i, m, j, k, tindex;
   uint64_t pp, v[2], s, *s64, *d64, *top;
@@ -805,8 +805,8 @@ gf_w128_split_4_128_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, 
   /* Doing this instead of gf_do_final_region_alignment() because that doesn't hold 128-bit vals */
 
   gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, ((char*)src+bytes)-(char*)rd.s_top, xor);
-#endif
 }
+#endif
 
 static
 void
@@ -1495,10 +1495,10 @@ void gf_w128_group_r_init(gf_t *gf)
   return;
 }
 
+#if defined(INTEL_SSE4)
   static
 void gf_w128_group_r_sse_init(gf_t *gf)
 {
-#if defined(INTEL_SSE4)
   int i, j;
   int g_r;
   uint64_t pp;
@@ -1520,8 +1520,8 @@ void gf_w128_group_r_sse_init(gf_t *gf)
     }
   }
   return;
-#endif
 }
+#endif
 
   static 
 int gf_w128_split_init(gf_t *gf)

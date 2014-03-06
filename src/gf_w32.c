@@ -120,12 +120,12 @@ xor)
   }
 }
 
+#if defined(INTEL_SSE4_PCLMUL)
+
 static 
 void
 gf_w32_clm_multiply_region_from_single_2(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
-
-#if defined(INTEL_SSE4_PCLMUL)
 
   int i;
   uint32_t *s32;
@@ -167,16 +167,16 @@ gf_w32_clm_multiply_region_from_single_2(gf_t *gf, void *src, void *dest, uint32
       d32[i] = ((gf_val_32_t)_mm_extract_epi32(result, 0));
     } 
   }
-#endif
 }
+#endif
+
+#if defined(INTEL_SSE4_PCLMUL) 
 
 static 
 void
 gf_w32_clm_multiply_region_from_single_3(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
 
-#if defined(INTEL_SSE4_PCLMUL) 
-
   int i;
   uint32_t *s32;
   uint32_t *d32;
@@ -222,14 +222,14 @@ gf_w32_clm_multiply_region_from_single_3(gf_t *gf, void *src, void *dest, uint32
       d32[i] = ((gf_val_32_t)_mm_extract_epi32(result, 0));
     } 
   }
-#endif
 }
+#endif
 
+#if defined(INTEL_SSE4_PCLMUL)
 static 
 void
 gf_w32_clm_multiply_region_from_single_4(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
-#if defined(INTEL_SSE4_PCLMUL)
   int i;
   uint32_t *s32;
   uint32_t *d32;
@@ -279,8 +279,8 @@ gf_w32_clm_multiply_region_from_single_4(gf_t *gf, void *src, void *dest, uint32
       d32[i] = ((gf_val_32_t)_mm_extract_epi32(result, 0));
     } 
   }
-#endif
 }
+#endif
 
 static
 inline
@@ -983,11 +983,11 @@ gf_w32_bytwo_p_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_
       prod = _mm_xor_si128(prod, t1); \
       v = _mm_srli_epi64(v, 1); }
 
+#ifdef INTEL_SSE2
 static
 void
 gf_w32_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *s8, *d8;
   uint32_t vrev;
@@ -1036,8 +1036,8 @@ gf_w32_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t 
     s8 += 16;
   }
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
 static
 void
@@ -1177,11 +1177,11 @@ gf_w32_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_
   gf_do_final_region_alignment(&rd);
 }
 
+#ifdef INTEL_SSE2
 static
 void
 gf_w32_bytwo_b_sse_region_2_noxor(gf_region_data *rd, struct gf_w32_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1200,14 +1200,14 @@ gf_w32_bytwo_b_sse_region_2_noxor(gf_region_data *rd, struct gf_w32_bytwo_data *
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static
 void
 gf_w32_bytwo_b_sse_region_2_xor(gf_region_data *rd, struct gf_w32_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1228,15 +1228,15 @@ gf_w32_bytwo_b_sse_region_2_xor(gf_region_data *rd, struct gf_w32_bytwo_data *bt
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
 
+#ifdef INTEL_SSE2
 static
 void 
 gf_w32_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSE2
   uint32_t itb;
   uint8_t *d8, *s8;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1284,8 +1284,8 @@ gf_w32_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t 
   }
 
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
 static
 int gf_w32_bytwo_init(gf_t *gf)
@@ -1552,11 +1552,11 @@ gf_w32_split_2_32_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint32_t
   gf_do_final_region_alignment(&rd);
 }
 
+#ifdef INTEL_SSSE3
 static
 void
 gf_w32_split_2_32_lazy_sse_multiply_region(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSSE3
   gf_internal_t *h;
   int i, m, j, tindex;
   uint32_t pp, v, v2, s, *s32, *d32, *top;
@@ -1631,8 +1631,8 @@ gf_w32_split_2_32_lazy_sse_multiply_region(gf_t *gf, void *src, void *dest, uint
 
   gf_do_final_region_alignment(&rd);
 
-#endif
 }
+#endif
 
 static
 void
