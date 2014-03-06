@@ -61,7 +61,7 @@ struct gf_bytwo_data {
   t2 = ((t2 << 1) - (t2 >> (GF_FIELD_WIDTH-1))); \
   b = (t1 ^ (t2 & ip));}
 
-#define SSE_AB2(pp, m1 ,m2, va, t1, t2) {\
+#define SSE_AB2(pp, m1, va, t1, t2) {\
           t1 = _mm_and_si128(_mm_slli_epi64(va, 1), m1); \
           t2 = _mm_and_si128(va, _mm_set1_epi8(0x88)); \
           t2 = _mm_sub_epi64 (_mm_slli_epi64(t2, 1), _mm_srli_epi64(t2, (GF_FIELD_WIDTH-1))); \
@@ -909,7 +909,7 @@ gf_w4_bytwo_p_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t
 }
 
 #define BYTWO_P_ONESTEP {\
-      SSE_AB2(pp, m1 ,m2, prod, t1, t2); \
+      SSE_AB2(pp, m1, prod, t1, t2); \
       t1 = _mm_and_si128(v, one); \
       t1 = _mm_sub_epi8(t1, one); \
       t1 = _mm_and_si128(t1, ta); \
@@ -1048,7 +1048,7 @@ gf_w4_bytwo_b_sse_region_2_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     _mm_store_si128((__m128i *)d8, va);
     d8 += 16;
     s8 += 16;
@@ -1072,7 +1072,7 @@ gf_w4_bytwo_b_sse_region_2_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     vb = _mm_load_si128 ((__m128i *)(d8));
     vb = _mm_xor_si128(vb, va);
     _mm_store_si128((__m128i *)d8, vb);
@@ -1098,8 +1098,8 @@ gf_w4_bytwo_b_sse_region_4_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
-    SSE_AB2(pp, m1, m2, va, t1, t2);
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     _mm_store_si128((__m128i *)d8, va);
     d8 += 16;
     s8 += 16;
@@ -1123,8 +1123,8 @@ gf_w4_bytwo_b_sse_region_4_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
-    SSE_AB2(pp, m1, m2, va, t1, t2);
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     vb = _mm_load_si128 ((__m128i *)(d8));
     vb = _mm_xor_si128(vb, va);
     _mm_store_si128((__m128i *)d8, vb);
@@ -1152,7 +1152,7 @@ gf_w4_bytwo_b_sse_region_3_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
     vb = va;
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     va = _mm_xor_si128(va, vb);
     _mm_store_si128((__m128i *)d8, va);
     d8 += 16;
@@ -1178,7 +1178,7 @@ gf_w4_bytwo_b_sse_region_3_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
     vb = _mm_xor_si128(_mm_load_si128 ((__m128i *)(d8)), va);
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     vb = _mm_xor_si128(vb, va);
     _mm_store_si128((__m128i *)d8, vb);
     d8 += 16;
@@ -1204,8 +1204,8 @@ gf_w4_bytwo_b_sse_region_5_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
     vb = va;
-    SSE_AB2(pp, m1, m2, va, t1, t2);
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     va = _mm_xor_si128(va, vb);
     _mm_store_si128((__m128i *)d8, va);
     d8 += 16;
@@ -1231,8 +1231,8 @@ gf_w4_bytwo_b_sse_region_5_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
     vb = _mm_xor_si128(_mm_load_si128 ((__m128i *)(d8)), va);
-    SSE_AB2(pp, m1, m2, va, t1, t2);
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     vb = _mm_xor_si128(vb, va);
     _mm_store_si128((__m128i *)d8, vb);
     d8 += 16;
@@ -1258,9 +1258,9 @@ gf_w4_bytwo_b_sse_region_7_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
     vb = va;
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     vb = _mm_xor_si128(va, vb);
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     va = _mm_xor_si128(va, vb);
     _mm_store_si128((__m128i *)d8, va);
     d8 += 16;
@@ -1286,9 +1286,9 @@ gf_w4_bytwo_b_sse_region_7_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
     vb = _mm_xor_si128(_mm_load_si128 ((__m128i *)(d8)), va);
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     vb = _mm_xor_si128(vb, va);
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     vb = _mm_xor_si128(vb, va);
     _mm_store_si128((__m128i *)d8, vb);
     d8 += 16;
@@ -1313,9 +1313,9 @@ gf_w4_bytwo_b_sse_region_6_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     vb = va;
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     va = _mm_xor_si128(va, vb);
     _mm_store_si128((__m128i *)d8, va);
     d8 += 16;
@@ -1340,9 +1340,9 @@ gf_w4_bytwo_b_sse_region_6_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 
   while (d8 < (uint8_t *) rd->d_top) {
     va = _mm_load_si128 ((__m128i *)(s8));
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     vb = _mm_xor_si128(_mm_load_si128 ((__m128i *)(d8)), va);
-    SSE_AB2(pp, m1, m2, va, t1, t2);
+    SSE_AB2(pp, m1, va, t1, t2);
     vb = _mm_xor_si128(vb, va);
     _mm_store_si128((__m128i *)d8, vb);
     d8 += 16;
@@ -1436,7 +1436,7 @@ gf_w4_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t v
         if (tb & 1) vb = _mm_xor_si128(vb, va);
         tb >>= 1;
         if (tb == 0) break;
-        SSE_AB2(pp, m1, m2, va, t1, t2);
+        SSE_AB2(pp, m1, va, t1, t2);
       }
       _mm_store_si128((__m128i *)d8, vb);
       d8 += 16;
