@@ -62,8 +62,8 @@ int main(int argc, char **argv)
   int w, j, i, size, iterations;
   gf_t      gf;
   double timer, elapsed, dnum, num;
-  uint8_t *ra, *rb, *mult4, *mult8;
-  uint16_t *ra16, *rb16, *log16, *alog16;
+  uint8_t *ra = NULL, *rb = NULL, *mult4, *mult8;
+  uint16_t *ra16 = NULL, *rb16 = NULL, *log16, *alog16;
   time_t t0;
   
   if (argc != 5) usage(NULL);
