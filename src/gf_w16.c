@@ -125,6 +125,7 @@ gf_w16_multiply_region_from_single(gf_t *gf, void *src, void *dest, gf_val_32_t 
   gf_do_final_region_alignment(&rd);
 }
 
+#if defined(INTEL_SSE4_PCLMUL)
 static
 void
 gf_w16_clm_multiply_region_from_single_2(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
@@ -132,8 +133,6 @@ gf_w16_clm_multiply_region_from_single_2(gf_t *gf, void *src, void *dest, gf_val
   gf_region_data rd;
   uint16_t *s16;
   uint16_t *d16;
-
-#if defined(INTEL_SSE4_PCLMUL)
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
@@ -186,9 +185,10 @@ gf_w16_clm_multiply_region_from_single_2(gf_t *gf, void *src, void *dest, gf_val
     } 
   }
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
+#if defined(INTEL_SSE4_PCLMUL)
 static
 void
 gf_w16_clm_multiply_region_from_single_3(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
@@ -197,8 +197,6 @@ gf_w16_clm_multiply_region_from_single_3(gf_t *gf, void *src, void *dest, gf_val
   uint16_t *s16;
   uint16_t *d16;
 
-#if defined(INTEL_SSE4_PCLMUL)
-
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
@@ -255,9 +253,10 @@ gf_w16_clm_multiply_region_from_single_3(gf_t *gf, void *src, void *dest, gf_val
     } 
   }
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
+#if defined(INTEL_SSE4_PCLMUL)
 static
 void
 gf_w16_clm_multiply_region_from_single_4(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
@@ -266,8 +265,6 @@ gf_w16_clm_multiply_region_from_single_4(gf_t *gf, void *src, void *dest, gf_val
   uint16_t *s16;
   uint16_t *d16;
 
-#if defined(INTEL_SSE4_PCLMUL)
-
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
@@ -328,8 +325,8 @@ gf_w16_clm_multiply_region_from_single_4(gf_t *gf, void *src, void *dest, gf_val
     } 
   }
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
 static
 inline
@@ -605,13 +602,13 @@ int gf_w16_shift_init(gf_t *gf)
 static 
 int gf_w16_cfm_init(gf_t *gf)
 {
+#if defined(INTEL_SSE4_PCLMUL)
   gf_internal_t *h;
 
   h = (gf_internal_t *) gf->scratch;
   
   /*Ben: Determining how many reductions to do */
   
-#if defined(INTEL_SSE4_PCLMUL)
   if ((0xfe00 & h->prim_poly) == 0) {
     gf->multiply.w32 = gf_w16_clm_multiply_2;
     gf->multiply_region.w32 = gf_w16_clm_multiply_region_from_single_2;
@@ -1548,11 +1545,11 @@ gf_w16_bytwo_p_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_
       prod = _mm_xor_si128(prod, t1); \
       v = _mm_srli_epi64(v, 1); }
 
+#ifdef INTEL_SSE2
 static
 void 
 gf_w16_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *s8, *d8;
   uint32_t vrev;
@@ -1609,14 +1606,14 @@ gf_w16_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t 
     s8 += 16;
   }
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static
 void
 gf_w16_bytwo_b_sse_region_2_noxor(gf_region_data *rd, struct gf_w16_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1635,14 +1632,14 @@ gf_w16_bytwo_b_sse_region_2_noxor(gf_region_data *rd, struct gf_w16_bytwo_data *
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static
 void
 gf_w16_bytwo_b_sse_region_2_xor(gf_region_data *rd, struct gf_w16_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1663,15 +1660,15 @@ gf_w16_bytwo_b_sse_region_2_xor(gf_region_data *rd, struct gf_w16_bytwo_data *bt
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
 
+#ifdef INTEL_SSE2
 static
 void 
 gf_w16_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSE2
   int itb;
   uint8_t *d8, *s8;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1719,8 +1716,8 @@ gf_w16_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t 
   }
 
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
 static
 void 

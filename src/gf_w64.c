@@ -87,6 +87,7 @@ xor)
   }
 }
 
+#if defined(INTEL_SSE4_PCLMUL) 
 static
 void
 gf_w64_clm_multiply_region_from_single_2(gf_t *gf, void *src, void *dest, gf_val_64_t val, int bytes, int
@@ -96,7 +97,6 @@ xor)
   gf_val_64_t *s64, *d64, *top;
   gf_region_data rd;
 
-#if defined(INTEL_SSE4_PCLMUL) 
   __m128i         a, b;
   __m128i         result, r1;
   __m128i         prim_poly;
@@ -175,9 +175,10 @@ xor)
     }
   }
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
+#if defined(INTEL_SSE4_PCLMUL)
 static
 void
 gf_w64_clm_multiply_region_from_single_4(gf_t *gf, void *src, void *dest, gf_val_64_t val, int bytes, int
@@ -187,7 +188,6 @@ xor)
   gf_val_64_t *s64, *d64, *top;
   gf_region_data rd;
 
-#if defined(INTEL_SSE4_PCLMUL)
   __m128i         a, b;
   __m128i         result, r1;
   __m128i         prim_poly;
@@ -263,8 +263,8 @@ xor)
     }
   }
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
 static
   inline
@@ -1369,11 +1369,11 @@ void gf_w64_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_
 #endif
 }
 
+#ifdef INTEL_SSE2
 static
 void
 gf_w64_bytwo_b_sse_region_2_xor(gf_region_data *rd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint64_t one64, amask;
   uint8_t *d8, *s8, tb;
@@ -1400,14 +1400,14 @@ gf_w64_bytwo_b_sse_region_2_xor(gf_region_data *rd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static
 void
 gf_w64_bytwo_b_sse_region_2_noxor(gf_region_data *rd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint64_t one64, amask;
   uint8_t *d8, *s8, tb;
@@ -1432,14 +1432,14 @@ gf_w64_bytwo_b_sse_region_2_noxor(gf_region_data *rd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static
 void
 gf_w64_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_64_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSE2
   uint64_t itb, amask, one64;
   uint8_t *d8, *s8;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1490,8 +1490,8 @@ gf_w64_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_64_t 
   }
 
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
 
 static
@@ -1712,11 +1712,11 @@ int gf_w64_composite_init(gf_t *gf)
   return 1;
 }
 
+#ifdef INTEL_SSSE3
 static
   void
 gf_w64_split_4_64_lazy_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSSE3
   gf_internal_t *h;
   int i, m, j, k, tindex;
   uint64_t pp, v, s, *s64, *d64, *top;
@@ -1793,14 +1793,14 @@ gf_w64_split_4_64_lazy_sse_altmap_multiply_region(gf_t *gf, void *src, void *des
     }
   }
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE4
 static
   void
 gf_w64_split_4_64_lazy_sse_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSE4
   gf_internal_t *h;
   int i, m, j, k, tindex;
   uint64_t pp, v, s, *s64, *d64, *top;
@@ -1997,8 +1997,8 @@ gf_w64_split_4_64_lazy_sse_multiply_region(gf_t *gf, void *src, void *dest, uint
   }
 
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
 #define GF_MULTBY_TWO(p) (((p) & GF_FIRST_BIT) ? (((p) << 1) ^ h->prim_poly) : (p) << 1);
 

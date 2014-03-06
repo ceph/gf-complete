@@ -414,11 +414,11 @@ gf_w4_single_table_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t 
 
 #define MM_PRINT(s, r) { uint8_t blah[16]; printf("%-12s", s); _mm_storeu_si128((__m128i *)blah, r); for (i = 0; i < 16; i++) printf(" %02x", blah[i]); printf("\n"); }
 
+#ifdef INTEL_SSSE3
 static
 void 
 gf_w4_single_table_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSSE3
   gf_region_data rd;
   uint8_t *base, *sptr, *dptr, *top;
   __m128i  tl, loset, h4, r, va, th;
@@ -460,8 +460,8 @@ gf_w4_single_table_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_3
   }
   gf_do_final_region_alignment(&rd);
 
-#endif
 }
+#endif
 
 static 
 int gf_w4_single_table_init(gf_t *gf)
@@ -916,11 +916,11 @@ gf_w4_bytwo_p_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t
       prod = _mm_xor_si128(prod, t1); \
       v = _mm_srli_epi64(v, 1); }
 
+#ifdef INTEL_SSE2
 static
 void
 gf_w4_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *s8, *d8;
   uint8_t vrev;
@@ -965,8 +965,8 @@ gf_w4_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t v
     s8 += 16;
   }
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
 /*
 static
@@ -1034,11 +1034,11 @@ gf_w4_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t v
 }
 */
 
+#ifdef INTEL_SSE2
 static 
 void
 gf_w4_bytwo_b_sse_region_2_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1057,14 +1057,14 @@ gf_w4_bytwo_b_sse_region_2_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static 
 void
 gf_w4_bytwo_b_sse_region_2_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1085,14 +1085,14 @@ gf_w4_bytwo_b_sse_region_2_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static 
 void
 gf_w4_bytwo_b_sse_region_4_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1112,14 +1112,14 @@ gf_w4_bytwo_b_sse_region_4_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static 
 void
 gf_w4_bytwo_b_sse_region_4_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1141,15 +1141,15 @@ gf_w4_bytwo_b_sse_region_4_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
 
+#ifdef INTEL_SSE2
 static 
 void
 gf_w4_bytwo_b_sse_region_3_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1170,14 +1170,14 @@ gf_w4_bytwo_b_sse_region_3_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static 
 void
 gf_w4_bytwo_b_sse_region_3_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1198,14 +1198,14 @@ gf_w4_bytwo_b_sse_region_3_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static 
 void
 gf_w4_bytwo_b_sse_region_5_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1227,14 +1227,14 @@ gf_w4_bytwo_b_sse_region_5_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static 
 void
 gf_w4_bytwo_b_sse_region_5_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1256,14 +1256,14 @@ gf_w4_bytwo_b_sse_region_5_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static 
 void
 gf_w4_bytwo_b_sse_region_7_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1286,14 +1286,14 @@ gf_w4_bytwo_b_sse_region_7_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static 
 void
 gf_w4_bytwo_b_sse_region_7_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1316,14 +1316,14 @@ gf_w4_bytwo_b_sse_region_7_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static 
 void
 gf_w4_bytwo_b_sse_region_6_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1345,14 +1345,14 @@ gf_w4_bytwo_b_sse_region_6_noxor(gf_region_data *rd, struct gf_bytwo_data *btd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static 
 void
 gf_w4_bytwo_b_sse_region_6_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
@@ -1374,14 +1374,14 @@ gf_w4_bytwo_b_sse_region_6_xor(gf_region_data *rd, struct gf_bytwo_data *btd)
     d8 += 16;
     s8 += 16;
   }
-#endif
 }
+#endif
 
+#ifdef INTEL_SSE2
 static
 void 
 gf_w4_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSE2
   uint8_t *d8, *s8, tb;
   __m128i pp, m1, m2, t1, t2, va, vb;
   struct gf_bytwo_data *btd;
@@ -1489,8 +1489,8 @@ gf_w4_bytwo_b_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t v
     }
   }
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
 static
 void 
