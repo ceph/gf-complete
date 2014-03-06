@@ -1166,6 +1166,8 @@ gf_w128_euclid(GFP gf, gf_val_128_t a128, gf_val_128_t b128)
   /* This needs to return some sort of error (in b128?) */
   if (a128[0] == 0 && a128[1] == 0) return;
 
+  b = (uint64_t *) b128;
+
   e_im1[0] = 0;
   e_im1[1] = ((gf_internal_t *) (gf->scratch))->prim_poly;
   e_i[0] = a128[0];
@@ -1239,7 +1241,6 @@ gf_w128_euclid(GFP gf, gf_val_128_t a128, gf_val_128_t b128)
     d_i = d_ip1;
   }
 
-  b = (uint64_t *) b128;
   b[0] = y_i[0];
   b[1] = y_i[1];
   return;
