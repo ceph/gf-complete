@@ -21,6 +21,7 @@ is in http://www.cs.utk.edu/~plank/plank/papers/CS-13-716.html.
 
 To compile, do:
 
+   ./autogen.sh
    ./configure
    make
    sudo make install
