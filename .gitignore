@@ -39,3 +39,10 @@ include/stamp-h1
 /config.log
 /config.status
 /libtool
+INSTALL
+config.guess
+config.sub
+include/config.h.in
+ltmain.sh
+m4/libtool.m4
+m4/ltversion.m4
