@@ -1584,6 +1584,7 @@ gf_w4_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t
         s64++;
       }
     }
+    break;
   case 6:
     if (xor) {
       while (d64 < (uint64_t *) rd.d_top) {
@@ -1606,6 +1607,7 @@ gf_w4_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t
         s64++;
       }
     }
+    break;
   case 7:
     if (xor) {
       while (d64 < (uint64_t *) rd.d_top) {
