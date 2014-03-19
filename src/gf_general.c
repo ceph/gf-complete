@@ -240,7 +240,7 @@ int gf_general_are_equal(gf_general_t *v1, gf_general_t *v2, int w)
     return (v1->w64 == v2->w64);
   } else {
     return (v1->w128[0] == v2->w128[0] &&
-            v1->w128[0] == v2->w128[0]);
+            v1->w128[1] == v2->w128[1]);
   }
 }
 
