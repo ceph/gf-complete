@@ -154,8 +154,8 @@ typedef enum {GF_E_MDEFDIV, /* Dev != Default && Mult == Default */
               GF_E_SP128AR, /* Mult == SPLIT, w=128, Bad arg1/arg2 */
               GF_E_SP128AL, /* Mult == SPLIT, w=128, SSE requires ALTMAP */
               GF_E_SP128AS, /* Mult == SPLIT, w=128, ALTMAP requires SSE */
-              GF_E_SP128_A, /* Mult == SPLIT, w=128, SSE only with 4/128 */
-              GF_E_SP128_S, /* Mult == SPLIT, w=128, ALTMAP only with 4/128 */
+              GF_E_SP128_A, /* Mult == SPLIT, w=128, ALTMAP only with 4/128 */
+              GF_E_SP128_S, /* Mult == SPLIT, w=128, SSE only with 4/128 */
               GF_E_SPLIT_W, /* Mult == SPLIT, Bad w (8, 16, 32, 64, 128)  */
               GF_E_SP_16AR, /* Mult == SPLIT, w=16, Bad arg1/arg2 */
               GF_E_SP_16_A, /* Mult == SPLIT, w=16, ALTMAP only with 4/16 */

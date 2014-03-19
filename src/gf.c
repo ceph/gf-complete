@@ -85,8 +85,8 @@ void gf_error()
     case GF_E_SP128AR: s = "With -m SPLIT, w=128, bad arg1/arg2."; break;
     case GF_E_SP128AL: s = "With -m SPLIT, w=128, -r SSE requires -r ALTMAP."; break;
     case GF_E_SP128AS: s = "With -m SPLIT, w=128, ALTMAP needs SSSE3 supported."; break;
-    case GF_E_SP128_A: s = "With -m SPLIT, w=128, -r SSE|NOSSE only with arg1/arg2 = 4/128."; break;
-    case GF_E_SP128_S: s = "With -m SPLIT, w=128, -r ALTMAP only with arg1/arg2 = 4/128."; break;
+    case GF_E_SP128_A: s = "With -m SPLIT, w=128, -r ALTMAP only with arg1/arg2 = 4/128."; break;
+    case GF_E_SP128_S: s = "With -m SPLIT, w=128, -r SSE|NOSSE only with arg1/arg2 = 4/128."; break;
     case GF_E_SPLIT_W: s = "With -m SPLIT, w must be in {8, 16, 32, 64, 128}."; break;
     case GF_E_SP_16AR: s = "With -m SPLIT, w=16, Bad arg1/arg2."; break;
     case GF_E_SP_16_A: s = "With -m SPLIT, w=16, -r ALTMAP only with arg1/arg2 = 4/16."; break;
