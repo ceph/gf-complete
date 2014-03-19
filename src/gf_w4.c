@@ -793,7 +793,6 @@ int gf_w4_table_init(gf_t *gf)
     } else {
       return gf_w4_quad_table_init(gf);
     }
-    return gf_w4_double_table_init(gf);
   } else {
     return gf_w4_single_table_init(gf);
   }
