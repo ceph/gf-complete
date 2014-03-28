@@ -284,9 +284,8 @@ inline
 gf_val_32_t
 gf_wgen_group_s_equals_r_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
-  int i;
   int leftover, rs;
-  uint32_t p, l, ind, r, a32;
+  uint32_t p, l, ind, a32;
   int bits_left;
   int g_s;
   int w;
@@ -362,7 +361,7 @@ gf_wgen_group_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 {
   int i;
   int leftover;
-  uint64_t p, l, r, mask;
+  uint64_t p, l, r;
   uint32_t a32, ind;
   int g_s, g_r;
   struct gf_wgen_group_data *gd;
@@ -496,7 +495,7 @@ int gf_wgen_table_8_init(gf_t *gf)
   gf_internal_t *h;
   int w;
   struct gf_wgen_table_w8_data *std;
-  uint32_t a, b, p, pp;
+  uint32_t a, b, p;
   
   h = (gf_internal_t *) gf->scratch;
   w = h->w;
@@ -557,7 +556,7 @@ int gf_wgen_table_16_init(gf_t *gf)
   gf_internal_t *h;
   int w;
   struct gf_wgen_table_w16_data *std;
-  uint32_t a, b, p, pp;
+  uint32_t a, b, p;
   
   h = (gf_internal_t *) gf->scratch;
   w = h->w;
@@ -917,11 +916,11 @@ gf_wgen_cauchy_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int byte
   for (i = 0; i < h->w; i++) {
     for (j = 0; j < h->w; j++) {
       if (val & (1 << j)) {
-        gf_multby_one(src, dest + j*rs, rs, (written & (1 << j)));
+        gf_multby_one(src, ((char*)dest) + j*rs, rs, (written & (1 << j)));
         written |= (1 << j);
       }
     }
-    src += rs;
+    src = (char*)src + rs;
     val = gf->multiply.w32(gf, val, 2);
   }
 }

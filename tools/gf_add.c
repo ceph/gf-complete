@@ -62,7 +62,7 @@ void print_128(uint64_t *v)
 
 int main(int argc, char **argv)
 {
-  int hex, al, bl, w;
+  int hex, w;
   uint32_t a, b, c, top;
   uint64_t a64, b64, c64;
   uint64_t a128[2], b128[2], c128[2];

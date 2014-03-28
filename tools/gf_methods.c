@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
   int listing;
   char *gf_argv[50], *x;
   gf_t gf;
-  char divs[200], ks[10], ls[10];
+  char ls[10];
   char * w_str;
 
   if (argc != 4) usage(NULL);

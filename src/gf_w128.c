@@ -81,6 +81,7 @@ int xor)
     }
 }
 
+#if defined(INTEL_SSE4_PCLMUL)
 static
 void
 gf_w128_clm_multiply_region_from_single(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes,
@@ -89,9 +90,7 @@ int xor)
     int i;
     gf_val_128_t s128;
     gf_val_128_t d128;
-    uint64_t c128[2];
     gf_region_data rd;
-#if defined(INTEL_SSE4_PCLMUL)
     __m128i     a,b;
     __m128i     result0,result1;
     __m128i     prim_poly;
@@ -105,8 +104,6 @@ int xor)
       if (val[1] == 0) { gf_multby_zero(dest, bytes, xor); return; }
       if (val[1] == 1) { gf_multby_one(src, dest, bytes, xor); return; }
     }
-
-    set_zero(c128, 0);
 
     s128 = (gf_val_128_t) src;
     d128 = (gf_val_128_t) dest;
@@ -184,8 +181,8 @@ int xor)
         d128[i+1] = (uint64_t)_mm_extract_epi64(result1,0);
       }
     }
-#endif
 }
+#endif
 
 /*
  * Some w128 notes:
@@ -384,7 +381,7 @@ gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
 {
 #if defined(INTEL_SSE4)
   int i;
-  __m128i a, b, pp, one, prod, amask, l_middle_one, u_middle_one; 
+  __m128i a, b, pp, prod, amask, u_middle_one; 
   /*John: pmask is always the highest bit set, and the rest zeros. amask changes, it's a countdown.*/
   uint32_t topbit, middlebit, pmask; /* this is used as a boolean value */
   gf_internal_t *h;
@@ -400,7 +397,6 @@ gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
   pmask = 0x80000000;
   amask = _mm_insert_epi32(prod, 0x80000000, 0x3);
   u_middle_one = _mm_insert_epi32(prod, 1, 0x2);
-  l_middle_one = _mm_insert_epi32(prod, 1 << 31, 0x1);
   
   for (i = 0; i < 64; i++) {
     topbit = (_mm_extract_epi32(prod, 0x3) & pmask);
@@ -599,13 +595,13 @@ gf_w128_split_4_128_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_
   }
 }
 
+#ifdef INTEL_SSSE3
 static
 void
 gf_w128_split_4_128_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSSE3
   gf_internal_t *h;
-  int i, m, j, k, tindex;
+  int i, j, k;
   uint64_t pp, v[2], s, *s64, *d64, *top;
   __m128i p, tables[32][16];
   struct gf_w128_split_4_128_data *ld;
@@ -624,7 +620,7 @@ gf_w128_split_4_128_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_
 
   /* Doing this instead of gf_do_initial_region_alignment() because that doesn't hold 128-bit vals */
 
-  gf_w128_multiply_region_from_single(gf, src, dest, val, (rd.s_start-src), xor);
+  gf_w128_multiply_region_from_single(gf, src, dest, val, ((char*)rd.s_start-(char*)src), xor);
 
   s64 = (uint64_t *) rd.s_start;
   d64 = (uint64_t *) rd.d_start;
@@ -694,18 +690,18 @@ gf_w128_split_4_128_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_
 
   /* Doing this instead of gf_do_final_region_alignment() because that doesn't hold 128-bit vals */
 
-  gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, (src+bytes)-rd.s_top, xor);
-#endif
+  gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, ((char*)src+bytes)-(char*)rd.s_top, xor);
 }
+#endif
 
+#ifdef INTEL_SSSE3
 static
 void
 gf_w128_split_4_128_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSSE3
   gf_internal_t *h;
-  int i, m, j, k, tindex;
-  uint64_t pp, v[2], s, *s64, *d64, *top;
+  int i, j, k;
+  uint64_t pp, v[2], *s64, *d64, *top;
   __m128i si, tables[32][16], p[16], v0, mask1;
   struct gf_w128_split_4_128_data *ld;
   uint8_t btable[16];
@@ -724,7 +720,7 @@ gf_w128_split_4_128_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, 
 
   /* Doing this instead of gf_do_initial_region_alignment() because that doesn't hold 128-bit vals */
 
-  gf_w128_multiply_region_from_single(gf, src, dest, val, (rd.s_start-src), xor);
+  gf_w128_multiply_region_from_single(gf, src, dest, val, ((char*)rd.s_start-(char*)src), xor);
 
   s64 = (uint64_t *) rd.s_start;
   d64 = (uint64_t *) rd.d_start;
@@ -804,9 +800,9 @@ gf_w128_split_4_128_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, 
   }
   /* Doing this instead of gf_do_final_region_alignment() because that doesn't hold 128-bit vals */
 
-  gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, (src+bytes)-rd.s_top, xor);
-#endif
+  gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, ((char*)src+bytes)-(char*)rd.s_top, xor);
 }
+#endif
 
 static
 void
@@ -886,7 +882,7 @@ gf_w128_split_8_128_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_
 void
 gf_w128_bytwo_b_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
 {
-  uint64_t bmask, pp, vmask;
+  uint64_t bmask, pp;
   gf_internal_t *h;
   uint64_t a[2], c[2], b[2], *s64, *d64, *top;
   gf_region_data rd;
@@ -987,7 +983,7 @@ void gf_w128_group_m_init(gf_t *gf, gf_val_128_t b128)
 void
 gf_w128_group_multiply(GFP gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_t c128)
 {
-  int i,j;
+  int i;
   /* index_r, index_m, total_m (if g_r > g_m) */
   int i_r, i_m, t_m;
   int mask_m, mask_r;
@@ -1162,10 +1158,11 @@ gf_w128_euclid(GFP gf, gf_val_128_t a128, gf_val_128_t b128)
   uint64_t c_i[2];
   uint64_t *b;
   uint64_t one = 1;
-  uint64_t buf, buf1;
 
   /* This needs to return some sort of error (in b128?) */
   if (a128[0] == 0 && a128[1] == 0) return;
+
+  b = (uint64_t *) b128;
 
   e_im1[0] = 0;
   e_im1[1] = ((gf_internal_t *) (gf->scratch))->prim_poly;
@@ -1240,7 +1237,6 @@ gf_w128_euclid(GFP gf, gf_val_128_t a128, gf_val_128_t b128)
     d_i = d_ip1;
   }
 
-  b = (uint64_t *) b128;
   b[0] = y_i[0];
   b[1] = y_i[1];
   return;
@@ -1326,7 +1322,6 @@ static
   void
 gf_w128_composite_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
 {
-  unsigned long uls, uld;
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
   gf_t *base_gf = h->base_gf;
   uint64_t b0 = val[1];
@@ -1381,14 +1376,13 @@ gf_w128_composite_multiply_region_alt(gf_t *gf, void *src, void *dest, gf_val_12
   gf_internal_t *h = (gf_internal_t *) gf->scratch;  gf_t *base_gf = h->base_gf;
   gf_val_64_t val0 = val[1];
   gf_val_64_t val1 = val[0];
-  uint64_t *l, *hi;
   uint8_t *slow, *shigh;
   uint8_t *dlow, *dhigh, *top;
   int sub_reg_size;
   gf_region_data rd;
 
   gf_set_region_data(&rd, gf, src, dest, bytes, 0, xor, 64);
-  gf_w128_multiply_region_from_single(gf, src, dest, val, (rd.s_start-src), xor);
+  gf_w128_multiply_region_from_single(gf, src, dest, val, ((char*)rd.s_start-(char*)src), xor);
 
   slow = (uint8_t *) rd.s_start;
   dlow = (uint8_t *) rd.d_start;
@@ -1404,7 +1398,7 @@ gf_w128_composite_multiply_region_alt(gf_t *gf, void *src, void *dest, gf_val_12
   base_gf->multiply_region.w64(base_gf, shigh, dhigh, base_gf->multiply.w64(base_gf, h->prim_poly, val1
         ), sub_reg_size, 1);
 
-  gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, (src+bytes)-rd.s_top, xor);
+  gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, ((char*)src+bytes)-(char*)rd.s_top, xor);
 }
 
 
@@ -1418,8 +1412,6 @@ int gf_w128_composite_init(gf_t *gf)
   } else {
     gf->multiply_region.w128 = gf_w128_composite_multiply_region;
   }
-
-  gf_internal_t *base_h = (gf_internal_t *) h->base_gf->scratch;
 
   gf->multiply.w128 = gf_w128_composite_multiply;
   gf->divide.w128 = gf_w128_divide_from_inverse;
@@ -1444,8 +1436,6 @@ int gf_w128_cfm_init(gf_t *gf)
 static
 int gf_w128_shift_init(gf_t *gf)
 {
-  gf_internal_t *h;
-  h = (gf_internal_t*) gf->scratch;
   gf->multiply.w128 = gf_w128_shift_multiply;
   gf->inverse.w128 = gf_w128_euclid;
   gf->multiply_region.w128 = gf_w128_multiply_region_from_single;
@@ -1501,10 +1491,10 @@ void gf_w128_group_r_init(gf_t *gf)
   return;
 }
 
+#if 0 // defined(INTEL_SSE4)
   static
 void gf_w128_group_r_sse_init(gf_t *gf)
 {
-#if defined(INTEL_SSE4)
   int i, j;
   int g_r;
   uint64_t pp;
@@ -1526,8 +1516,8 @@ void gf_w128_group_r_sse_init(gf_t *gf)
     }
   }
   return;
-#endif
 }
+#endif
 
   static 
 int gf_w128_split_init(gf_t *gf)
@@ -1587,12 +1577,10 @@ int gf_w128_group_init(gf_t *gf)
 {
   gf_internal_t *scratch;
   gf_group_tables_t *gt;
-  int g_m, g_r, size_r;
-  long tmp;
+  int g_r, size_r;
 
   scratch = (gf_internal_t *) gf->scratch;
   gt = scratch->private;
-  g_m = scratch->arg1;
   g_r = scratch->arg2;
   size_r = (1 << g_r);
 
@@ -1690,7 +1678,6 @@ void gf_w128_composite_extract_word(gf_t *gf, void *start, int bytes, int index,
 int gf_w128_scratch_size(int mult_type, int region_type, int divide_type, int arg1, int arg2)
 {
   int size_m, size_r;
-  int w = 128;
   if (divide_type==GF_DIVIDE_MATRIX) return 0;
 
   switch(mult_type)
@@ -1739,7 +1726,7 @@ int gf_w128_scratch_size(int mult_type, int region_type, int divide_type, int ar
 
 int gf_w128_init(gf_t *gf)
 {
-  gf_internal_t *h, *h_base, *h_base_base, *h_base_base_base;
+  gf_internal_t *h;
   int no_default_flag = 0;
 
   h = (gf_internal_t *) gf->scratch;
