@@ -24,3 +24,7 @@ To compile, do:
    ./configure
    make
    sudo make install
+
+To run the tests, do:
+
+   make check
