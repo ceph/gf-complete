@@ -1584,7 +1584,7 @@ int gf_w128_group_init(gf_t *gf)
   g_r = scratch->arg2;
   size_r = (1 << g_r);
 
-  gt->r_table = scratch->private + (2 * sizeof(uint64_t *));
+  gt->r_table = (gf_val_128_t)((char*)scratch->private + (2 * sizeof(uint64_t *)));
   gt->m_table = gt->r_table + size_r;
   gt->m_table[2] = 0;
   gt->m_table[3] = 0;
