@@ -595,7 +595,7 @@ gf_w128_split_4_128_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_
   }
 }
 
-#ifdef INTEL_SSSE3
+#if defined(INTEL_SSSE3) && defined(INTEL_SSE4)
 static
 void
 gf_w128_split_4_128_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
@@ -694,7 +694,7 @@ gf_w128_split_4_128_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_
 }
 #endif
 
-#ifdef INTEL_SSSE3
+#if defined(INTEL_SSSE3) && defined(INTEL_SSE4)
 static
 void
 gf_w128_split_4_128_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes, int xor)
