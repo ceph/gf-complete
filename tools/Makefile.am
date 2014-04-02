@@ -3,6 +3,8 @@
 INCLUDES=-I./ -I../include
 AM_CFLAGS = -O3 $(SIMD_FLAGS) -fPIC $(INCLUDES)
 
+TESTS=run-tests.sh
+
 bin_PROGRAMS = gf_mult gf_div gf_add gf_time gf_methods gf_poly gf_inline_time
 
 gf_mult_SOURCES = gf_mult.c
