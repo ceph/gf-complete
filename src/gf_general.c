@@ -267,7 +267,6 @@ void gf_general_do_region_check(gf_t *gf, gf_general_t *a, void *orig_a, void *o
   int w, words, i;
   gf_general_t oa, ot, ft, sb;
   char sa[50], soa[50], sot[50], sft[50], ssb[50];
-  uint8_t *p;
 
   h = (gf_internal_t *) gf->scratch;
   w = h->w;
@@ -327,7 +326,7 @@ void gf_general_set_up_single_timing_test(int w, void *ra, void *rb, int size)
   uint64_t *r64;
   int i;
 
-  top = rb+size;
+  top = (char*)rb+size;
 
   /* If w is 8, 16, 32, 64 or 128, fill the regions with random bytes.
      However, don't allow for zeros in rb, because that will screw up
@@ -366,7 +365,7 @@ void gf_general_set_up_single_timing_test(int w, void *ra, void *rb, int size)
           r64[1] = g.w128[1];
           break;
       }
-      rb += (w/8);
+      rb = (char*)rb + (w/8);
     }
   } else if (w == 4) {
     r8a = (uint8_t *) ra;
@@ -408,7 +407,7 @@ int gf_general_do_single_timing_test(gf_t *gf, void *ra, void *rb, int size, cha
 
   h = (gf_internal_t *) gf->scratch;
   w = h->w;
-  top = ra + size;
+  top = (char*)ra + size;
 
   if (w == 8 || w == 4) {
     r8a = (uint8_t *) ra; 

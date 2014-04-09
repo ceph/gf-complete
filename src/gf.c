@@ -179,13 +179,11 @@ uint64_t gf_composite_get_default_poly(gf_t *base)
 int gf_error_check(int w, int mult_type, int region_type, int divide_type,
                    int arg1, int arg2, uint64_t poly, gf_t *base)
 {
-  int sse4 = 0;
   int sse3 = 0;
   int sse2 = 0;
   int pclmul = 0;
   int rdouble, rquad, rlazy, rsse, rnosse, raltmap, rcauchy, tmp;
-  uint64_t pp;
-  gf_internal_t *sub, *subsub, *subsubsub;
+  gf_internal_t *sub;
 
   rdouble = (region_type & GF_REGION_DOUBLE_TABLE);
   rquad   = (region_type & GF_REGION_QUAD_TABLE);
@@ -212,10 +210,6 @@ int gf_error_check(int w, int mult_type, int region_type, int divide_type,
 
 #ifdef INTEL_SSSE3
   sse3 = 1;
-#endif
-
-#ifdef INTEL_SSE4
-  sse4 = 1;
 #endif
 
 #ifdef INTEL_SSE4_PCLMUL
@@ -488,7 +482,7 @@ int gf_init_hard(gf_t *gf, int w, int mult_type,
   h->arg2 = arg2;
   h->base_gf = base_gf;
   h->private = (void *) gf->scratch;
-  h->private += (sizeof(gf_internal_t));
+  h->private = (char*)h->private + (sizeof(gf_internal_t));
   gf->extract_word.w32 = NULL;
 
   switch(w) {
@@ -525,7 +519,7 @@ void gf_alignment_error(char *s, int a)
 
 static 
 void gf_invert_binary_matrix(uint32_t *mat, uint32_t *inv, int rows) {
-  int cols, i, j, k;
+  int cols, i, j;
   uint32_t tmp;
 
   cols = rows;
@@ -594,7 +588,7 @@ uint32_t gf_bitmatrix_inverse(uint32_t y, int w, uint32_t pp)
 void gf_two_byte_region_table_multiply(gf_region_data *rd, uint16_t *base)
 {
   uint64_t a, prod;
-  int j, xor;
+  int xor;
   uint64_t *s64, *d64, *top;
 
   s64 = rd->s_start;
@@ -693,8 +687,8 @@ static void gf_slow_multiply_region(gf_region_data *rd, void *src, void *dest, v
       fprintf(stderr, "Error: gf_slow_multiply_region: w=%d not implemented.\n", h->w);
       exit(1);
     }
-    src += wb;
-    dest += wb;
+    src = (char*)src + wb;
+    dest = (char*)dest + wb;
   }
 }
 
@@ -773,8 +767,7 @@ void gf_set_region_data(gf_region_data *rd,
   int xor,
   int align)
 {
-  uint8_t *s8, *d8;
-  gf_internal_t *h;
+  gf_internal_t *h = NULL;
   int wb;
   uint32_t a;
   unsigned long uls, uld;
@@ -802,7 +795,7 @@ void gf_set_region_data(gf_region_data *rd,
 
   if (align == -1) { /* JSP: This is cauchy.  Error check bytes, then set up the pointers
                         so that there are no alignment regions. */
-    if (bytes % h->w != 0) {
+    if (h != NULL && bytes % h->w != 0) {
       fprintf(stderr, "Error in region multiply operation.\n");
       fprintf(stderr, "The size must be a multiple of %d bytes.\n", h->w);
       exit(1);
@@ -810,8 +803,8 @@ void gf_set_region_data(gf_region_data *rd,
   
     rd->s_start = src;
     rd->d_start = dest;
-    rd->s_top = src + bytes;
-    rd->d_top = src + bytes;
+    rd->s_top = (char*)src + bytes;
+    rd->d_top = (char*)src + bytes;
     return;
   }
 
@@ -840,12 +833,12 @@ void gf_set_region_data(gf_region_data *rd,
 
   uls %= a;
   if (uls != 0) uls = (a-uls);
-  rd->s_start = rd->src + uls;
-  rd->d_start = rd->dest + uls;
+  rd->s_start = (char*)rd->src + uls;
+  rd->d_start = (char*)rd->dest + uls;
   bytes -= uls;
   bytes -= (bytes % align);
-  rd->s_top = rd->s_start + bytes;
-  rd->d_top = rd->d_start + bytes;
+  rd->s_top = (char*)rd->s_start + bytes;
+  rd->d_top = (char*)rd->d_start + bytes;
 
 }
 
@@ -856,7 +849,7 @@ void gf_do_initial_region_alignment(gf_region_data *rd)
 
 void gf_do_final_region_alignment(gf_region_data *rd)
 {
-  gf_slow_multiply_region(rd, rd->s_top, rd->d_top, rd->src+rd->bytes);
+  gf_slow_multiply_region(rd, rd->s_top, rd->d_top, (char*)rd->src+rd->bytes);
 }
 
 void gf_multby_zero(void *dest, int bytes, int xor) 
@@ -897,9 +890,8 @@ void gf_multby_one(void *src, void *dest, int bytes, int xor)
   __m128i ms, md;
 #endif
   unsigned long uls, uld;
-  uint8_t *s8, *d8, *dtop8;
+  uint8_t *s8, *d8;
   uint64_t *s64, *d64, *dtop64;
-  int abytes;
   gf_region_data rd;
 
   if (!xor) {
@@ -910,6 +902,7 @@ void gf_multby_one(void *src, void *dest, int bytes, int xor)
   uld = (unsigned long) dest;
 
 #ifdef   INTEL_SSE2
+  int abytes;
   s8 = (uint8_t *) src;
   d8 = (uint8_t *) dest;
   if (uls % 16 == uld % 16) {
@@ -1025,7 +1018,7 @@ static void gf_unaligned_xor(void *src, void *dest, int bytes)
   }
   
   d8 = (uint8_t *) d64;
-  while (d8 < (uint8_t *) (dest+bytes)) {
+  while (d8 < (uint8_t *) ((char*)dest+bytes)) {
     *d8 ^= *s8;
     d8++;
     s8++;

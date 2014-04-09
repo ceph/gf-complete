@@ -28,8 +28,8 @@ int main(int argc, char **argv)
 {
   uint32_t a, b, c;
   uint8_t *r1, *r2;
-  uint16_t *r16;
-  uint32_t *r32;
+  uint16_t *r16 = NULL;
+  uint32_t *r32 = NULL;
   int w, i;
   gf_t gf;
 

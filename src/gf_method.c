@@ -21,10 +21,9 @@
 int create_gf_from_argv(gf_t *gf, int w, int argc, char **argv, int starting)
 {
   int mult_type, divide_type, region_type;
-  int arg1, arg2, subrg_size;
+  int arg1, arg2;
   uint64_t prim_poly;
   gf_t *base;
-  char *crt, *x, *y;
 
   mult_type = GF_MULT_DEFAULT;
   region_type = GF_REGION_DEFAULT;
