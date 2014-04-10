@@ -916,11 +916,11 @@ gf_wgen_cauchy_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int byte
   for (i = 0; i < h->w; i++) {
     for (j = 0; j < h->w; j++) {
       if (val & (1 << j)) {
-        gf_multby_one(src, ((char*)dest) + j*rs, rs, (written & (1 << j)));
+        gf_multby_one(src, ((uint8_t *)dest) + j*rs, rs, (written & (1 << j)));
         written |= (1 << j);
       }
     }
-    src = (char*)src + rs;
+    src = (uint8_t *)src + rs;
     val = gf->multiply.w32(gf, val, 2);
   }
 }
