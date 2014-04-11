@@ -1491,6 +1491,34 @@ void gf_w128_group_r_init(gf_t *gf)
   return;
 }
 
+#if 0 // defined(INTEL_SSE4)
+  static
+void gf_w128_group_r_sse_init(gf_t *gf)
+{
+  int i, j;
+  int g_r;
+  uint64_t pp;
+  gf_internal_t *scratch;
+  gf_group_tables_t *gt;
+  scratch = (gf_internal_t *) gf->scratch;
+  gt = scratch->private;
+  __m128i zero = _mm_setzero_si128();
+  __m128i *table = (__m128i *)(gt->r_table);
+  g_r = scratch->arg2;
+  pp = scratch->prim_poly;
+  table[0] = zero;
+  for (i = 1; i < (1 << g_r); i++) {
+    table[i] = zero;
+    for (j = 0; j < g_r; j++) {
+      if (i & (1 << j)) {
+        table[i] = _mm_xor_si128(table[i], _mm_insert_epi64(zero, pp << j, 0));
+      }
+    }
+  }
+  return;
+}
+#endif
+
   static 
 int gf_w128_split_init(gf_t *gf)
 {
