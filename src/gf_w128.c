@@ -620,7 +620,7 @@ gf_w128_split_4_128_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_
 
   /* Doing this instead of gf_do_initial_region_alignment() because that doesn't hold 128-bit vals */
 
-  gf_w128_multiply_region_from_single(gf, src, dest, val, ((char*)rd.s_start-(char*)src), xor);
+  gf_w128_multiply_region_from_single(gf, src, dest, val, ((uint8_t *)rd.s_start-(uint8_t *)src), xor);
 
   s64 = (uint64_t *) rd.s_start;
   d64 = (uint64_t *) rd.d_start;
@@ -690,7 +690,7 @@ gf_w128_split_4_128_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_
 
   /* Doing this instead of gf_do_final_region_alignment() because that doesn't hold 128-bit vals */
 
-  gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, ((char*)src+bytes)-(char*)rd.s_top, xor);
+  gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, ((uint8_t *)src+bytes)-(uint8_t *)rd.s_top, xor);
 }
 #endif
 
@@ -720,7 +720,7 @@ gf_w128_split_4_128_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, 
 
   /* Doing this instead of gf_do_initial_region_alignment() because that doesn't hold 128-bit vals */
 
-  gf_w128_multiply_region_from_single(gf, src, dest, val, ((char*)rd.s_start-(char*)src), xor);
+  gf_w128_multiply_region_from_single(gf, src, dest, val, ((uint8_t *)rd.s_start-(uint8_t *)src), xor);
 
   s64 = (uint64_t *) rd.s_start;
   d64 = (uint64_t *) rd.d_start;
@@ -800,7 +800,7 @@ gf_w128_split_4_128_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, 
   }
   /* Doing this instead of gf_do_final_region_alignment() because that doesn't hold 128-bit vals */
 
-  gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, ((char*)src+bytes)-(char*)rd.s_top, xor);
+  gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, ((uint8_t *)src+bytes)-(uint8_t *)rd.s_top, xor);
 }
 #endif
 
@@ -1382,7 +1382,7 @@ gf_w128_composite_multiply_region_alt(gf_t *gf, void *src, void *dest, gf_val_12
   gf_region_data rd;
 
   gf_set_region_data(&rd, gf, src, dest, bytes, 0, xor, 64);
-  gf_w128_multiply_region_from_single(gf, src, dest, val, ((char*)rd.s_start-(char*)src), xor);
+  gf_w128_multiply_region_from_single(gf, src, dest, val, ((uint8_t *)rd.s_start-(uint8_t *)src), xor);
 
   slow = (uint8_t *) rd.s_start;
   dlow = (uint8_t *) rd.d_start;
@@ -1398,7 +1398,7 @@ gf_w128_composite_multiply_region_alt(gf_t *gf, void *src, void *dest, gf_val_12
   base_gf->multiply_region.w64(base_gf, shigh, dhigh, base_gf->multiply.w64(base_gf, h->prim_poly, val1
         ), sub_reg_size, 1);
 
-  gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, ((char*)src+bytes)-(char*)rd.s_top, xor);
+  gf_w128_multiply_region_from_single(gf, rd.s_top, rd.d_top, val, ((uint8_t *)src+bytes)-(uint8_t *)rd.s_top, xor);
 }
 
 
@@ -1584,7 +1584,7 @@ int gf_w128_group_init(gf_t *gf)
   g_r = scratch->arg2;
   size_r = (1 << g_r);
 
-  gt->r_table = (gf_val_128_t)((char*)scratch->private + (2 * sizeof(uint64_t *)));
+  gt->r_table = (gf_val_128_t)((uint8_t *)scratch->private + (2 * sizeof(uint64_t *)));
   gt->m_table = gt->r_table + size_r;
   gt->m_table[2] = 0;
   gt->m_table[3] = 0;

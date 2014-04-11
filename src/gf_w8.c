@@ -1319,13 +1319,13 @@ gf_w8_composite_multiply_region_alt(gf_t *gf, void *src, void *dest, gf_val_32_t
   gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 32);
   gf_do_initial_region_alignment(&rd);
 
-  sub_reg_size = ((char*)rd.d_top - (char*)rd.d_start) / 2;
+  sub_reg_size = ((uint8_t *)rd.d_top - (uint8_t *)rd.d_start) / 2;
 
   base_gf->multiply_region.w32(base_gf, rd.s_start, rd.d_start, val0, sub_reg_size, xor);
-  base_gf->multiply_region.w32(base_gf, (char*)rd.s_start+sub_reg_size, rd.d_start, val1, sub_reg_size, 1);
-  base_gf->multiply_region.w32(base_gf, rd.s_start, (char*)rd.d_start+sub_reg_size, val1, sub_reg_size, xor);
-  base_gf->multiply_region.w32(base_gf, (char*)rd.s_start+sub_reg_size, (char*)rd.d_start+sub_reg_size, val0, sub_reg_size, 1);
-  base_gf->multiply_region.w32(base_gf, (char*)rd.s_start+sub_reg_size, (char*)rd.d_start+sub_reg_size, base_gf->multiply.w32(base_gf, h->prim_poly, val1), sub_reg_size, 1);
+  base_gf->multiply_region.w32(base_gf, (uint8_t *)rd.s_start+sub_reg_size, rd.d_start, val1, sub_reg_size, 1);
+  base_gf->multiply_region.w32(base_gf, rd.s_start, (uint8_t *)rd.d_start+sub_reg_size, val1, sub_reg_size, xor);
+  base_gf->multiply_region.w32(base_gf, (uint8_t *)rd.s_start+sub_reg_size, (uint8_t *)rd.d_start+sub_reg_size, val0, sub_reg_size, 1);
+  base_gf->multiply_region.w32(base_gf, (uint8_t *)rd.s_start+sub_reg_size, (uint8_t *)rd.d_start+sub_reg_size, base_gf->multiply.w32(base_gf, h->prim_poly, val1), sub_reg_size, 1);
 
    gf_do_final_region_alignment(&rd);
 }
