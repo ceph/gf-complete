@@ -793,7 +793,6 @@ int gf_w4_table_init(gf_t *gf)
     } else {
       return gf_w4_quad_table_init(gf);
     }
-    return gf_w4_double_table_init(gf);
   } else {
     return gf_w4_single_table_init(gf);
   }
@@ -1584,6 +1583,7 @@ gf_w4_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t
         s64++;
       }
     }
+    break;
   case 6:
     if (xor) {
       while (d64 < (uint64_t *) rd.d_top) {
@@ -1606,6 +1606,7 @@ gf_w4_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t
         s64++;
       }
     }
+    break;
   case 7:
     if (xor) {
       while (d64 < (uint64_t *) rd.d_top) {

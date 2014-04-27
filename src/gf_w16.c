@@ -1817,6 +1817,7 @@ gf_w16_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_
         s64++;
       }
     }
+    break;
   default:
     if (xor) {
       while (d64 < (uint64_t *) rd.d_top) {

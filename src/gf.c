@@ -85,8 +85,8 @@ void gf_error()
     case GF_E_SP128AR: s = "With -m SPLIT, w=128, bad arg1/arg2."; break;
     case GF_E_SP128AL: s = "With -m SPLIT, w=128, -r SSE requires -r ALTMAP."; break;
     case GF_E_SP128AS: s = "With -m SPLIT, w=128, ALTMAP needs SSSE3 supported."; break;
-    case GF_E_SP128_A: s = "With -m SPLIT, w=128, -r SSE|NOSSE only with arg1/arg2 = 4/128."; break;
-    case GF_E_SP128_S: s = "With -m SPLIT, w=128, -r ALTMAP only with arg1/arg2 = 4/128."; break;
+    case GF_E_SP128_A: s = "With -m SPLIT, w=128, -r ALTMAP only with arg1/arg2 = 4/128."; break;
+    case GF_E_SP128_S: s = "With -m SPLIT, w=128, -r SSE|NOSSE only with arg1/arg2 = 4/128."; break;
     case GF_E_SPLIT_W: s = "With -m SPLIT, w must be in {8, 16, 32, 64, 128}."; break;
     case GF_E_SP_16AR: s = "With -m SPLIT, w=16, Bad arg1/arg2."; break;
     case GF_E_SP_16_A: s = "With -m SPLIT, w=16, -r ALTMAP only with arg1/arg2 = 4/16."; break;
@@ -338,11 +338,12 @@ int gf_error_check(int w, int mult_type, int region_type, int divide_type,
       if (rsse && !sse3)                        { _gf_errno = GF_E_SP_SSE3; return 0; }
       if (raltmap)                              { _gf_errno = GF_E_SP_8__A; return 0; }
     } else if (w == 16) {
-      if (arg1 == 4 && arg2 == 16) {
-        if (rsse && !sse3)                      { _gf_errno = GF_E_SP_SSE3; return 0; }
-      } else if (arg1 == 8 && (arg2 == 16 || arg2 == 8)) {
+      if ((arg1 == 8 && arg2 == 8) ||
+          (arg1 == 8 && arg2 == 16)) {
         if (rsse || rnosse)                     { _gf_errno = GF_E_SP_16_S; return 0; }
         if (raltmap)                            { _gf_errno = GF_E_SP_16_A; return 0; }
+      } else if (arg1 == 4 && arg2 == 16) {
+        if (rsse && !sse3)                      { _gf_errno = GF_E_SP_SSE3; return 0; }
       } else                                    { _gf_errno = GF_E_SP_16AR; return 0; }
     } else if (w == 32) {
       if ((arg1 == 8 && arg2 == 8) ||
@@ -350,10 +351,8 @@ int gf_error_check(int w, int mult_type, int region_type, int divide_type,
           (arg1 == 16 && arg2 == 32)) {
         if (rsse || rnosse)                     { _gf_errno = GF_E_SP_32_S; return 0; }
         if (raltmap)                            { _gf_errno = GF_E_SP_32_A; return 0; }
-      } else if ((arg1 == 4 && arg2 == 32) ||
-          (arg1 == 4 && arg2 == 32)) {
+      } else if (arg1 == 4 && arg2 == 32) {
         if (rsse && !sse3)                      { _gf_errno = GF_E_SP_SSE3; return 0; }
-        if (raltmap && arg1 != 4)               { _gf_errno = GF_E_SP_32_A; return 0; }
         if (raltmap && !sse3)                   { _gf_errno = GF_E_SP_32AS; return 0; }
         if (raltmap && rnosse)                  { _gf_errno = GF_E_SP_32AS; return 0; }
       } else                                    { _gf_errno = GF_E_SP_32AR; return 0; }
