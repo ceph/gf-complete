@@ -1482,7 +1482,7 @@ gf_w32_split_16_32_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint32_
     p = (xor) ? *d32 : 0;
     a = *s32;
     i = 0;
-    while (a != 0) {
+    while (a != 0 && i < 2) {
       v = (a & 0xffff);
       p ^= t[i][v];
       a >>= 16;
