@@ -321,12 +321,9 @@ gf_w64_shift_multiply (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
   gf_internal_t *h;
 
   h = (gf_internal_t *) gf->scratch;
-  ppr = h->prim_poly;
   
   /* Allen: set leading one of primitive polynomial */
   
-  ppl = 1;
- 
   a = a64;
   bl = 0;
   br = b64;
