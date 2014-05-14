@@ -188,8 +188,6 @@ int main(int argc, char **argv)
       if (tmethods[(int)test] == NULL) {
         printf("No %s method.\n", tstrings[(int)test]);
       } else {
-        elapsed = 0;
-
         if (test == '0') gf_general_set_zero(&a, w);
         if (test == '1') gf_general_set_one(&a, w);
         if (test == '2') gf_general_set_two(&a, w);
