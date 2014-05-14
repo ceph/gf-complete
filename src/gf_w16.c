@@ -1268,9 +1268,10 @@ int gf_w16_split_init(gf_t *gf)
 
   h = (gf_internal_t *) gf->scratch;
 
-issse3 = 0;
 #ifdef INTEL_SSSE3
   issse3 = 1;
+#else
+  issse3 = 0;
 #endif
 
   if (h->arg1 == 8 && h->arg2 == 8) {
@@ -2270,7 +2271,6 @@ void gf_w16_group_4_4_region_multiply(gf_t *gf, void *src, void *dest, gf_val_32
   top = (uint16_t *) rd.d_top;
 
   while (d16 < top) {
-    p = 0;
     a16 = *s16;
     p16 = (xor) ? *d16 : 0;
     ind = a16 >> 12;
