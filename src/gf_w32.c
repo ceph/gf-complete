@@ -787,7 +787,6 @@ gf_w32_group_4_4_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
   d44 = (struct gf_w32_group_data *) h->private;
   gf_w32_group_set_shift_tables(d44->shift, b, h);
 
-  p = 0;
   a32 = a;
   ind = a32 >> 28;
   a32 <<= 4;
@@ -2079,11 +2078,6 @@ gf_w32_split_4_32_lazy_sse_multiply_region(gf_t *gf, void *src, void *dest, uint
       v2 = _mm_packus_epi16(tv2, tv0);
       v3 = _mm_packus_epi16(tv3, tv1);
       
-      p0 = v0;
-      p1 = v1;
-      p2 = v2;
-      p3 = v3;
-
       si = _mm_and_si128(v0, mask1);
       p0 = _mm_shuffle_epi8(tables[6][0], si);
       p1 = _mm_shuffle_epi8(tables[6][1], si);
@@ -2170,14 +2164,16 @@ int gf_w32_split_init(gf_t *gf)
   uint32_t p, basep;
   int i, j, exp, ispclmul, issse3;
 
-  ispclmul = 0;
 #if defined(INTEL_SSE4_PCLMUL)
   ispclmul = 1;
+#else
+  ispclmul = 0;
 #endif
 
-  issse3 = 0;
 #ifdef INTEL_SSSE3
   issse3 = 1;
+#else
+  issse3 = 0;
 #endif
 
   h = (gf_internal_t *) gf->scratch;
