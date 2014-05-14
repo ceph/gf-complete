@@ -1617,7 +1617,6 @@ gf_w32_split_2_32_lazy_sse_multiply_region(gf_t *gf, void *src, void *dest, uint
       xi = _mm_and_si128(si, mask2);
       xi = _mm_xor_si128(xi, adder);
       pi = _mm_xor_si128(pi, _mm_shuffle_epi8(tables[tindex], xi));
-      si = _mm_srli_epi16(si, 2);
       tindex++;
       
       vi = _mm_srli_epi32(vi, 8);
