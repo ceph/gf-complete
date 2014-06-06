@@ -286,6 +286,16 @@ int gf_error_check(int w, int mult_type, int region_type, int divide_type,
     return 1;
   }
 
+  //ADAM
+  if (mult_type == GF_MULT_CARRY_FREE_GK) {
+    if (w != 4 && w != 8 && w != 16 &&
+        w != 32 && w != 64 && w != 128)            { _gf_errno = GF_E_CFM___W; return 0; }
+    if (raltmap)                                   { _gf_errno = GF_E_ALT_CFM; return 0; }
+    if (rsse || rnosse)                            { _gf_errno = GF_E_SSE_CFM; return 0; }
+    if (!pclmul)                                   { _gf_errno = GF_E_PCLMULX; return 0; }
+    return 1;
+  }
+
   if (mult_type == GF_MULT_BYTWO_p || mult_type == GF_MULT_BYTWO_b) {
     if (raltmap)                    { _gf_errno = GF_E_ALT_BY2; return 0; }
     if (rsse && !sse2)              { _gf_errno = GF_E_BY2_SSE; return 0; }

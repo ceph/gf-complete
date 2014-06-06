@@ -399,7 +399,94 @@ uint32_t gf_w32_matrix (gf_t *gf, uint32_t b)
    extra memory.  
 */
 
+//ADAM
+static
+inline
+gf_val_32_t
+gf_w32_cfmgk_multiply (gf_t *gf, gf_val_32_t a32, gf_val_32_t b32)
+{
+  gf_val_32_t rv = 0;
 
+#if defined(INTEL_SSE4_PCLMUL)
+
+  __m128i         a, b;
+  __m128i         result;
+  __m128i         w;
+  __m128i         g, q;
+  gf_internal_t * h = gf->scratch;
+  uint64_t        g_star, q_plus;
+
+  q_plus = *(uint64_t *) h->private;
+  g_star = *((uint64_t *) h->private + 1);
+
+  a = _mm_insert_epi32 (_mm_setzero_si128(), a32, 0);
+  b = _mm_insert_epi32 (a, b32, 0);
+  g = _mm_insert_epi64 (a, g_star, 0);
+  q = _mm_insert_epi64 (a, q_plus, 0);
+  
+  result = _mm_clmulepi64_si128 (a, b, 0);
+  w = _mm_clmulepi64_si128 (q, _mm_srli_si128 (result, 4), 0);
+  w = _mm_clmulepi64_si128 (g, _mm_srli_si128 (w, 4), 0);
+  result = _mm_xor_si128 (result, w);
+
+  /* Extracts 32 bit value from result. */
+  rv = ((gf_val_32_t)_mm_extract_epi32(result, 0));
+#endif
+  return rv;
+}
+
+//ADAM
+#if defined(INTEL_SSE4_PCLMUL)
+
+static 
+void
+gf_w32_cfmgk_multiply_region_from_single(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
+{
+
+  int i;
+  uint32_t *s32;
+  uint32_t *d32;
+  
+  __m128i         a, b;
+  __m128i         result;
+  __m128i         w;
+  __m128i         g, q;
+  gf_internal_t * h = gf->scratch;
+  uint64_t        g_star, q_plus;
+  
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
+  if (val == 1) { gf_multby_one(src, dest, bytes, xor); return; }
+
+  q_plus = *(uint64_t *) h->private;
+  g_star = *((uint64_t *) h->private + 1);
+
+  g = _mm_insert_epi64 (a, g_star, 0);
+  q = _mm_insert_epi64 (a, q_plus, 0);
+  a = _mm_insert_epi32 (_mm_setzero_si128(), val, 0);
+  s32 = (uint32_t *) src;
+  d32 = (uint32_t *) dest; 
+ 
+  if (xor) {
+    for (i = 0; i < bytes/sizeof(uint32_t); i++) {
+      b = _mm_insert_epi32 (a, s32[i], 0);
+      result = _mm_clmulepi64_si128 (a, b, 0);
+      w = _mm_clmulepi64_si128 (q, _mm_srli_si128 (result, 4), 0);
+      w = _mm_clmulepi64_si128 (g, _mm_srli_si128 (w, 4), 0);
+      result = _mm_xor_si128 (result, w);
+      d32[i] ^= ((gf_val_32_t)_mm_extract_epi32(result, 0));
+    } 
+  } else {
+    for (i = 0; i < bytes/sizeof(uint32_t); i++) {
+      b = _mm_insert_epi32 (a, s32[i], 0);
+      result = _mm_clmulepi64_si128 (a, b, 0);
+      w = _mm_clmulepi64_si128 (q, _mm_srli_si128 (result, 4), 0);
+      w = _mm_clmulepi64_si128 (g, _mm_srli_si128 (w, 4), 0);
+      result = _mm_xor_si128 (result, w);
+      d32[i] = ((gf_val_32_t)_mm_extract_epi32(result, 0));
+    } 
+  }
+}
+#endif
 
 
 static
@@ -446,6 +533,7 @@ gf_w32_clm_multiply_2 (gf_t *gf, gf_val_32_t a32, gf_val_32_t b32)
 #endif
   return rv;
 }
+
 static
 inline
 gf_val_32_t
@@ -550,6 +638,45 @@ gf_w32_shift_multiply (gf_t *gf, uint32_t a32, uint32_t b32)
     if (product & (one << i)) product ^= (pp << (i-GF_FIELD_WIDTH)); 
   }
   return product;
+}
+
+//ADAM
+  static 
+int gf_w32_cfmgk_init(gf_t *gf)
+{
+  gf->inverse.w32 = gf_w32_euclid;
+  gf->multiply_region.w32 = gf_w32_multiply_region_from_single;
+  
+#if defined(INTEL_SSE4_PCLMUL)
+  gf_internal_t *h;
+
+  h = (gf_internal_t *) gf->scratch;
+  gf->multiply.w32 = gf_w32_cfmgk_multiply;
+  gf->multiply_region.w32 = gf_w32_cfmgk_multiply_region_from_single;
+
+  //setup in the private section the q+ and g* ADAM
+  uint64_t *q_plus = (uint64_t *) h->private;
+  uint64_t *g_star = (uint64_t *) h->private + 1;
+
+  //q+
+  uint64_t tmp = h->prim_poly << 32;
+  *q_plus = 1ULL << 32;
+
+  int i;
+  for(i = 63; i >= 32; i--)
+    if((1ULL << i) & tmp)
+    {
+      *q_plus |= 1ULL << (i-32);
+      tmp ^= h->prim_poly << (i-32);
+    }
+
+  //g*
+  *g_star = h->prim_poly & ((1ULL << 32) - 1);
+
+  return 1;
+#endif
+
+  return 0;
 }
 
   static 
@@ -2656,6 +2783,10 @@ int gf_w32_scratch_size(int mult_type, int region_type, int divide_type, int arg
     case GF_MULT_CARRY_FREE:
       return sizeof(gf_internal_t);
       break;
+    //ADAM
+    case GF_MULT_CARRY_FREE_GK:
+      return sizeof(gf_internal_t) + sizeof(uint64_t)*2;
+      break;
     case GF_MULT_SHIFT:
       return sizeof(gf_internal_t);
       break;
@@ -2703,14 +2834,15 @@ int gf_w32_init(gf_t *gf)
   gf->multiply_region.w32 = NULL;
 
   switch(h->mult_type) {
-    case GF_MULT_CARRY_FREE:  if (gf_w32_cfm_init(gf) == 0) return 0; break;
-    case GF_MULT_SHIFT:       if (gf_w32_shift_init(gf) == 0) return 0; break;
-    case GF_MULT_COMPOSITE:   if (gf_w32_composite_init(gf) == 0) return 0; break;
+    case GF_MULT_CARRY_FREE:    if (gf_w32_cfm_init(gf) == 0) return 0; break;
+    case GF_MULT_CARRY_FREE_GK: if (gf_w32_cfmgk_init(gf) == 0) return 0; break; //ADAM
+    case GF_MULT_SHIFT:         if (gf_w32_shift_init(gf) == 0) return 0; break;
+    case GF_MULT_COMPOSITE:     if (gf_w32_composite_init(gf) == 0) return 0; break;
     case GF_MULT_DEFAULT: 
-    case GF_MULT_SPLIT_TABLE: if (gf_w32_split_init(gf) == 0) return 0; break;
-    case GF_MULT_GROUP:       if (gf_w32_group_init(gf) == 0) return 0; break;
+    case GF_MULT_SPLIT_TABLE:   if (gf_w32_split_init(gf) == 0) return 0; break;
+    case GF_MULT_GROUP:         if (gf_w32_group_init(gf) == 0) return 0; break;
     case GF_MULT_BYTWO_p:   
-    case GF_MULT_BYTWO_b:     if (gf_w32_bytwo_init(gf) == 0) return 0; break;
+    case GF_MULT_BYTWO_b:       if (gf_w32_bytwo_init(gf) == 0) return 0; break;
     default: return 0;
   }
   if (h->divide_type == GF_DIVIDE_EUCLID) {
