@@ -761,6 +761,7 @@ with_gnu_ld
 with_sysroot
 enable_libtool_lock
 enable_maintainer_mode
+enable_sse
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1403,6 +1404,7 @@ Optional Features:
   --enable-maintainer-mode
                           enable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
+  --disable-sse           Build without SSE optimizations
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -11379,7 +11381,7 @@ fi
 
 
 # Override default CFLAGS
-CFLAGS="-Wall -O3 -g"
+CFLAGS="-Wall -Wpointer-arith -O3 -g"
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -12998,6 +13000,16 @@ $as_echo "$as_me: WARNING: Your processor supports avx instructions but not your
   esac
 
 
+
+
+# Check whether --enable-sse was given.
+if test "${enable_sse+set}" = set; then :
+  enableval=$enable_sse; if   test "x$enableval" = "xno" ; then
+                SIMD_FLAGS=""
+                echo "DISABLED SSE!!!"
+              fi
+
+fi
 
 
 ac_config_files="$ac_config_files Makefile src/Makefile tools/Makefile test/Makefile examples/Makefile"
