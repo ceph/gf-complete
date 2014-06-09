@@ -24,5 +24,13 @@ AC_PROG_CC
 
 AX_EXT()
 
+AC_ARG_ENABLE([sse],
+              AS_HELP_STRING([--disable-sse], [Build without SSE optimizations]),
+              [if   test "x$enableval" = "xno" ; then
+                SIMD_FLAGS=""
+                echo "DISABLED SSE!!!"
+              fi]
+)
+
 AC_CONFIG_FILES([Makefile src/Makefile tools/Makefile test/Makefile examples/Makefile])
 AC_OUTPUT
