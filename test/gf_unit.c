@@ -141,15 +141,12 @@ int main(int argc, char **argv)
   if (!gf_init_hard(&gf_def, w, GF_MULT_DEFAULT, GF_REGION_DEFAULT, GF_DIVIDE_DEFAULT,
       (h->mult_type != GF_MULT_COMPOSITE) ? h->prim_poly : 0, 0, 0, NULL, NULL))
     problem("No default for this value of w");
+
   if (w == 4) {
     mult4 = gf_w4_get_mult_table(&gf);
-  }
-
-  if (w == 8) {
+  } else if (w == 8) {
     mult8 = gf_w8_get_mult_table(&gf);
-  }
-
-  if (w == 16) {
+  } else if (w == 16) {
     log16 = gf_w16_get_log_table(&gf);
     alog16 = gf_w16_get_mult_alog_table(&gf);
   }
@@ -308,7 +305,6 @@ int main(int argc, char **argv)
           gf_general_val_to_s(c, w, cs, 1);
           printf("Error in single multiplication (all numbers in hex):\n\n");
           printf("  gf.multiply(gf, %s, %s) = %s, which is clearly wrong.\n", as, bs, cs);
-;
           exit(1);
         }
       }
@@ -422,5 +418,15 @@ int main(int argc, char **argv)
       gf_general_do_region_check(&gf, a, rc+s_start, rd+d_start, target+d_start, bytes, xor);
     }
   }
+
+  free(a);
+  free(b);
+  free(c);
+  free(d);
+  free(ra);
+  free(rb);
+  free(rc);
+  free(rd);
+  
   return 0;
 }

@@ -100,7 +100,7 @@ xor)
   __m128i         result, r1;
   __m128i         prim_poly;
   __m128i         w;
-  __m128i         m1, m2, m3, m4;
+  __m128i         m1, m3, m4;
   gf_internal_t * h = gf->scratch;
   
   if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
@@ -112,8 +112,6 @@ xor)
   prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0xffffffffULL));
   b = _mm_insert_epi64 (_mm_setzero_si128(), val, 0);
   m1 = _mm_set_epi32(0, 0, 0, (uint32_t)0xffffffff);
-  m2 = _mm_slli_si128(m1, 4);
-  m2 = _mm_or_si128(m1, m2);
   m3 = _mm_slli_si128(m1, 8);
   m4 = _mm_slli_si128(m3, 4);
 
@@ -321,12 +319,9 @@ gf_w64_shift_multiply (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
   gf_internal_t *h;
 
   h = (gf_internal_t *) gf->scratch;
-  ppr = h->prim_poly;
   
   /* Allen: set leading one of primitive polynomial */
   
-  ppl = 1;
- 
   a = a64;
   bl = 0;
   br = b64;

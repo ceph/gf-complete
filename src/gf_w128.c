@@ -568,7 +568,6 @@ gf_w128_split_4_128_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_
     printf("\n");
   }
  */
-  i = 0;
   while (d64 < top) {
     v[0] = (xor) ? d64[0] : 0;
     v[1] = (xor) ? d64[1] : 0;
@@ -613,7 +612,6 @@ gf_w128_split_4_128_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_
   }
 
   h = (gf_internal_t *) gf->scratch;
-  pp = h->prim_poly;
   
   /* We only do this to check on alignment. */
   gf_set_region_data(&rd, gf, src, dest, bytes, 0, xor, 16);
@@ -713,7 +711,6 @@ gf_w128_split_4_128_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, 
   }
 
   h = (gf_internal_t *) gf->scratch;
-  pp = h->prim_poly;
   
   /* We only do this to check on alignment. */
   gf_set_region_data(&rd, gf, src, dest, bytes, 0, xor, 256);

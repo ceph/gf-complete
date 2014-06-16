@@ -1209,9 +1209,10 @@ int gf_w8_table_init(gf_t *gf)
 
   h = (gf_internal_t *) gf->scratch;
 
-  issse = 0;
 #ifdef INTEL_SSSE3
   issse = 1;
+#else
+  issse = 0;
 #endif
 
   if (h->mult_type == GF_MULT_DEFAULT && issse) {
