@@ -36,7 +36,7 @@
 typedef enum {GF_MULT_DEFAULT,
               GF_MULT_SHIFT,
               GF_MULT_CARRY_FREE,
-              GF_MULT_CARRY_FREE_GK, //ADAM
+              GF_MULT_CARRY_FREE_GK,
               GF_MULT_GROUP,
               GF_MULT_BYTWO_p,
               GF_MULT_BYTWO_b,

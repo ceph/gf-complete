@@ -286,7 +286,6 @@ int gf_error_check(int w, int mult_type, int region_type, int divide_type,
     return 1;
   }
 
-  //ADAM
   if (mult_type == GF_MULT_CARRY_FREE_GK) {
     if (w != 4 && w != 8 && w != 16 &&
         w != 32 && w != 64 && w != 128)            { _gf_errno = GF_E_CFM___W; return 0; }

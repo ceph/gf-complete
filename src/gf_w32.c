@@ -399,7 +399,6 @@ uint32_t gf_w32_matrix (gf_t *gf, uint32_t b)
    extra memory.  
 */
 
-//ADAM
 static
 inline
 gf_val_32_t
@@ -435,7 +434,6 @@ gf_w32_cfmgk_multiply (gf_t *gf, gf_val_32_t a32, gf_val_32_t b32)
   return rv;
 }
 
-//ADAM
 #if defined(INTEL_SSE4_PCLMUL)
 
 static 
@@ -640,7 +638,6 @@ gf_w32_shift_multiply (gf_t *gf, uint32_t a32, uint32_t b32)
   return product;
 }
 
-//ADAM
   static 
 int gf_w32_cfmgk_init(gf_t *gf)
 {
@@ -654,11 +651,9 @@ int gf_w32_cfmgk_init(gf_t *gf)
   gf->multiply.w32 = gf_w32_cfmgk_multiply;
   gf->multiply_region.w32 = gf_w32_cfmgk_multiply_region_from_single;
 
-  //setup in the private section the q+ and g* ADAM
   uint64_t *q_plus = (uint64_t *) h->private;
   uint64_t *g_star = (uint64_t *) h->private + 1;
 
-  //q+
   uint64_t tmp = h->prim_poly << 32;
   *q_plus = 1ULL << 32;
 
@@ -670,7 +665,6 @@ int gf_w32_cfmgk_init(gf_t *gf)
       tmp ^= h->prim_poly << (i-32);
     }
 
-  //g*
   *g_star = h->prim_poly & ((1ULL << 32) - 1);
 
   return 1;
@@ -2778,7 +2772,6 @@ int gf_w32_scratch_size(int mult_type, int region_type, int divide_type, int arg
     case GF_MULT_CARRY_FREE:
       return sizeof(gf_internal_t);
       break;
-    //ADAM
     case GF_MULT_CARRY_FREE_GK:
       return sizeof(gf_internal_t) + sizeof(uint64_t)*2;
       break;
@@ -2830,7 +2823,7 @@ int gf_w32_init(gf_t *gf)
 
   switch(h->mult_type) {
     case GF_MULT_CARRY_FREE:    if (gf_w32_cfm_init(gf) == 0) return 0; break;
-    case GF_MULT_CARRY_FREE_GK: if (gf_w32_cfmgk_init(gf) == 0) return 0; break; //ADAM
+    case GF_MULT_CARRY_FREE_GK: if (gf_w32_cfmgk_init(gf) == 0) return 0; break;
     case GF_MULT_SHIFT:         if (gf_w32_shift_init(gf) == 0) return 0; break;
     case GF_MULT_COMPOSITE:     if (gf_w32_composite_init(gf) == 0) return 0; break;
     case GF_MULT_DEFAULT: 

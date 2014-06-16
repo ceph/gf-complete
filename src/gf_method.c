@@ -47,7 +47,6 @@ int create_gf_from_argv(gf_t *gf, int w, int argc, char **argv, int starting)
         } else if (strcmp(argv[starting], "CARRY_FREE") == 0) {
           mult_type = GF_MULT_CARRY_FREE;
           starting++;
-        //ADAM
         } else if (strcmp(argv[starting], "CARRY_FREE_GK") == 0) {
           mult_type = GF_MULT_CARRY_FREE_GK;
           starting++;
