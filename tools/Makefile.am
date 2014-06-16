@@ -1,6 +1,6 @@
 # GF-Complete 'tools' AM file
 
-INCLUDES=-I./ -I../include
+AM_CPPFLAGS=-I./ -I../include
 AM_CFLAGS = -O3 $(SIMD_FLAGS) -fPIC $(INCLUDES)
 
 TESTS=run-tests.sh

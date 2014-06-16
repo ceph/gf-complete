@@ -1,7 +1,7 @@
 # GF-Complete 'core' AM file
 # Creates the library
 
-INCLUDES=-I./ -I../include
+AM_CPPFLAGS=-I./ -I../include
 AM_CFLAGS = -O3 $(SIMD_FLAGS) -fPIC $(INCLUDES)
 
 lib_LTLIBRARIES = libgf_complete.la
