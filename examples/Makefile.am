@@ -1,7 +1,7 @@
 # GF-Complete 'examples' AM file
 
-AM_CPPFLAGS=-I./ -I../include
-AM_CFLAGS = -O3 $(SIMD_FLAGS) -fPIC $(INCLUDES)
+AM_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include
+AM_CFLAGS = -O3 $(SIMD_FLAGS) -fPIC
 
 bin_PROGRAMS = gf_example_1 gf_example_2 gf_example_3 gf_example_4 \
                gf_example_5 gf_example_6 gf_example_7

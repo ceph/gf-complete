@@ -1,7 +1,7 @@
 # GF-Complete 'tools' AM file
 
-AM_CPPFLAGS=-I./ -I../include
-AM_CFLAGS = -O3 $(SIMD_FLAGS) -fPIC $(INCLUDES)
+AM_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include
+AM_CFLAGS = -O3 $(SIMD_FLAGS) -fPIC
 
 TESTS=run-tests.sh
 
