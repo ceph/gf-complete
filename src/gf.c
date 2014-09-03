@@ -217,6 +217,11 @@ int gf_error_check(int w, int mult_type, int region_type, int divide_type,
   pclmul = 1;
 #endif
 
+#ifdef ARM_NEON
+  pclmul = 1;
+  sse3 = 1;
+#endif
+
 
   if (w < 1 || (w > 32 && w != 64 && w != 128)) { _gf_errno = GF_E_BAD___W; return 0; }
     
