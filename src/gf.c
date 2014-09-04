@@ -954,7 +954,42 @@ void gf_multby_one(void *src, void *dest, int bytes, int xor)
   }
   return;
 #endif
+#if defined(ARM_NEON)
+  s8 = (uint8_t *) src;
+  d8 = (uint8_t *) dest;
 
+  if (uls % 16 == uld % 16) {
+    gf_set_region_data(&rd, NULL, src, dest, bytes, 1, xor, 16);
+    while (s8 != rd.s_start) {
+      *d8 ^= *s8;
+      s8++;
+      d8++;
+    }
+    while (s8 < (uint8_t *) rd.s_top) {
+      uint8x16_t vs = vld1q_u8 (s8);
+      uint8x16_t vd = vld1q_u8 (d8);
+      uint8x16_t vr = veorq_u8 (vs, vd);
+      vst1q_u8 (d8, vr);
+      s8 += 16;
+      d8 += 16;
+    }
+  } else {
+    while (s8 + 15 < (uint8_t *) src + bytes) {
+      uint8x16_t vs = vld1q_u8 (s8);
+      uint8x16_t vd = vld1q_u8 (d8);
+      uint8x16_t vr = veorq_u8 (vs, vd);
+      vst1q_u8 (d8, vr);
+      s8 += 16;
+      d8 += 16;
+    }
+  }
+  while (s8 < (uint8_t *) src + bytes) {
+    *d8 ^= *s8;
+    s8++;
+    d8++;
+  }
+  return;
+#endif
   if (uls % 8 != uld % 8) {
     gf_unaligned_xor(src, dest, bytes);
     return;
