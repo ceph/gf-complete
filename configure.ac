@@ -24,6 +24,27 @@ AC_PROG_CC
 
 AX_EXT()
 
+AC_ARG_ENABLE([neon],
+              AS_HELP_STRING([--disable-neon], [Build without NEON optimizations]))
+
+AS_IF([test "x$enable_neon" != "xno"],
+      [noneon_CPPFLAGS=$CPPFLAGS
+       CPPFLAGS="$CPPFLAGS $SIMD_FLAGS"
+       AC_CHECK_HEADER([arm_neon.h],
+                       [have_neon=yes],
+                       [have_neon=no
+                        CPPFLAGS=$noneon_CPPFLAGS])],
+      [have_neon=no
+       AS_IF([test "x$ax_cv_have_neon_ext" = "xyes"],
+             [SIMD_FLAGS=""])
+      ])
+
+AS_IF([test "x$have_neon" = "xno"],
+      [AS_IF([test "x$enable_neon" = "xyes"],
+             [AC_MSG_ERROR([neon requested but arm_neon.h not found])])
+      ])
+AM_CONDITIONAL([HAVE_NEON], [test "x$have_neon" = "xyes"])
+
 AC_ARG_ENABLE([sse],
               AS_HELP_STRING([--disable-sse], [Build without SSE optimizations]),
               [if   test "x$enableval" = "xno" ; then

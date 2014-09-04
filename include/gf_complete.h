@@ -33,6 +33,10 @@
   #include <wmmintrin.h>
 #endif
 
+#if defined(ARM_NEON)
+  #include <arm_neon.h>
+#endif
+
 
 /* These are the different ways to perform multiplication.
    Not all are implemented for all values of w.

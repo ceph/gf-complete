@@ -41,6 +41,55 @@ AC_DEFUN([AX_EXT],
   AC_REQUIRE([AC_CANONICAL_HOST])
 
   case $host_cpu in
+    aarch64*)
+      AC_DEFINE(HAVE_ARCH_AARCH64,,[targeting AArch64])
+      SIMD_FLAGS="$SIMD_FLAGS -DARCH_AARCH64"
+
+      AC_CACHE_CHECK([whether NEON is supported], [ax_cv_have_neon_ext],
+          [
+            # TODO: detect / cross-compile
+            ax_cv_have_neon_ext=yes
+          ])
+      AC_CACHE_CHECK([whether cryptographic extension is supported], [ax_cv_have_arm_crypt_ext],
+          [
+            # TODO: detect / cross-compile
+            ax_cv_have_arm_crypt_ext=yes
+          ])
+
+      if test "$ax_cv_have_arm_crypt_ext" = yes; then
+        AC_DEFINE(HAVE_ARM_CRYPT_EXT,,[Support ARM cryptographic extension])
+      fi
+
+      if test "$ax_cv_have_neon_ext" = yes; then
+        AC_DEFINE(HAVE_NEON,,[Support NEON instructions])
+      fi
+
+      if test "$ax_cv_have_arm_crypt_ext" = yes && test "$ax_cv_have_neon_ext" = yes; then
+          AX_CHECK_COMPILE_FLAG(-march=armv8-a+simd+crypto,
+                                SIMD_FLAGS="$SIMD_FLAGS -march=armv8-a+simd+crypto -DARM_CRYPT -DARM_NEON", [])
+      elif test "$ax_cv_have_arm_crypt_ext" = yes; then
+          AX_CHECK_COMPILE_FLAG(-march=armv8-a+crypto,
+                                SIMD_FLAGS="$SIMD_FLAGS -march=armv8-a+crypto -DARM_CRYPT", [])
+      elif test "$ax_cv_have_neon_ext" = yes; then
+          AX_CHECK_COMPILE_FLAG(-march=armv8-a+simd,
+                                SIMD_FLAGS="$SIMD_FLAGS -march=armv8-a+simd -DARM_NEON", [])
+      fi
+    ;;
+
+    arm*)
+      AC_CACHE_CHECK([whether NEON is supported], [ax_cv_have_neon_ext],
+          [
+            # TODO: detect / cross-compile
+            ax_cv_have_neon_ext=yes
+          ])
+
+      if test "$ax_cv_have_neon_ext" = yes; then
+        AC_DEFINE(HAVE_NEON,,[Support NEON instructions])
+        AX_CHECK_COMPILE_FLAG(-mfpu=neon,
+                                SIMD_FLAGS="$SIMD_FLAGS -mfpu=neon -DARM_NEON", [])
+      fi
+    ;;
+
     powerpc*)
       AC_CACHE_CHECK([whether altivec is supported], [ax_cv_have_altivec_ext],
           [
