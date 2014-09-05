@@ -22,6 +22,13 @@ AM_MAINTAINER_MODE([disable])
 dnl Compiling with per-target flags requires AM_PROG_CC_C_O.
 AC_PROG_CC
 
+# Check for functions to provide aligned memory
+#
+AC_CHECK_FUNCS([posix_memalign],
+ [found_memalign=yes; break])
+
+AS_IF([test "x$found_memalign" != "xyes"], [AC_MSG_WARN([No function for aligned memory allocation found])])
+
 AX_EXT()
 
 AC_ARG_ENABLE([neon],
