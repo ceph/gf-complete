@@ -392,7 +392,7 @@ int gf_error_check(int w, int mult_type, int region_type, int divide_type,
   if (mult_type == GF_MULT_COMPOSITE) {
     if (w != 8 && w != 16 && w != 32 
                && w != 64 && w != 128)          { _gf_errno = GF_E_COMP__W; return 0; }
-    if ((poly >> (w/2)) != 0)                   { _gf_errno = GF_E_COMP_PP; return 0; }
+    if (w < 128 && (poly >> (w/2)) != 0)                   { _gf_errno = GF_E_COMP_PP; return 0; }
     if (divide_type != GF_DIVIDE_DEFAULT)       { _gf_errno = GF_E_DIVCOMP; return 0; }
     if (arg1 != 2)                              { _gf_errno = GF_E_COMP_A2; return 0; }
     if (rsse || rnosse)                         { _gf_errno = GF_E_COMP_SS; return 0; }
