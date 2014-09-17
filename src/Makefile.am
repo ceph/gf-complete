@@ -11,7 +11,8 @@ libgf_complete_la_SOURCES = gf.c gf_method.c gf_wgen.c gf_w4.c gf_w8.c gf_w16.c 
 if HAVE_NEON
 libgf_complete_la_SOURCES += gf_w4_neon.c  \
                              gf_w8_neon.c  \
-                             gf_w16_neon.c
+                             gf_w16_neon.c \
+                             gf_w32_neon.c
 endif
 
 libgf_complete_la_LDFLAGS = -version-info 1:0:0
