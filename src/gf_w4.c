@@ -11,49 +11,7 @@
 #include "gf_int.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-#define GF_FIELD_WIDTH      4
-#define GF_DOUBLE_WIDTH     (GF_FIELD_WIDTH*2)
-#define GF_FIELD_SIZE       (1 << GF_FIELD_WIDTH)
-#define GF_MULT_GROUP_SIZE       (GF_FIELD_SIZE-1)
-
-/* ------------------------------------------------------------
-   JSP: Each implementation has its own data, which is allocated
-   at one time as part of the handle. For that reason, it 
-   shouldn't be hierarchical -- i.e. one should be able to 
-   allocate it with one call to malloc. */
-
-struct gf_logtable_data {
-    uint8_t      log_tbl[GF_FIELD_SIZE];
-    uint8_t      antilog_tbl[GF_FIELD_SIZE * 2];
-    uint8_t      *antilog_tbl_div;
-};
-
-struct gf_single_table_data {
-    uint8_t      mult[GF_FIELD_SIZE][GF_FIELD_SIZE];
-    uint8_t      div[GF_FIELD_SIZE][GF_FIELD_SIZE];
-};
-
-struct gf_double_table_data {
-    uint8_t      div[GF_FIELD_SIZE][GF_FIELD_SIZE];
-    uint8_t      mult[GF_FIELD_SIZE][GF_FIELD_SIZE*GF_FIELD_SIZE];
-};
-struct gf_quad_table_data {
-    uint8_t      div[GF_FIELD_SIZE][GF_FIELD_SIZE];
-    uint16_t     mult[GF_FIELD_SIZE][(1<<16)];
-};
-
-struct gf_quad_table_lazy_data {
-    uint8_t      div[GF_FIELD_SIZE][GF_FIELD_SIZE];
-    uint8_t      smult[GF_FIELD_SIZE][GF_FIELD_SIZE];
-    uint16_t     mult[(1 << 16)];
-};
-
-struct gf_bytwo_data {
-    uint64_t prim_poly;
-    uint64_t mask1;
-    uint64_t mask2;
-};
+#include "gf_w4.h"
 
 #define AB2(ip, am1 ,am2, b, t1, t2) {\
   t1 = (b << 1) & am1;\
@@ -489,11 +447,15 @@ int gf_w4_single_table_init(gf_t *gf)
   gf->inverse.w32 = NULL;
   gf->divide.w32 = gf_w4_single_table_divide;
   gf->multiply.w32 = gf_w4_single_table_multiply;
-  #ifdef INTEL_SSSE3
+  #if defined(INTEL_SSSE3) || defined(ARM_NEON)
     if(h->region_type & (GF_REGION_NOSIMD | GF_REGION_CAUCHY))
       gf->multiply_region.w32 = gf_w4_single_table_multiply_region;
     else
+    #if defined(INTEL_SSSE3)
       gf->multiply_region.w32 = gf_w4_single_table_sse_multiply_region;
+    #elif defined(ARM_NEON)
+      gf_w4_neon_single_table_init(gf);
+    #endif
   #else
     gf->multiply_region.w32 = gf_w4_single_table_multiply_region;
     if (h->region_type & GF_REGION_SIMD) return 0;
@@ -774,16 +736,16 @@ int gf_w4_table_init(gf_t *gf)
 {
   int rt;
   gf_internal_t *h;
-  int issse3 = 0;
+  int simd = 0;
 
-#ifdef INTEL_SSSE3
-  issse3 = 1;
+#if defined(INTEL_SSSE3) || defined(ARM_NEON)
+  simd = 1;
 #endif
 
   h = (gf_internal_t *) gf->scratch;
   rt = (h->region_type);
 
-  if (h->mult_type == GF_MULT_DEFAULT && !issse3) rt |= GF_REGION_DOUBLE_TABLE;
+  if (h->mult_type == GF_MULT_DEFAULT && !simd) rt |= GF_REGION_DOUBLE_TABLE;
 
   if (rt & GF_REGION_DOUBLE_TABLE) {
     return gf_w4_double_table_init(gf);
@@ -1937,6 +1899,8 @@ int gf_w4_cfm_init(gf_t *gf)
 #if defined(INTEL_SSE4_PCLMUL)
   gf->multiply.w32 = gf_w4_clm_multiply;
   return 1;
+#elif defined(ARM_NEON)
+  return gf_w4_neon_cfm_init(gf);
 #endif
   return 0;
 }
@@ -1953,10 +1917,13 @@ int gf_w4_shift_init(gf_t *gf)
 
 int gf_w4_scratch_size(int mult_type, int region_type, int divide_type, int arg1, int arg2)
 {
-  int issse3 = 0;
+  int issse3 = 0, isneon = 0;
 
 #ifdef INTEL_SSSE3
   issse3 = 1;
+#endif
+#ifdef ARM_NEON
+  isneon = 1;
 #endif
 
   switch(mult_type)
@@ -1971,7 +1938,8 @@ int gf_w4_scratch_size(int mult_type, int region_type, int divide_type, int arg1
         return sizeof(gf_internal_t) + sizeof(struct gf_single_table_data) + 64;
       }
 
-      if (mult_type == GF_MULT_DEFAULT && !issse3) region_type = GF_REGION_DOUBLE_TABLE;
+      if (mult_type == GF_MULT_DEFAULT && !(issse3 || isneon))
+          region_type = GF_REGION_DOUBLE_TABLE;
 
       if (region_type & GF_REGION_DOUBLE_TABLE) {
         return sizeof(gf_internal_t) + sizeof(struct gf_double_table_data) + 64;
