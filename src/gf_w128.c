@@ -1527,7 +1527,7 @@ int gf_w128_split_init(gf_t *gf)
 
   gf->multiply.w128 = gf_w128_bytwo_p_multiply;
 #if defined(INTEL_SSE4_PCLMUL)
-  if (!(h->region_type & GF_REGION_NOSSE)){
+  if (!(h->region_type & GF_REGION_NOSIMD)){
     gf->multiply.w128 = gf_w128_clm_multiply;
   }
 #endif
@@ -1546,7 +1546,7 @@ int gf_w128_split_init(gf_t *gf)
     if((h->region_type & GF_REGION_ALTMAP))
     {
       #ifdef INTEL_SSE4
-        if(!(h->region_type & GF_REGION_NOSSE))
+        if(!(h->region_type & GF_REGION_NOSIMD))
           gf->multiply_region.w128 = gf_w128_split_4_128_sse_altmap_multiply_region;
         else
           return 0;
@@ -1556,7 +1556,7 @@ int gf_w128_split_init(gf_t *gf)
     }
     else {
       #ifdef INTEL_SSE4
-        if(!(h->region_type & GF_REGION_NOSSE))
+        if(!(h->region_type & GF_REGION_NOSIMD))
           gf->multiply_region.w128 = gf_w128_split_4_128_sse_multiply_region;
         else
           gf->multiply_region.w128 = gf_w128_split_4_128_multiply_region;

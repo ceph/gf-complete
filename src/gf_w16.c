@@ -1327,14 +1327,14 @@ int gf_w16_split_init(gf_t *gf)
 
   } else if ((h->arg1 == 4 && h->arg2 == 16) || (h->arg2 == 4 && h->arg1 == 16)) {
     if (issse3) {
-      if(h->region_type & GF_REGION_ALTMAP && h->region_type & GF_REGION_NOSSE)
+      if(h->region_type & GF_REGION_ALTMAP && h->region_type & GF_REGION_NOSIMD)
         gf->multiply_region.w32 = gf_w16_split_4_16_lazy_nosse_altmap_multiply_region;
-      else if(h->region_type & GF_REGION_NOSSE)
+      else if(h->region_type & GF_REGION_NOSIMD)
         gf->multiply_region.w32 = gf_w16_split_4_16_lazy_multiply_region;
       else if(h->region_type & GF_REGION_ALTMAP)
         gf->multiply_region.w32 = gf_w16_split_4_16_lazy_sse_altmap_multiply_region;
     } else {
-      if(h->region_type & GF_REGION_SSE)
+      if(h->region_type & GF_REGION_SIMD)
         return 0;
       else if(h->region_type & GF_REGION_ALTMAP)
         gf->multiply_region.w32 = gf_w16_split_4_16_lazy_nosse_altmap_multiply_region;
@@ -1884,25 +1884,25 @@ int gf_w16_bytwo_init(gf_t *gf)
   if (h->mult_type == GF_MULT_BYTWO_p) {
     gf->multiply.w32 = gf_w16_bytwo_p_multiply;
     #ifdef INTEL_SSE2
-      if (h->region_type & GF_REGION_NOSSE)
+      if (h->region_type & GF_REGION_NOSIMD)
         gf->multiply_region.w32 = gf_w16_bytwo_p_nosse_multiply_region;
       else
         gf->multiply_region.w32 = gf_w16_bytwo_p_sse_multiply_region;
     #else
       gf->multiply_region.w32 = gf_w16_bytwo_p_nosse_multiply_region;
-      if(h->region_type & GF_REGION_SSE)
+      if(h->region_type & GF_REGION_SIMD)
         return 0;
     #endif
   } else {
     gf->multiply.w32 = gf_w16_bytwo_b_multiply;
     #ifdef INTEL_SSE2
-      if (h->region_type & GF_REGION_NOSSE)
+      if (h->region_type & GF_REGION_NOSIMD)
         gf->multiply_region.w32 = gf_w16_bytwo_b_nosse_multiply_region;
       else
         gf->multiply_region.w32 = gf_w16_bytwo_b_sse_multiply_region;
     #else
       gf->multiply_region.w32 = gf_w16_bytwo_b_nosse_multiply_region;
-      if(h->region_type & GF_REGION_SSE)
+      if(h->region_type & GF_REGION_SIMD)
         return 0;
     #endif
   }

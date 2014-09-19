@@ -1180,13 +1180,13 @@ int gf_w8_split_init(gf_t *gf)
   gf->multiply.w32 = gf_w8_split_multiply;
   
   #ifdef INTEL_SSSE3
-    if (h->region_type & GF_REGION_NOSSE)
+    if (h->region_type & GF_REGION_NOSIMD)
       gf->multiply_region.w32 = gf_w8_split_multiply_region;
     else
       gf->multiply_region.w32 = gf_w8_split_multiply_region_sse;
   #else
     gf->multiply_region.w32 = gf_w8_split_multiply_region;
-    if(h->region_type & GF_REGION_SSE)
+    if(h->region_type & GF_REGION_SIMD)
       return 0;
   #endif
 
@@ -2259,25 +2259,25 @@ int gf_w8_bytwo_init(gf_t *gf)
   if (h->mult_type == GF_MULT_BYTWO_p) {
     gf->multiply.w32 = gf_w8_bytwo_p_multiply;
 #ifdef INTEL_SSE2
-    if (h->region_type & GF_REGION_NOSSE)
+    if (h->region_type & GF_REGION_NOSIMD)
       gf->multiply_region.w32 = gf_w8_bytwo_p_nosse_multiply_region;
     else
       gf->multiply_region.w32 = gf_w8_bytwo_p_sse_multiply_region;
 #else
     gf->multiply_region.w32 = gf_w8_bytwo_p_nosse_multiply_region;
-    if(h->region_type & GF_REGION_SSE)
+    if(h->region_type & GF_REGION_SIMD)
       return 0;
 #endif
   } else {
     gf->multiply.w32 = gf_w8_bytwo_b_multiply;
 #ifdef INTEL_SSE2
-    if (h->region_type & GF_REGION_NOSSE)
+    if (h->region_type & GF_REGION_NOSIMD)
       gf->multiply_region.w32 = gf_w8_bytwo_b_nosse_multiply_region;
     else
       gf->multiply_region.w32 = gf_w8_bytwo_b_sse_multiply_region;
 #else
     gf->multiply_region.w32 = gf_w8_bytwo_b_nosse_multiply_region;
-    if(h->region_type & GF_REGION_SSE)
+    if(h->region_type & GF_REGION_SIMD)
       return 0;
 #endif
   }

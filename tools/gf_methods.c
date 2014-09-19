@@ -28,7 +28,7 @@ static char *MULTS[NMULTS] = { "SHIFT", "CARRY_FREE", "CARRY_FREE_GK", "GROUP44"
 /* Make sure CAUCHY is last */
 
 #define NREGIONS (7) 
-static char *REGIONS[NREGIONS] = { "DOUBLE", "QUAD", "LAZY", "SSE", "NOSSE", 
+static char *REGIONS[NREGIONS] = { "DOUBLE", "QUAD", "LAZY", "SIMD", "NOSIMD",
                                    "ALTMAP", "CAUCHY" };
 
 #define BNREGIONS (4) 

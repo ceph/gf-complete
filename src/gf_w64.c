@@ -1488,25 +1488,25 @@ int gf_w64_bytwo_init(gf_t *gf)
   if (h->mult_type == GF_MULT_BYTWO_p) {
     gf->multiply.w64 = gf_w64_bytwo_p_multiply;
     #ifdef INTEL_SSE2 
-      if (h->region_type & GF_REGION_NOSSE)
+      if (h->region_type & GF_REGION_NOSIMD)
         gf->multiply_region.w64 = gf_w64_bytwo_p_nosse_multiply_region; 
       else
         gf->multiply_region.w64 = gf_w64_bytwo_p_sse_multiply_region; 
     #else
       gf->multiply_region.w64 = gf_w64_bytwo_p_nosse_multiply_region; 
-      if(h->region_type & GF_REGION_SSE)
+      if(h->region_type & GF_REGION_SIMD)
         return 0;
     #endif
   } else {
     gf->multiply.w64 = gf_w64_bytwo_b_multiply;
     #ifdef INTEL_SSE2 
-      if (h->region_type & GF_REGION_NOSSE)
+      if (h->region_type & GF_REGION_NOSIMD)
         gf->multiply_region.w64 = gf_w64_bytwo_b_nosse_multiply_region; 
       else
         gf->multiply_region.w64 = gf_w64_bytwo_b_sse_multiply_region; 
     #else
       gf->multiply_region.w64 = gf_w64_bytwo_b_nosse_multiply_region; 
-      if(h->region_type & GF_REGION_SSE)
+      if(h->region_type & GF_REGION_SIMD)
         return 0;
     #endif
   }
@@ -2006,7 +2006,7 @@ int gf_w64_split_init(gf_t *gf)
   gf->multiply.w64 = gf_w64_bytwo_p_multiply; 
 
 #if defined(INTEL_SSE4_PCLMUL) 
-  if ((!(h->region_type & GF_REGION_NOSSE) &&
+  if ((!(h->region_type & GF_REGION_NOSIMD) &&
      (h->arg1 == 64 || h->arg2 == 64)) ||
      h->mult_type == GF_MULT_DEFAULT){
    
@@ -2045,7 +2045,7 @@ int gf_w64_split_init(gf_t *gf)
     d4 = (struct gf_split_4_64_lazy_data *) h->private;
     d4->last_value = 0;
 
-    if((h->region_type & GF_REGION_ALTMAP) && (h->region_type & GF_REGION_NOSSE)) return 0;
+    if((h->region_type & GF_REGION_ALTMAP) && (h->region_type & GF_REGION_NOSIMD)) return 0;
     if(h->region_type & GF_REGION_ALTMAP)
     {
       #ifdef INTEL_SSSE3
@@ -2057,13 +2057,13 @@ int gf_w64_split_init(gf_t *gf)
     else //no altmap
     {
       #ifdef INTEL_SSE4
-        if(h->region_type & GF_REGION_NOSSE)
+        if(h->region_type & GF_REGION_NOSIMD)
           gf->multiply_region.w64 = gf_w64_split_4_64_lazy_multiply_region;
         else
           gf->multiply_region.w64 = gf_w64_split_4_64_lazy_sse_multiply_region; 
       #else
         gf->multiply_region.w64 = gf_w64_split_4_64_lazy_multiply_region;
-        if(h->region_type & GF_REGION_SSE)
+        if(h->region_type & GF_REGION_SIMD)
           return 0;
       #endif
     }

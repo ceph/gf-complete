@@ -490,13 +490,13 @@ int gf_w4_single_table_init(gf_t *gf)
   gf->divide.w32 = gf_w4_single_table_divide;
   gf->multiply.w32 = gf_w4_single_table_multiply;
   #ifdef INTEL_SSSE3
-    if(h->region_type & (GF_REGION_NOSSE | GF_REGION_CAUCHY))
+    if(h->region_type & (GF_REGION_NOSIMD | GF_REGION_CAUCHY))
       gf->multiply_region.w32 = gf_w4_single_table_multiply_region;
     else
       gf->multiply_region.w32 = gf_w4_single_table_sse_multiply_region;
   #else
     gf->multiply_region.w32 = gf_w4_single_table_multiply_region;
-    if (h->region_type & GF_REGION_SSE) return 0;
+    if (h->region_type & GF_REGION_SIMD) return 0;
   #endif
 
   return 1;
@@ -1905,25 +1905,25 @@ int gf_w4_bytwo_init(gf_t *gf)
   if (h->mult_type == GF_MULT_BYTWO_p) {
     gf->multiply.w32 = gf_w4_bytwo_p_multiply;
     #ifdef INTEL_SSE2
-      if (h->region_type & GF_REGION_NOSSE)
+      if (h->region_type & GF_REGION_NOSIMD)
         gf->multiply_region.w32 = gf_w4_bytwo_p_nosse_multiply_region;
       else
         gf->multiply_region.w32 = gf_w4_bytwo_p_sse_multiply_region;
     #else
       gf->multiply_region.w32 = gf_w4_bytwo_p_nosse_multiply_region;
-      if (h->region_type & GF_REGION_SSE)
+      if (h->region_type & GF_REGION_SIMD)
         return 0;
     #endif
   } else {
     gf->multiply.w32 = gf_w4_bytwo_b_multiply;
     #ifdef INTEL_SSE2
-      if (h->region_type & GF_REGION_NOSSE)
+      if (h->region_type & GF_REGION_NOSIMD)
         gf->multiply_region.w32 = gf_w4_bytwo_b_nosse_multiply_region;
       else
         gf->multiply_region.w32 = gf_w4_bytwo_b_sse_multiply_region;
     #else
       gf->multiply_region.w32 = gf_w4_bytwo_b_nosse_multiply_region;
-      if (h->region_type & GF_REGION_SSE)
+      if (h->region_type & GF_REGION_SIMD)
         return 0;
     #endif
   }
