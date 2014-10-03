@@ -107,7 +107,6 @@ int create_gf_from_argv(gf_t *gf, int w, int argc, char **argv, int starting)
             return 0;
           }
         } else {
-          if (base != NULL) gf_free(base, 1);
           _gf_errno = GF_E_UNKNOWN;
           return 0;
         }
