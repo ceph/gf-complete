@@ -2307,7 +2307,9 @@ int gf_w32_split_init(gf_t *gf)
     if ((h->region_type & GF_REGION_NOSIMD) || !(issse3 || isneon)) {
       gf->multiply_region.w32 = gf_w32_split_4_32_lazy_multiply_region;
     } else if (isneon) {
+#ifdef ARM_NEON
       gf_w32_neon_split_init(gf);
+#endif
     } else if (h->region_type & GF_REGION_ALTMAP) {
       gf->multiply_region.w32 = gf_w32_split_4_32_lazy_sse_altmap_multiply_region;
     } else {

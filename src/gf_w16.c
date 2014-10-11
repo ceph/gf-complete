@@ -1275,7 +1275,9 @@ int gf_w16_split_init(gf_t *gf)
   if (issse3) {
     gf->multiply_region.w32 = gf_w16_split_4_16_lazy_sse_multiply_region;
   } else if (isneon) {
+#ifdef ARM_NEON
     gf_w16_neon_split_init(gf);
+#endif
   } else {
     gf->multiply_region.w32 = gf_w16_split_8_16_lazy_multiply_region;
   }
