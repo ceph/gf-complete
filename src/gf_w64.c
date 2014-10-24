@@ -11,38 +11,7 @@
 #include "gf_int.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-#define GF_FIELD_WIDTH (64)
-#define GF_FIRST_BIT (1ULL << 63)
-
-#define GF_BASE_FIELD_WIDTH (32)
-#define GF_BASE_FIELD_SIZE       (1ULL << GF_BASE_FIELD_WIDTH)
-#define GF_BASE_FIELD_GROUP_SIZE  GF_BASE_FIELD_SIZE-1
-
-struct gf_w64_group_data {
-    uint64_t *reduce;
-    uint64_t *shift;
-    uint64_t *memory;
-};
-
-struct gf_split_4_64_lazy_data {
-    uint64_t      tables[16][16];
-    uint64_t      last_value;
-};
-
-struct gf_split_8_64_lazy_data {
-    uint64_t      tables[8][(1<<8)];
-    uint64_t      last_value;
-};
-
-struct gf_split_16_64_lazy_data {
-    uint64_t      tables[4][(1<<16)];
-    uint64_t      last_value;
-};
-
-struct gf_split_8_8_data {
-    uint64_t      tables[15][256][256];
-};
+#include "gf_w64.h"
 
 static
 inline
@@ -1488,25 +1457,25 @@ int gf_w64_bytwo_init(gf_t *gf)
   if (h->mult_type == GF_MULT_BYTWO_p) {
     gf->multiply.w64 = gf_w64_bytwo_p_multiply;
     #ifdef INTEL_SSE2 
-      if (h->region_type & GF_REGION_NOSSE)
+      if (h->region_type & GF_REGION_NOSIMD)
         gf->multiply_region.w64 = gf_w64_bytwo_p_nosse_multiply_region; 
       else
         gf->multiply_region.w64 = gf_w64_bytwo_p_sse_multiply_region; 
     #else
       gf->multiply_region.w64 = gf_w64_bytwo_p_nosse_multiply_region; 
-      if(h->region_type & GF_REGION_SSE)
+      if(h->region_type & GF_REGION_SIMD)
         return 0;
     #endif
   } else {
     gf->multiply.w64 = gf_w64_bytwo_b_multiply;
     #ifdef INTEL_SSE2 
-      if (h->region_type & GF_REGION_NOSSE)
+      if (h->region_type & GF_REGION_NOSIMD)
         gf->multiply_region.w64 = gf_w64_bytwo_b_nosse_multiply_region; 
       else
         gf->multiply_region.w64 = gf_w64_bytwo_b_sse_multiply_region; 
     #else
       gf->multiply_region.w64 = gf_w64_bytwo_b_nosse_multiply_region; 
-      if(h->region_type & GF_REGION_SSE)
+      if(h->region_type & GF_REGION_SIMD)
         return 0;
     #endif
   }
@@ -2006,7 +1975,7 @@ int gf_w64_split_init(gf_t *gf)
   gf->multiply.w64 = gf_w64_bytwo_p_multiply; 
 
 #if defined(INTEL_SSE4_PCLMUL) 
-  if ((!(h->region_type & GF_REGION_NOSSE) &&
+  if ((!(h->region_type & GF_REGION_NOSIMD) &&
      (h->arg1 == 64 || h->arg2 == 64)) ||
      h->mult_type == GF_MULT_DEFAULT){
    
@@ -2027,11 +1996,15 @@ int gf_w64_split_init(gf_t *gf)
   /* Allen: set region pointers for default mult type. Single pointers are
    * taken care of above (explicitly for sse, implicitly for no sse). */
 
-#ifdef INTEL_SSE4
+#if defined(INTEL_SSE4) || defined(ARCH_AARCH64)
   if (h->mult_type == GF_MULT_DEFAULT) {
     d4 = (struct gf_split_4_64_lazy_data *) h->private;
     d4->last_value = 0;
+#if defined(INTEL_SSE4)
     gf->multiply_region.w64 = gf_w64_split_4_64_lazy_sse_multiply_region; 
+#elif defined(ARCH_AARCH64)
+    gf_w64_neon_split_init(gf);
+#endif
   }
 #else
   if (h->mult_type == GF_MULT_DEFAULT) {
@@ -2045,25 +2018,31 @@ int gf_w64_split_init(gf_t *gf)
     d4 = (struct gf_split_4_64_lazy_data *) h->private;
     d4->last_value = 0;
 
-    if((h->region_type & GF_REGION_ALTMAP) && (h->region_type & GF_REGION_NOSSE)) return 0;
+    if((h->region_type & GF_REGION_ALTMAP) && (h->region_type & GF_REGION_NOSIMD)) return 0;
     if(h->region_type & GF_REGION_ALTMAP)
     {
       #ifdef INTEL_SSSE3
         gf->multiply_region.w64 = gf_w64_split_4_64_lazy_sse_altmap_multiply_region; 
+      #elif defined(ARCH_AARCH64)
+        gf_w64_neon_split_init(gf);
       #else
         return 0;
       #endif
     }
     else //no altmap
     {
-      #ifdef INTEL_SSE4
-        if(h->region_type & GF_REGION_NOSSE)
+      #if defined(INTEL_SSE4) || defined(ARCH_AARCH64)
+        if(h->region_type & GF_REGION_NOSIMD)
           gf->multiply_region.w64 = gf_w64_split_4_64_lazy_multiply_region;
         else
-          gf->multiply_region.w64 = gf_w64_split_4_64_lazy_sse_multiply_region; 
+        #if defined(INTEL_SSE4)
+          gf->multiply_region.w64 = gf_w64_split_4_64_lazy_sse_multiply_region;
+        #elif defined(ARCH_AARCH64)
+          gf_w64_neon_split_init(gf);
+        #endif
       #else
         gf->multiply_region.w64 = gf_w64_split_4_64_lazy_multiply_region;
-        if(h->region_type & GF_REGION_SSE)
+        if(h->region_type & GF_REGION_SIMD)
           return 0;
       #endif
     }
@@ -2134,7 +2113,7 @@ int gf_w64_scratch_size(int mult_type, int region_type, int divide_type, int arg
       /* Allen: set the *local* arg1 and arg2, just for scratch size purposes,
        * then fall through to split table scratch size code. */
 
-#ifdef INTEL_SSE4
+#if defined(INTEL_SSE4) || defined(ARCH_AARCH64)
       arg1 = 64;
       arg2 = 4;
 #else

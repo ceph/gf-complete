@@ -8,6 +8,14 @@
  * Performs unit testing for gf arithmetic
  */
 
+#include "config.h"
+
+#ifdef HAVE_POSIX_MEMALIGN
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 600
+#endif
+#endif
+
 #include <stdio.h>
 #include <getopt.h>
 #include <stdint.h>
@@ -82,6 +90,9 @@ int main(int argc, char **argv)
   uint32_t mask = 0;
   char *ra, *rb, *rc, *rd, *target;
   int align;
+#ifndef HAVE_POSIX_MEMALIGN
+  char *malloc_ra, *malloc_rb, *malloc_rc, *malloc_rd;
+#endif
 
 
   if (argc < 4) usage(NULL);
@@ -116,18 +127,26 @@ int main(int argc, char **argv)
   c = (gf_general_t *) malloc(sizeof(gf_general_t));
   d = (gf_general_t *) malloc(sizeof(gf_general_t));
 
+#if HAVE_POSIX_MEMALIGN
+  if (posix_memalign((void **) &ra, 16, sizeof(char)*REGION_SIZE))
+    ra = NULL;
+  if (posix_memalign((void **) &rb, 16, sizeof(char)*REGION_SIZE))
+    rb = NULL;
+  if (posix_memalign((void **) &rc, 16, sizeof(char)*REGION_SIZE))
+    rc = NULL;
+  if (posix_memalign((void **) &rd, 16, sizeof(char)*REGION_SIZE))
+    rd = NULL;
+#else
   //15 bytes extra to make sure it's 16byte aligned
-  ra = (char *) malloc(sizeof(char)*REGION_SIZE+15);
-  rb = (char *) malloc(sizeof(char)*REGION_SIZE+15);
-  rc = (char *) malloc(sizeof(char)*REGION_SIZE+15);
-  rd = (char *) malloc(sizeof(char)*REGION_SIZE+15);
-
-  //this still assumes 8 byte aligned pointer from malloc
-  //(which is usual on 32-bit machines)
-  ra += (uint64_t)ra & 0xf;
-  rb += (uint64_t)rb & 0xf;
-  rc += (uint64_t)rc & 0xf;
-  rd += (uint64_t)rd & 0xf;
+  malloc_ra = (char *) malloc(sizeof(char)*REGION_SIZE+15);
+  malloc_rb = (char *) malloc(sizeof(char)*REGION_SIZE+15);
+  malloc_rc = (char *) malloc(sizeof(char)*REGION_SIZE+15);
+  malloc_rd = (char *) malloc(sizeof(char)*REGION_SIZE+15);
+  ra = (uint8_t *) (((uintptr_t) malloc_ra + 15) & ~((uintptr_t) 0xf));
+  rb = (uint8_t *) (((uintptr_t) malloc_rb + 15) & ~((uintptr_t) 0xf));
+  rc = (uint8_t *) (((uintptr_t) malloc_rc + 15) & ~((uintptr_t) 0xf));
+  rd = (uint8_t *) (((uintptr_t) malloc_rd + 15) & ~((uintptr_t) 0xf));
+#endif
 
   if (w <= 32) {
     mask = 0;
@@ -423,10 +442,17 @@ int main(int argc, char **argv)
   free(b);
   free(c);
   free(d);
+#ifdef HAVE_POSIX_MEMALIGN
   free(ra);
   free(rb);
   free(rc);
   free(rd);
+#else
+  free(malloc_ra);
+  free(malloc_rb);
+  free(malloc_rc);
+  free(malloc_rd);
+#endif
   
   return 0;
 }

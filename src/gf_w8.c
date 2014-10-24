@@ -9,87 +9,9 @@
  */
 
 #include "gf_int.h"
+#include "gf_w8.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-#define GF_FIELD_WIDTH (8)
-#define GF_FIELD_SIZE       (1 << GF_FIELD_WIDTH)
-#define GF_HALF_SIZE       (1 << (GF_FIELD_WIDTH/2))
-#define GF_MULT_GROUP_SIZE       GF_FIELD_SIZE-1
-
-#define GF_BASE_FIELD_WIDTH (4)
-#define GF_BASE_FIELD_SIZE       (1 << GF_BASE_FIELD_WIDTH)
-
-struct gf_w8_logtable_data {
-    uint8_t         log_tbl[GF_FIELD_SIZE];
-    uint8_t         antilog_tbl[GF_FIELD_SIZE * 2];
-    uint8_t         inv_tbl[GF_FIELD_SIZE];
-};
-
-struct gf_w8_logzero_table_data {
-    short           log_tbl[GF_FIELD_SIZE];  /* Make this signed, so that we can divide easily */
-    uint8_t         antilog_tbl[512+512+1];
-    uint8_t         *div_tbl;
-    uint8_t         *inv_tbl;
-};
-
-struct gf_w8_logzero_small_table_data {
-    short           log_tbl[GF_FIELD_SIZE];  /* Make this signed, so that we can divide easily */
-    uint8_t         antilog_tbl[255*3];
-    uint8_t         inv_tbl[GF_FIELD_SIZE];
-    uint8_t         *div_tbl;
-};
-
-struct gf_w8_composite_data {
-  uint8_t *mult_table;
-};
-
-/* Don't change the order of these relative to gf_w8_half_table_data */
-
-struct gf_w8_default_data {
-  uint8_t     high[GF_FIELD_SIZE][GF_HALF_SIZE];
-  uint8_t     low[GF_FIELD_SIZE][GF_HALF_SIZE];
-  uint8_t     divtable[GF_FIELD_SIZE][GF_FIELD_SIZE];
-  uint8_t     multtable[GF_FIELD_SIZE][GF_FIELD_SIZE];
-};
-
-struct gf_w8_half_table_data {
-  uint8_t     high[GF_FIELD_SIZE][GF_HALF_SIZE];
-  uint8_t     low[GF_FIELD_SIZE][GF_HALF_SIZE];
-};
-
-struct gf_w8_single_table_data {
-  uint8_t     divtable[GF_FIELD_SIZE][GF_FIELD_SIZE];
-  uint8_t     multtable[GF_FIELD_SIZE][GF_FIELD_SIZE];
-};
-
-struct gf_w8_double_table_data {
-    uint8_t         div[GF_FIELD_SIZE][GF_FIELD_SIZE];
-    uint16_t        mult[GF_FIELD_SIZE][GF_FIELD_SIZE*GF_FIELD_SIZE];
-};
-
-struct gf_w8_double_table_lazy_data {
-    uint8_t         div[GF_FIELD_SIZE][GF_FIELD_SIZE];
-    uint8_t         smult[GF_FIELD_SIZE][GF_FIELD_SIZE];
-    uint16_t        mult[GF_FIELD_SIZE*GF_FIELD_SIZE];
-};
-
-struct gf_w4_logtable_data {
-    uint8_t         log_tbl[GF_BASE_FIELD_SIZE];
-    uint8_t         antilog_tbl[GF_BASE_FIELD_SIZE * 2];
-    uint8_t         *antilog_tbl_div;
-};
-
-struct gf_w4_single_table_data {
-    uint8_t         div[GF_BASE_FIELD_SIZE][GF_BASE_FIELD_SIZE];
-    uint8_t         mult[GF_BASE_FIELD_SIZE][GF_BASE_FIELD_SIZE];
-};
-
-struct gf_w8_bytwo_data {
-    uint64_t prim_poly;
-    uint64_t mask1;
-    uint64_t mask2;
-};
 
 #define AB2(ip, am1 ,am2, b, t1, t2) {\
   t1 = (b << 1) & am1;\
@@ -603,6 +525,8 @@ int gf_w8_cfm_init(gf_t *gf)
       return 0;
     }
   return 1;
+#elif defined(ARM_NEON)
+  return gf_w8_neon_cfm_init(gf);
 #endif
 
   return 0;
@@ -938,7 +862,7 @@ gf_w8_default_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
   return (ftd->multtable[a][b]);
 }
 
-#ifdef INTEL_SSSE3
+#if defined(INTEL_SSSE3) || defined(ARM_NEON)
 static
   gf_val_32_t
 gf_w8_default_divide(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
@@ -1179,14 +1103,18 @@ int gf_w8_split_init(gf_t *gf)
 
   gf->multiply.w32 = gf_w8_split_multiply;
   
-  #ifdef INTEL_SSSE3
-    if (h->region_type & GF_REGION_NOSSE)
+  #if defined(INTEL_SSSE3) || defined(ARM_NEON)
+    if (h->region_type & GF_REGION_NOSIMD)
       gf->multiply_region.w32 = gf_w8_split_multiply_region;
     else
+    #if defined(INTEL_SSSE3)
       gf->multiply_region.w32 = gf_w8_split_multiply_region_sse;
+    #elif defined(ARM_NEON)
+      gf_w8_neon_split_init(gf);
+    #endif
   #else
     gf->multiply_region.w32 = gf_w8_split_multiply_region;
-    if(h->region_type & GF_REGION_SSE)
+    if(h->region_type & GF_REGION_SIMD)
       return 0;
   #endif
 
@@ -1205,17 +1133,17 @@ int gf_w8_table_init(gf_t *gf)
   struct gf_w8_double_table_data *dtd = NULL;
   struct gf_w8_double_table_lazy_data *ltd = NULL;
   struct gf_w8_default_data *dd = NULL;
-  int a, b, c, prod, scase, issse;
+  int a, b, c, prod, scase, use_simd;
 
   h = (gf_internal_t *) gf->scratch;
 
-#ifdef INTEL_SSSE3
-  issse = 1;
+#if defined(INTEL_SSSE3) || defined(ARM_NEON)
+  use_simd = 1;
 #else
-  issse = 0;
+  use_simd = 0;
 #endif
 
-  if (h->mult_type == GF_MULT_DEFAULT && issse) {
+  if (h->mult_type == GF_MULT_DEFAULT && use_simd) {
     dd = (struct gf_w8_default_data *)h->private;
     scase = 3;
     bzero(dd->high, sizeof(uint8_t) * GF_FIELD_SIZE * GF_HALF_SIZE);
@@ -1290,10 +1218,14 @@ int gf_w8_table_init(gf_t *gf)
       gf->multiply_region.w32 = gf_w8_double_table_multiply_region;
       break;
     case 3:
-#ifdef INTEL_SSSE3
+#if defined(INTEL_SSSE3) || defined(ARM_NEON)
       gf->divide.w32 = gf_w8_default_divide;
       gf->multiply.w32 = gf_w8_default_multiply;
+#if defined(INTEL_SSSE3)
       gf->multiply_region.w32 = gf_w8_split_multiply_region_sse;
+#elif defined(ARM_NEON)
+      gf_w8_neon_split_init(gf);
+#endif
 #endif
       break;
   }
@@ -2259,25 +2191,25 @@ int gf_w8_bytwo_init(gf_t *gf)
   if (h->mult_type == GF_MULT_BYTWO_p) {
     gf->multiply.w32 = gf_w8_bytwo_p_multiply;
 #ifdef INTEL_SSE2
-    if (h->region_type & GF_REGION_NOSSE)
+    if (h->region_type & GF_REGION_NOSIMD)
       gf->multiply_region.w32 = gf_w8_bytwo_p_nosse_multiply_region;
     else
       gf->multiply_region.w32 = gf_w8_bytwo_p_sse_multiply_region;
 #else
     gf->multiply_region.w32 = gf_w8_bytwo_p_nosse_multiply_region;
-    if(h->region_type & GF_REGION_SSE)
+    if(h->region_type & GF_REGION_SIMD)
       return 0;
 #endif
   } else {
     gf->multiply.w32 = gf_w8_bytwo_b_multiply;
 #ifdef INTEL_SSE2
-    if (h->region_type & GF_REGION_NOSSE)
+    if (h->region_type & GF_REGION_NOSIMD)
       gf->multiply_region.w32 = gf_w8_bytwo_b_nosse_multiply_region;
     else
       gf->multiply_region.w32 = gf_w8_bytwo_b_sse_multiply_region;
 #else
     gf->multiply_region.w32 = gf_w8_bytwo_b_nosse_multiply_region;
-    if(h->region_type & GF_REGION_SSE)
+    if(h->region_type & GF_REGION_SIMD)
       return 0;
 #endif
   }
@@ -2296,7 +2228,7 @@ int gf_w8_scratch_size(int mult_type, int region_type, int divide_type, int arg1
   switch(mult_type)
   {
     case GF_MULT_DEFAULT:
-#ifdef INTEL_SSSE3
+#if defined(INTEL_SSSE3) || defined(ARM_NEON)
       return sizeof(gf_internal_t) + sizeof(struct gf_w8_default_data) + 64;
 #endif
       return sizeof(gf_internal_t) + sizeof(struct gf_w8_single_table_data) + 64;

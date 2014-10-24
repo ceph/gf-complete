@@ -33,6 +33,10 @@
   #include <wmmintrin.h>
 #endif
 
+#if defined(ARM_NEON)
+  #include <arm_neon.h>
+#endif
+
 
 /* These are the different ways to perform multiplication.
    Not all are implemented for all values of w.
@@ -61,7 +65,9 @@ typedef enum {GF_MULT_DEFAULT,
 #define GF_REGION_DOUBLE_TABLE (0x1)
 #define GF_REGION_QUAD_TABLE   (0x2)
 #define GF_REGION_LAZY         (0x4)
+#define GF_REGION_SIMD         (0x8)
 #define GF_REGION_SSE          (0x8)
+#define GF_REGION_NOSIMD       (0x10)
 #define GF_REGION_NOSSE        (0x10)
 #define GF_REGION_ALTMAP       (0x20)
 #define GF_REGION_CAUCHY       (0x40)
