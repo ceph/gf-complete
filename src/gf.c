@@ -11,6 +11,7 @@
 #include "gf_int.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 int _gf_errno = GF_E_DEFAULT;
 
@@ -528,7 +529,7 @@ void gf_alignment_error(char *s, int a)
   fprintf(stderr, "Alignment error in %s:\n", s);
   fprintf(stderr, "   The source and destination buffers must be aligned to each other,\n");
   fprintf(stderr, "   and they must be aligned to a %d-byte address.\n", a);
-  exit(1);
+  assert(0);
 }
 
 static 
@@ -551,7 +552,7 @@ void gf_invert_binary_matrix(uint32_t *mat, uint32_t *inv, int rows) {
       for (j = i+1; j < rows && (mat[j] & (1 << i)) == 0; j++) ;
       if (j == rows) {
         fprintf(stderr, "galois_invert_matrix: Matrix not invertible!!\n");
-        exit(1);
+        assert(0);
       }
       tmp = mat[i]; mat[i] = mat[j]; mat[j] = tmp;
       tmp = inv[i]; inv[i] = inv[j]; inv[j] = tmp;
@@ -812,7 +813,7 @@ void gf_set_region_data(gf_region_data *rd,
     if (h != NULL && bytes % h->w != 0) {
       fprintf(stderr, "Error in region multiply operation.\n");
       fprintf(stderr, "The size must be a multiple of %d bytes.\n", h->w);
-      exit(1);
+      assert(0);
     }
   
     rd->s_start = src;
@@ -828,7 +829,7 @@ void gf_set_region_data(gf_region_data *rd,
     fprintf(stderr, "to each other along a %d byte boundary.\n", a);
     fprintf(stderr, "Src = 0x%lx.  Dest = 0x%lx\n", (unsigned long) src,
             (unsigned long) dest);
-    exit(1);
+    assert(0);
   }
 
   if (uls % wb != 0) {
@@ -836,13 +837,13 @@ void gf_set_region_data(gf_region_data *rd,
     fprintf(stderr, "The pointers must be aligned along a %d byte boundary.\n", wb);
     fprintf(stderr, "Src = 0x%lx.  Dest = 0x%lx\n", (unsigned long) src,
             (unsigned long) dest);
-    exit(1);
+    assert(0);
   }
 
   if (bytes % wb != 0) {
     fprintf(stderr, "Error in region multiply operation.\n");
     fprintf(stderr, "The size must be a multiple of %d bytes.\n", wb);
-    exit(1);
+    assert(0);
   }
 
   uls %= a;

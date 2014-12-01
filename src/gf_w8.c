@@ -12,6 +12,7 @@
 #include "gf_w8.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #define AB2(ip, am1 ,am2, b, t1, t2) {\
   t1 = (b << 1) & am1;\
@@ -1168,7 +1169,7 @@ int gf_w8_table_init(gf_t *gf)
     scase = 2;
   } else {
     fprintf(stderr, "Internal error in gf_w8_table_init\n");
-    exit(0);
+    assert(0);
   }
 
   for (a = 1; a < GF_FIELD_SIZE; a++) {
