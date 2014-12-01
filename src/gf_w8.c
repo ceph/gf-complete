@@ -11,6 +11,7 @@
 #include "gf_int.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #define GF_FIELD_WIDTH (8)
 #define GF_FIELD_SIZE       (1 << GF_FIELD_WIDTH)
@@ -1239,7 +1240,7 @@ int gf_w8_table_init(gf_t *gf)
     scase = 2;
   } else {
     fprintf(stderr, "Internal error in gf_w8_table_init\n");
-    exit(0);
+    assert(0);
   }
 
   for (a = 1; a < GF_FIELD_SIZE; a++) {
