@@ -50,6 +50,7 @@ config.sub
 ltmain.sh
 m4/libtool.m4
 m4/ltversion.m4
+src/.dirstamp
 
 examples/gf_example_1
 examples/gf_example_2
