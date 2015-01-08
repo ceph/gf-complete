@@ -12,7 +12,7 @@ The user's manual is in the file Manual.pdf.
 
 The online home for GF-Complete is:
 
-  - https://jerasure.org/jerasure/gf-complete
+  - http://jerasure.org/jerasure/gf-complete
 
 To compile, do:
 
