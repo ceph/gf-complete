@@ -60,5 +60,11 @@ AC_ARG_ENABLE([sse],
               fi]
 )
 
+AC_ARG_ENABLE([valgrind],
+            [AS_HELP_STRING([--enable-valgrind], [run tests with valgrind])],
+            [],
+            [enable_valgrind=no])
+AM_CONDITIONAL(ENABLE_VALGRIND, test "x$enable_valgrind" != xno)
+
 AC_CONFIG_FILES([Makefile src/Makefile tools/Makefile test/Makefile examples/Makefile])
 AC_OUTPUT
