@@ -910,7 +910,8 @@ void gf_multby_one(void *src, void *dest, int bytes, int xor)
   gf_region_data rd;
 
   if (!xor) {
-    memcpy(dest, src, bytes);
+    if (dest != src)
+      memcpy(dest, src, bytes);
     return;
   }
   uls = (unsigned long) src;
