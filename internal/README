@@ -16,6 +16,7 @@ The online home for GF-Complete is:
 
 To compile, do:
 
+   ./autogen
    ./configure
    make
    sudo make install
