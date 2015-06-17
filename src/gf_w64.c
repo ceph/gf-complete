@@ -2153,7 +2153,6 @@ int gf_w64_scratch_size(int mult_type, int region_type, int divide_type, int arg
 int gf_w64_init(gf_t *gf)
 {
   gf_internal_t *h;
-  int no_default_flag = 0;
 
   h = (gf_internal_t *) gf->scratch;
   
@@ -2167,10 +2166,6 @@ int gf_w64_init(gf_t *gf)
       if (h->prim_poly == 0) return 0; /* This shouldn't happen */
     } else {
       h->prim_poly = 0x1b;
-    } 
-    if (no_default_flag == 1) { 
-      fprintf(stderr,"Code contains no default irreducible polynomial for given base field\n"); 
-      return 0; 
     } 
   }
 
