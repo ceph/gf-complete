@@ -767,7 +767,7 @@ gf_w64_group_multiply(gf_t *gf, gf_val_64_t a, gf_val_64_t b)
   gd = (struct gf_w64_group_data *) h->private;
   gf_w64_group_set_shift_tables(gd->shift, b, h);
 
-  mask = ((1 << g_s) - 1);
+  mask = (((uint64_t)1 << g_s) - 1);
   top = 0;
   bot = gd->shift[a&mask];
   a >>= g_s; 
