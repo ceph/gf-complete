@@ -791,7 +791,7 @@ gf_w64_group_multiply(gf_t *gf, gf_val_64_t a, gf_val_64_t b)
      
   lshift = ((lshift-1) / g_r) * g_r;
   rshift = 64 - lshift;
-  mask = (1 << g_r) - 1;
+  mask = ((uint64_t)1 << g_r) - 1;
   while (lshift >= 0) {
     tp = gd->reduce[(top >> lshift) & mask];
     top ^= (tp >> rshift);
