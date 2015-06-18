@@ -994,7 +994,7 @@ int gf_w64_group_init(gf_t *gf)
   gd->reduce = gd->shift + (1 << g_s);
 
   gd->reduce[0] = 0;
-  for (i = 0; i < (1 << g_r); i++) {
+  for (i = 0; i < ((uint64_t)1 << g_r); i++) {
     p = 0;
     index = 0;
     for (j = 0; j < g_r; j++) {
