@@ -840,8 +840,8 @@ void gf_w64_group_multiply_region(gf_t *gf, void *src, void *dest, gf_val_64_t v
   d64 = (uint64_t *) rd.d_start;
   dtop = (uint64_t *) rd.d_top;
 
-  smask = (1 << g_s) - 1;
-  rmask = (1 << g_r) - 1;
+  smask = ((uint64_t)1 << g_s) - 1;
+  rmask = ((uint64_t)1 << g_r) - 1;
 
   while (d64 < dtop) {
     a64 = *s64;
