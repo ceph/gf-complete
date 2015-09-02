@@ -1218,7 +1218,7 @@ int gf_w16_split_init(gf_t *gf)
   struct gf_w16_split_8_8_data *d8;
   int i, j, exp, issse3;
   int isneon = 0;
-  uint32_t p, basep;
+  uint32_t p, basep, tmp;
 
   h = (gf_internal_t *) gf->scratch;
 
@@ -1253,7 +1253,8 @@ int gf_w16_split_init(gf_t *gf)
           if (j&1) {
             d8->tables[exp][i][j] = d8->tables[exp][i][j^1] ^ p;
           } else {
-            d8->tables[exp][i][j] = GF_MULTBY_TWO(d8->tables[exp][i][j>>1]);
+            tmp = d8->tables[exp][i][j>>1];
+            d8->tables[exp][i][j] = GF_MULTBY_TWO(tmp);
           }
         }
       }

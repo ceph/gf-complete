@@ -50,7 +50,7 @@ void
 gf_w32_multiply_region_from_single(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int 
 xor)
 {
-  int i;
+  uint32_t i;
   uint32_t *s32;
   uint32_t *d32;
    
@@ -75,7 +75,7 @@ void
 gf_w32_clm_multiply_region_from_single_2(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
 
-  int i;
+  uint32_t i;
   uint32_t *s32;
   uint32_t *d32;
   
@@ -125,7 +125,7 @@ void
 gf_w32_clm_multiply_region_from_single_3(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
 
-  int i;
+  uint32_t i;
   uint32_t *s32;
   uint32_t *d32;
   
@@ -178,7 +178,7 @@ static
 void
 gf_w32_clm_multiply_region_from_single_4(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
-  int i;
+  uint32_t i;
   uint32_t *s32;
   uint32_t *d32;
   
@@ -389,7 +389,7 @@ void
 gf_w32_cfmgk_multiply_region_from_single(gf_t *gf, void *src, void *dest, uint32_t val, int bytes, int xor)
 {
 
-  int i;
+  uint32_t i;
   uint32_t *s32;
   uint32_t *d32;
   
@@ -666,12 +666,12 @@ static
   void
 gf_w32_group_set_shift_tables(uint32_t *shift, uint32_t val, gf_internal_t *h)
 {
-  int i;
+  uint32_t i;
   uint32_t j;
 
   shift[0] = 0;
 
-  for (i = 1; i < (1 << h->arg1); i <<= 1) {
+  for (i = 1; i < ((uint32_t)1 << h->arg1); i <<= 1) {
     for (j = 0; j < i; j++) shift[i|j] = shift[j]^val;
     if (val & GF_FIRST_BIT) {
       val <<= 1;
@@ -2375,7 +2375,7 @@ int gf_w32_group_init(gf_t *gf)
   uint32_t i, j, p, index;
   struct gf_w32_group_data *gd;
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
-  int g_r, g_s;
+  uint32_t g_r, g_s;
 
   g_s = h->arg1;
   g_r = h->arg2;
@@ -2393,7 +2393,7 @@ int gf_w32_group_init(gf_t *gf)
   gd->tshift = ((gd->tshift-1)/g_r) * g_r;
 
   gd->reduce[0] = 0;
-  for (i = 0; i < (1 << g_r); i++) {
+  for (i = 0; i < ((uint32_t)1 << g_r); i++) {
     p = 0;
     index = 0;
     for (j = 0; j < g_r; j++) {
