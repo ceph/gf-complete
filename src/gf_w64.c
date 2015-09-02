@@ -35,7 +35,7 @@ void
 gf_w64_multiply_region_from_single(gf_t *gf, void *src, void *dest, gf_val_64_t val, int bytes, int
 xor)
 {
-  int i;
+  uint32_t i;
   gf_val_64_t *s64;
   gf_val_64_t *d64;
 
@@ -733,7 +733,7 @@ static
 void
 gf_w64_group_set_shift_tables(uint64_t *shift, uint64_t val, gf_internal_t *h)
 {
-  int i;
+  uint64_t i;
   uint64_t j;
   uint64_t one = 1;
   int g_s;
@@ -741,7 +741,7 @@ gf_w64_group_set_shift_tables(uint64_t *shift, uint64_t val, gf_internal_t *h)
   g_s = h->arg1;
   shift[0] = 0;
  
-  for (i = 1; i < (1 << g_s); i <<= 1) {
+  for (i = 1; i < ((uint64_t)1 << g_s); i <<= 1) {
     for (j = 0; j < i; j++) shift[i|j] = shift[j]^val;
     if (val & (one << 63)) {
       val <<= 1;
@@ -984,7 +984,7 @@ int gf_w64_group_init(gf_t *gf)
   uint64_t i, j, p, index;
   struct gf_w64_group_data *gd;
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
-  int g_r, g_s;
+  uint64_t g_r, g_s;
 
   g_s = h->arg1;
   g_r = h->arg2;

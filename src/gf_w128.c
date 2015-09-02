@@ -49,7 +49,7 @@ void
 gf_w128_multiply_region_from_single(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes,
 int xor)
 {
-    int i;
+    uint32_t i;
     gf_val_128_t s128;
     gf_val_128_t d128;
     uint64_t c128[2];
@@ -87,7 +87,7 @@ void
 gf_w128_clm_multiply_region_from_single(gf_t *gf, void *src, void *dest, gf_val_128_t val, int bytes,
 int xor)
 {
-    int i;
+    uint32_t i;
     gf_val_128_t s128;
     gf_val_128_t d128;
     gf_region_data rd;
