@@ -767,7 +767,7 @@ gf_w64_group_multiply(gf_t *gf, gf_val_64_t a, gf_val_64_t b)
   gd = (struct gf_w64_group_data *) h->private;
   gf_w64_group_set_shift_tables(gd->shift, b, h);
 
-  mask = ((1 << g_s) - 1);
+  mask = (((uint64_t)1 << g_s) - 1);
   top = 0;
   bot = gd->shift[a&mask];
   a >>= g_s; 
@@ -791,7 +791,7 @@ gf_w64_group_multiply(gf_t *gf, gf_val_64_t a, gf_val_64_t b)
      
   lshift = ((lshift-1) / g_r) * g_r;
   rshift = 64 - lshift;
-  mask = (1 << g_r) - 1;
+  mask = ((uint64_t)1 << g_r) - 1;
   while (lshift >= 0) {
     tp = gd->reduce[(top >> lshift) & mask];
     top ^= (tp >> rshift);
@@ -840,8 +840,8 @@ void gf_w64_group_multiply_region(gf_t *gf, void *src, void *dest, gf_val_64_t v
   d64 = (uint64_t *) rd.d_start;
   dtop = (uint64_t *) rd.d_top;
 
-  smask = (1 << g_s) - 1;
-  rmask = (1 << g_r) - 1;
+  smask = ((uint64_t)1 << g_s) - 1;
+  rmask = ((uint64_t)1 << g_r) - 1;
 
   while (d64 < dtop) {
     a64 = *s64;
@@ -994,7 +994,7 @@ int gf_w64_group_init(gf_t *gf)
   gd->reduce = gd->shift + (1 << g_s);
 
   gd->reduce[0] = 0;
-  for (i = 0; i < (1 << g_r); i++) {
+  for (i = 0; i < ((uint64_t)1 << g_r); i++) {
     p = 0;
     index = 0;
     for (j = 0; j < g_r; j++) {
@@ -2153,7 +2153,6 @@ int gf_w64_scratch_size(int mult_type, int region_type, int divide_type, int arg
 int gf_w64_init(gf_t *gf)
 {
   gf_internal_t *h;
-  int no_default_flag = 0;
 
   h = (gf_internal_t *) gf->scratch;
   
@@ -2167,10 +2166,6 @@ int gf_w64_init(gf_t *gf)
       if (h->prim_poly == 0) return 0; /* This shouldn't happen */
     } else {
       h->prim_poly = 0x1b;
-    } 
-    if (no_default_flag == 1) { 
-      fprintf(stderr,"Code contains no default irreducible polynomial for given base field\n"); 
-      return 0; 
     } 
   }
 
