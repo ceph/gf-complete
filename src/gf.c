@@ -119,7 +119,7 @@ void gf_error()
 uint64_t gf_composite_get_default_poly(gf_t *base) 
 {
   gf_internal_t *h;
-  int rv;
+  uint64_t rv;
 
   h = (gf_internal_t *) base->scratch;
   if (h->w == 4) {
@@ -584,7 +584,7 @@ uint32_t gf_bitmatrix_inverse(uint32_t y, int w, uint32_t pp)
   uint32_t mat[32], inv[32], mask;
   int i;
 
-  mask = (w == 32) ? 0xffffffff : (1 << w) - 1;
+  mask = (w == 32) ? 0xffffffff : ((uint32_t)1 << w) - 1;
   for (i = 0; i < w; i++) {
     mat[i] = y;
 

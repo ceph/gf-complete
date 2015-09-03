@@ -4,7 +4,7 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
 AM_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include
-AM_CFLAGS = -O3 $(SIMD_FLAGS) -fPIC
+AM_CFLAGS = -O3 $(SIMD_FLAGS) -fPIC -Wsign-compare
 
 lib_LTLIBRARIES = libgf_complete.la
 libgf_complete_la_SOURCES = gf.c gf_method.c gf_wgen.c gf_w4.c gf_w8.c gf_w16.c gf_w32.c \

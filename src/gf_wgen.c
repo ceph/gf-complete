@@ -166,10 +166,10 @@ gf_wgen_shift_multiply (gf_t *gf, uint32_t a32, uint32_t b32)
 
   product = 0;
 
-  for (i = 0; i < h->w; i++) {
+  for (i = 0; i < (uint64_t)h->w; i++) {
     if (a & (one << i)) product ^= (b << i);
   }
-  for (i = h->w*2-1; i >= h->w; i--) {
+  for (i = h->w*2-1; i >= (uint64_t)h->w; i--) {
     if (product & (one << i)) product ^= (pp << (i-h->w));
   }
   return product;
@@ -256,7 +256,7 @@ static
 void
 gf_wgen_group_set_shift_tables(uint32_t *shift, uint32_t val, gf_internal_t *h)
 {
-  int i;
+  uint32_t i;
   uint32_t j;
   int g_s;
 
@@ -268,7 +268,7 @@ gf_wgen_group_set_shift_tables(uint32_t *shift, uint32_t val, gf_internal_t *h)
 
   shift[0] = 0;
 
-  for (i = 1; i < (1 << g_s); i <<= 1) {
+  for (i = 1; i < ((uint32_t)1 << g_s); i <<= 1) {
     for (j = 0; j < i; j++) shift[i|j] = shift[j]^val;
     if (val & (1 << (h->w-1))) {
       val <<= 1;
@@ -417,7 +417,7 @@ int gf_wgen_group_init(gf_t *gf)
   uint32_t i, j, p, index;
   struct gf_wgen_group_data *gd;
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
-  int g_s, g_r;
+  uint32_t g_s, g_r;
 
   if (h->mult_type == GF_MULT_DEFAULT) {
     g_s = 2;
@@ -440,7 +440,7 @@ int gf_wgen_group_init(gf_t *gf)
   gd->tshift = ((gd->tshift-1)/g_r) * g_r;
 
   gd->reduce[0] = 0;
-  for (i = 0; i < (1 << g_r); i++) {
+  for (i = 0; i < ((uint32_t)1 << g_r); i++) {
     p = 0;
     index = 0;
     for (j = 0; j < g_r; j++) {
@@ -504,15 +504,15 @@ int gf_wgen_table_8_init(gf_t *gf)
   std->mult = &(std->base);
   std->div = std->mult + ((1<<h->w)*(1<<h->w));
   
-  for (a = 0; a < (1 << w); a++) {
+  for (a = 0; a < ((uint32_t)1 << w); a++) {
     std->mult[a] = 0;
     std->mult[a<<w] = 0;
     std->div[a] = 0;
     std->div[a<<w] = 0;
   }
     
-  for (a = 1; a < (1 << w); a++) {
-    for (b = 1; b < (1 << w); b++) {
+  for (a = 1; a < ((uint32_t)1 << w); a++) {
+    for (b = 1; b < ((uint32_t)1 << w); b++) {
       p = gf_wgen_shift_multiply(gf, a, b);
       std->mult[(a<<w)|b] = p;
       std->div[(p<<w)|a] = b;
@@ -565,15 +565,15 @@ int gf_wgen_table_16_init(gf_t *gf)
   std->mult = &(std->base);
   std->div = std->mult + ((1<<h->w)*(1<<h->w));
   
-  for (a = 0; a < (1 << w); a++) {
+  for (a = 0; a < ((uint32_t)1 << w); a++) {
     std->mult[a] = 0;
     std->mult[a<<w] = 0;
     std->div[a] = 0;
     std->div[a<<w] = 0;
   }
   
-  for (a = 1; a < (1 << w); a++) {
-    for (b = 1; b < (1 << w); b++) {
+  for (a = 1; a < ((uint32_t)1 << w); a++) {
+    for (b = 1; b < ((uint32_t)1 << w); b++) {
       p = gf_wgen_shift_multiply(gf, a, b);
       std->mult[(a<<w)|b] = p;
       std->div[(p<<w)|a] = b;
@@ -649,11 +649,11 @@ int gf_wgen_log_8_init(gf_t *gf)
   std->anti = std->log + (1<<h->w);
   std->danti = std->anti + (1<<h->w)-1;
   
-  for (i = 0; i < (1 << w); i++)
+  for (i = 0; i < ((uint32_t)1 << w); i++)
     std->log[i] = 0;
 
   a = 1;
-  for(i=0; i < (1<<w)-1; i++)
+  for(i=0; i < ((uint32_t)1<<w)-1; i++)
   {
     if (std->log[a] != 0) check = 1;
     std->log[a] = i;
@@ -724,11 +724,11 @@ int gf_wgen_log_16_init(gf_t *gf)
   std->anti = std->log + (1<<h->w);
   std->danti = std->anti + (1<<h->w)-1;
  
-  for (i = 0; i < (1 << w); i++)
+  for (i = 0; i < ((uint32_t)1 << w); i++)
     std->log[i] = 0;
 
   a = 1;
-  for(i=0; i < (1<<w)-1; i++)
+  for(i=0; i < ((uint32_t)1<<w)-1; i++)
   {
     if (std->log[a] != 0) check = 1;
     std->log[a] = i;
@@ -800,11 +800,11 @@ int gf_wgen_log_32_init(gf_t *gf)
   std->anti = std->log + (1<<h->w);
   std->danti = std->anti + (1<<h->w)-1;
   
-  for (i = 0; i < (1 << w); i++)
+  for (i = 0; i < ((uint32_t)1 << w); i++)
     std->log[i] = 0;
 
   a = 1;
-  for(i=0; i < (1<<w)-1; i++)
+  for(i=0; i < ((uint32_t)1<<w)-1; i++)
   {
     if (std->log[a] != 0) check = 1;
     std->log[a] = i;
