@@ -1884,7 +1884,7 @@ int gf_w16_log_zero_init(gf_t *gf)
 
   ltd->log_tbl[0] = (-GF_MULT_GROUP_SIZE) + 1;
 
-  bzero(&(ltd->_antilog_tbl[0]), sizeof(ltd->_antilog_tbl));
+  memset(&(ltd->_antilog_tbl[0]), 0, sizeof(ltd->_antilog_tbl));
 
   ltd->antilog_tbl = &(ltd->_antilog_tbl[GF_FIELD_SIZE * 2]);
 
