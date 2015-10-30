@@ -88,7 +88,7 @@ gf_w128_clm_multiply_region_from_single(gf_t *gf, void *src, void *dest, gf_val_
 int xor)
 {
     uint32_t i;
-    gf_val_128_t s128;
+    __m128i* s128;
     gf_val_128_t d128;
     gf_region_data rd;
     __m128i     a,b;
@@ -105,20 +105,18 @@ int xor)
       if (val[1] == 1) { gf_multby_one(src, dest, bytes, xor); return; }
     }
 
-    s128 = (gf_val_128_t) src;
+    s128 = (__m128i*) src;
     d128 = (gf_val_128_t) dest;
 
     if (xor) {
       for (i = 0; i < bytes/sizeof(gf_val_64_t); i += 2) {
-        a = _mm_insert_epi64 (_mm_setzero_si128(), s128[i+1], 0);
-        b = _mm_insert_epi64 (a, val[1], 0);
-        a = _mm_insert_epi64 (a, s128[i], 1);
-        b = _mm_insert_epi64 (b, val[0], 1);
+        a = _mm_loadu_si128 (s128 + (i>>1));
+        b = _mm_loadu_si128 ((__m128i*) val);
     
-        c = _mm_clmulepi64_si128 (a, b, 0x00); /*low-low*/
-        f = _mm_clmulepi64_si128 (a, b, 0x01); /*high-low*/
-        e = _mm_clmulepi64_si128 (a, b, 0x10); /*low-high*/
-        d = _mm_clmulepi64_si128 (a, b, 0x11); /*high-high*/
+        c = _mm_clmulepi64_si128 (a, b, 0x11); /*low-low*/
+        f = _mm_clmulepi64_si128 (a, b, 0x10); /*high-low*/
+        e = _mm_clmulepi64_si128 (a, b, 0x01); /*low-high*/
+        d = _mm_clmulepi64_si128 (a, b, 0x00); /*high-high*/
 
         /* now reusing a and b as temporary variables*/
         result0 = _mm_setzero_si128();
@@ -141,20 +139,18 @@ int xor)
         a = _mm_insert_epi64 (result0, 0, 1);
         b = _mm_clmulepi64_si128 (a, prim_poly, 0x00);
         result1 = _mm_xor_si128 (result1, b); 
-        d128[i] ^= (uint64_t)_mm_extract_epi64(result1,1);
-        d128[i+1] ^= (uint64_t)_mm_extract_epi64(result1,0);
+        d128[i] ^= (uint64_t)_mm_cvtsi128_si64(_mm_srli_si128(result1,8));
+        d128[i+1] ^= (uint64_t)_mm_cvtsi128_si64(result1);
       }
     } else {
       for (i = 0; i < bytes/sizeof(gf_val_64_t); i += 2) {
-        a = _mm_insert_epi64 (_mm_setzero_si128(), s128[i+1], 0);
-        b = _mm_insert_epi64 (a, val[1], 0);
-        a = _mm_insert_epi64 (a, s128[i], 1);
-        b = _mm_insert_epi64 (b, val[0], 1);
+        a = _mm_loadu_si128 (s128 + (i>>1));
+        b = _mm_loadu_si128 ((__m128i*) val);
 
-        c = _mm_clmulepi64_si128 (a, b, 0x00); /*low-low*/
-        f = _mm_clmulepi64_si128 (a, b, 0x01); /*high-low*/
-        e = _mm_clmulepi64_si128 (a, b, 0x10); /*low-high*/ 
-        d = _mm_clmulepi64_si128 (a, b, 0x11); /*high-high*/ 
+        c = _mm_clmulepi64_si128 (a, b, 0x11); /*low-low*/
+        f = _mm_clmulepi64_si128 (a, b, 0x10); /*high-low*/
+        e = _mm_clmulepi64_si128 (a, b, 0x01); /*low-high*/ 
+        d = _mm_clmulepi64_si128 (a, b, 0x00); /*high-high*/ 
 
         /* now reusing a and b as temporary variables*/
         result0 = _mm_setzero_si128();
@@ -177,8 +173,8 @@ int xor)
         a = _mm_insert_epi64 (result0, 0, 1);
         b = _mm_clmulepi64_si128 (a, prim_poly, 0x00);
         result1 = _mm_xor_si128 (result1, b);
-        d128[i] = (uint64_t)_mm_extract_epi64(result1,1);
-        d128[i+1] = (uint64_t)_mm_extract_epi64(result1,0);
+        d128[i] = (uint64_t)_mm_cvtsi128_si64(_mm_srli_si128(result1,8));
+        d128[i+1] = (uint64_t)_mm_cvtsi128_si64(result1);
       }
     }
 }
@@ -301,10 +297,8 @@ gf_w128_clm_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_
     __m128i     c,d,e,f;
     gf_internal_t * h = gf->scratch;
     
-    a = _mm_insert_epi64 (_mm_setzero_si128(), a128[1], 0);
-    b = _mm_insert_epi64 (a, b128[1], 0);
-    a = _mm_insert_epi64 (a, a128[0], 1);
-    b = _mm_insert_epi64 (b, b128[0], 1);
+    a = _mm_set_epi64x (a128[0], a128[1]);
+    b = _mm_set_epi64x (b128[0], b128[1]);
 
     prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)h->prim_poly);
 
@@ -336,8 +330,8 @@ gf_w128_clm_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_
     b = _mm_clmulepi64_si128 (a, prim_poly, 0x00);
     result1 = _mm_xor_si128 (result1, b);
 
-    c128[0] = (uint64_t)_mm_extract_epi64(result1,1);
-    c128[1] = (uint64_t)_mm_extract_epi64(result1,0);
+    c128[0] = (uint64_t)_mm_cvtsi128_si64(_mm_srli_si128(result1,8));
+    c128[1] = (uint64_t)_mm_cvtsi128_si64(result1);
 #endif
 return;
 }
@@ -390,10 +384,8 @@ gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
   h = (gf_internal_t *) gf->scratch;
   pp = _mm_set_epi32(0, 0, 0, (uint32_t)h->prim_poly);
   prod = _mm_setzero_si128();
-  a = _mm_insert_epi64(prod, a128[1], 0x0);
-  a = _mm_insert_epi64(a, a128[0], 0x1);
-  b = _mm_insert_epi64(prod, b128[1], 0x0);
-  b = _mm_insert_epi64(b, b128[0], 0x1);
+  a = _mm_set_epi64x(a128[0], a128[1]);
+  b = _mm_set_epi64x(b128[0], b128[1]);
   pmask = 0x80000000;
   amask = _mm_insert_epi32(prod, 0x80000000, 0x3);
   u_middle_one = _mm_insert_epi32(prod, 1, 0x2);
@@ -408,7 +400,7 @@ gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
     if (topbit) {
       prod = _mm_xor_si128(prod, pp);
     }
-    if (((uint64_t)_mm_extract_epi64(_mm_and_si128(a, amask), 1))) {
+    if (((uint64_t)_mm_cvtsi128_si64(_mm_srli_si128(_mm_and_si128(a, amask), 8)))) {
       prod = _mm_xor_si128(prod, b);
     }
     amask = _mm_srli_epi64(amask, 1); /*so does this one, but we can just replace after loop*/
@@ -420,13 +412,13 @@ gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
     prod = _mm_slli_epi64(prod, 1);
     if (middlebit) prod = _mm_xor_si128(prod, u_middle_one);
     if (topbit) prod = _mm_xor_si128(prod, pp);
-    if (((uint64_t)_mm_extract_epi64(_mm_and_si128(a, amask), 0))) {
+    if (((uint64_t)_mm_cvtsi128_si64(_mm_and_si128(a, amask)))) {
       prod = _mm_xor_si128(prod, b);
     }
     amask = _mm_srli_epi64(amask, 1);
   }
-  c128[0] = (uint64_t)_mm_extract_epi64(prod, 1);
-  c128[1] = (uint64_t)_mm_extract_epi64(prod, 0);
+  c128[0] = (uint64_t)_mm_cvtsi128_si64(_mm_srli_si128(prod,8));
+  c128[1] = (uint64_t)_mm_cvtsi128_si64(prod);
 #endif
   return;
 }
@@ -444,14 +436,12 @@ gf_w128_sse_bytwo_b_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
   h = (gf_internal_t *) gf->scratch;
   
   c = _mm_setzero_si128();
-  lmask = _mm_insert_epi64(c, 1ULL << 63, 0);
-  hmask = _mm_insert_epi64(c, 1ULL << 63, 1);
-  b = _mm_insert_epi64(c, a128[0], 1);
-  b = _mm_insert_epi64(b, a128[1], 0);
-  a = _mm_insert_epi64(c, b128[0], 1);
-  a = _mm_insert_epi64(a, b128[1], 0);
-  pp = _mm_insert_epi64(c, h->prim_poly, 0);
-  middle_one = _mm_insert_epi64(c, 1, 0x1);
+  lmask = _mm_set_epi64x(0, 1ULL << 63);
+  hmask = _mm_set_epi64x(1ULL << 63, 0);
+  a = _mm_set_epi64x(b128[0], b128[1]);
+  b = _mm_set_epi64x(a128[0], a128[1]);
+  pp = _mm_set_epi64x(0, h->prim_poly);
+  middle_one = _mm_set_epi64x(1, 0);
 
   while (1) {
     if (_mm_extract_epi32(a, 0x0) & 1) {
@@ -460,13 +450,13 @@ gf_w128_sse_bytwo_b_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
     middlebit = (_mm_extract_epi32(a, 0x2) & 1);
     a = _mm_srli_epi64(a, 1);
     if (middlebit) a = _mm_xor_si128(a, lmask);
-    if ((_mm_extract_epi64(a, 0x1) == 0ULL) && (_mm_extract_epi64(a, 0x0) == 0ULL)){
-      c128[0] = _mm_extract_epi64(c, 0x1);
-      c128[1] = _mm_extract_epi64(c, 0x0);
+    if (_mm_movemask_epi8(_mm_cmpeq_epi8(a, _mm_setzero_si128())) == 0xffff){
+      c128[0] = _mm_cvtsi128_si64(_mm_srli_si128(c, 8));
+      c128[1] = _mm_cvtsi128_si64(c);
       return;
     }
-    topbit = (_mm_extract_epi64(_mm_and_si128(b, hmask), 1));
-    middlebit = (_mm_extract_epi64(_mm_and_si128(b, lmask), 0));
+    topbit = (_mm_cvtsi128_si64(_mm_srli_si128(_mm_and_si128(b, hmask), 8)));
+    middlebit = (_mm_cvtsi128_si64(_mm_and_si128(b, lmask)));
     b = _mm_slli_epi64(b, 1);
     if (middlebit) b = _mm_xor_si128(b, middle_one);
     if (topbit) b = _mm_xor_si128(b, pp);
@@ -1508,7 +1498,7 @@ void gf_w128_group_r_sse_init(gf_t *gf)
     table[i] = zero;
     for (j = 0; j < g_r; j++) {
       if (i & (1 << j)) {
-        table[i] = _mm_xor_si128(table[i], _mm_insert_epi64(zero, pp << j, 0));
+        table[i] = _mm_xor_si128(table[i], _mm_cvtsi64_si128(pp << j));
       }
     }
   }
