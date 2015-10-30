@@ -953,7 +953,7 @@ void
 gf_w16_split_4_16_lazy_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
 #ifdef INTEL_SSSE3
-  uint64_t i, j, *s64, *d64, *top64;;
+  uint64_t i, j, *s64, *d64, *top64;
   uint64_t c, prod;
   uint8_t low[4][16];
   uint8_t high[4][16];
@@ -1086,7 +1086,7 @@ void
 gf_w16_split_4_16_lazy_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
 #ifdef INTEL_SSSE3
-  uint64_t i, j, *s64, *d64, *top64;;
+  uint64_t i, j, *s64, *d64, *top64;
   uint64_t c, prod;
   uint8_t low[4][16];
   uint8_t high[4][16];
@@ -2107,7 +2107,7 @@ gf_w16_composite_multiply_region_alt(gf_t *gf, void *src, void *dest, gf_val_32_
   gf_region_data rd;
   int sub_reg_size;
   uint8_t *slow, *shigh;
-  uint8_t *dlow, *dhigh, *top;;
+  uint8_t *dlow, *dhigh, *top;
 
   /* JSP: I want the two pointers aligned wrt each other on 16 byte 
      boundaries.  So I'm going to make sure that the area on 
