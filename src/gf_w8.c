@@ -1244,11 +1244,7 @@ gf_w8_composite_multiply_region_alt(gf_t *gf, void *src, void *dest, gf_val_32_t
   gf_region_data rd;
   int sub_reg_size;
 
-  if (val == 0) {
-    if (xor) return;
-    memset(dest, 0, bytes);
-    return;
-  }
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
 
   gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 32);
   gf_do_initial_region_alignment(&rd);
@@ -1385,11 +1381,7 @@ gf_w8_composite_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val
 
   cd = (struct gf_w8_composite_data *) h->private;
 
-  if (val == 0) {
-    if (xor) return;
-    memset(dest, 0, bytes);
-    return;
-  }
+  if (val == 0) { gf_multby_zero(dest, bytes, xor); return; }
 
   gf_set_region_data(&rd, gf, src, dest, bytes, val, xor, 1);
   gf_do_initial_region_alignment(&rd);
