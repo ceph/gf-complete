@@ -368,8 +368,8 @@ gf_w32_cfmgk_multiply (gf_t *gf, gf_val_32_t a32, gf_val_32_t b32)
 
   a = _mm_insert_epi32 (_mm_setzero_si128(), a32, 0);
   b = _mm_insert_epi32 (a, b32, 0);
-  g = _mm_insert_epi64 (a, g_star, 0);
-  q = _mm_insert_epi64 (a, q_plus, 0);
+  g = _mm_cvtsi64_si128 (g_star);
+  q = _mm_cvtsi64_si128 (q_plus);
   
   result = _mm_clmulepi64_si128 (a, b, 0);
   w = _mm_clmulepi64_si128 (q, _mm_srli_si128 (result, 4), 0);
@@ -406,8 +406,8 @@ gf_w32_cfmgk_multiply_region_from_single(gf_t *gf, void *src, void *dest, uint32
   q_plus = *(uint64_t *) h->private;
   g_star = *((uint64_t *) h->private + 1);
 
-  g = _mm_insert_epi64 (a, g_star, 0);
-  q = _mm_insert_epi64 (a, q_plus, 0);
+  g = _mm_cvtsi64_si128 (g_star);
+  q = _mm_cvtsi64_si128 (q_plus);
   a = _mm_insert_epi32 (_mm_setzero_si128(), val, 0);
   s32 = (uint32_t *) src;
   d32 = (uint32_t *) dest; 
