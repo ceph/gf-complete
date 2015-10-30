@@ -897,7 +897,7 @@ gf_w16_split_8_16_lazy_multiply_region(gf_t *gf, void *src, void *dest, gf_val_3
       a <<= 8;
     }
 
-    //JSP: We can move the conditional outside the while loop, but we need to fully test it to understand which is better.
+    /*JSP: We can move the conditional outside the while loop, but we need to fully test it to understand which is better.*/
    
     prod ^= ((xor) ? *d64 : 0); 
     *d64 = prod;

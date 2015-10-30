@@ -210,7 +210,7 @@ int main(int argc, char **argv)
       n = power;
     }
   }
-  // in case the for-loop header fails
+  /* in case the for-loop header fails */
   assert (n >= 0);
 
   poly = (gf_general_t *) malloc(sizeof(gf_general_t)*(n+1));

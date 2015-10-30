@@ -1167,24 +1167,24 @@ gf_w128_euclid(GFP gf, gf_val_128_t a128, gf_val_128_t b128)
   e_i[1] = a128[1];
   d_im1 = 128;
 
-  //Allen: I think d_i starts at 63 here, and checks each bit of a, starting at MSB, looking for the first nonzero bit
-  //so d_i should be 0 if this half of a is all 0s, otherwise it should be the position from right of the first-from-left zero bit of this half of a.
-  //BUT if d_i is 0 at end we won't know yet if the rightmost bit of this half is 1 or not
+  /*Allen: I think d_i starts at 63 here, and checks each bit of a, starting at MSB, looking for the first nonzero bit
+   *so d_i should be 0 if this half of a is all 0s, otherwise it should be the position from right of the first-from-left zero bit of this half of a.
+   *BUT if d_i is 0 at end we won't know yet if the rightmost bit of this half is 1 or not*/
 
   for (d_i = (d_im1-1) % 64; ((one << d_i) & e_i[0]) == 0 && d_i > 0; d_i--) ;
 
-  //Allen: this is testing just the first half of the stop condition above, so if it holds we know we did not find a nonzero bit yet
+  /*Allen: this is testing just the first half of the stop condition above, so if it holds we know we did not find a nonzero bit yet*/
 
   if (!((one << d_i) & e_i[0])) {
 
-    //Allen: this is doing the same thing on the other half of a. In other words, we're still searching for a nonzero bit of a.
-    // but not bothering to test if d_i hits zero, which is fine because we've already tested for a=0.
+    /*Allen: this is doing the same thing on the other half of a. In other words, we're still searching for a nonzero bit of a.
+     *but not bothering to test if d_i hits zero, which is fine because we've already tested for a=0.*/
 
     for (d_i = (d_im1-1) % 64; ((one << d_i) & e_i[1]) == 0; d_i--) ;
 
   } else {
 
-    //Allen: if a 1 was found in more-significant half of a, make d_i the ACTUAL index of the first nonzero bit in the entire a.
+    /*Allen: if a 1 was found in more-significant half of a, make d_i the ACTUAL index of the first nonzero bit in the entire a.*/
 
     d_i += 64;
   }
@@ -1488,7 +1488,7 @@ void gf_w128_group_r_init(gf_t *gf)
   return;
 }
 
-#if 0 // defined(INTEL_SSE4)
+#if 0 /* defined(INTEL_SSE4) */
   static
 void gf_w128_group_r_sse_init(gf_t *gf)
 {

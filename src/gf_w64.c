@@ -2029,7 +2029,7 @@ int gf_w64_split_init(gf_t *gf)
         return 0;
       #endif
     }
-    else //no altmap
+    else /*no altmap*/
     {
       #if defined(INTEL_SSE4) || defined(ARCH_AARCH64)
         if(h->region_type & GF_REGION_NOSIMD)

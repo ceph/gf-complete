@@ -19,7 +19,7 @@
   t2 = ((t2 << 1) - (t2 >> (GF_FIELD_WIDTH-1))); \
   b = (t1 ^ (t2 & ip));}
 
-// ToDo(KMG/JSP): Why is 0x88 hard-coded?
+/* ToDo(KMG/JSP): Why is 0x88 hard-coded? */
 #define SSE_AB2(pp, m1, va, t1, t2) {\
           t1 = _mm_and_si128(_mm_slli_epi64(va, 1), m1); \
           t2 = _mm_and_si128(va, _mm_set1_epi8(0x88)); \

@@ -662,7 +662,7 @@ int gf_wgen_log_8_init(gf_t *gf)
     a <<= 1;
     if(a & (1<<w))
       a ^= h->prim_poly;
-    //a &= ((1 << w)-1);
+    /*a &= ((1 << w)-1);*/
   }
 
   if (check != 0) {
@@ -737,7 +737,7 @@ int gf_wgen_log_16_init(gf_t *gf)
     a <<= 1;
     if(a & (1<<w))
       a ^= h->prim_poly;
-    //a &= ((1 << w)-1);
+    /*a &= ((1 << w)-1);*/
   }
 
   if (check) {
@@ -813,7 +813,7 @@ int gf_wgen_log_32_init(gf_t *gf)
     a <<= 1;
     if(a & (1<<w))
       a ^= h->prim_poly;
-    //a &= ((1 << w)-1);
+    /*a &= ((1 << w)-1);*/
   }
 
   if (check != 0) {
