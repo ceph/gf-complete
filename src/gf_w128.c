@@ -412,7 +412,7 @@ void
 gf_w128_sse_bytwo_b_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_t c128)
 {
 #if defined(INTEL_SSE4)
-  __m128i a, b, lmask, hmask, pp, c, middle_one;
+  __m128i a, b, lmask, pp, c, middle_one;
   gf_internal_t *h;
   uint64_t topbit, middlebit;
 
@@ -420,7 +420,6 @@ gf_w128_sse_bytwo_b_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
   
   c = _mm_setzero_si128();
   lmask = _mm_set_epi32(0, 0, 1UL << 31, 0);
-  hmask = _mm_set_epi32(1UL << 31, 0, 0, 0);
   a = _mm_loadu_si128((__m128i*)b128);
   b = _mm_loadu_si128((__m128i*)a128);
   a = _mm_shuffle_epi32(a, _MM_SHUFFLE(1, 0, 3, 2));
