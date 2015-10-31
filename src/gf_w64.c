@@ -13,6 +13,22 @@
 #include <stdlib.h>
 #include "gf_w64.h"
 
+#if defined(__x86_64__) || \
+    defined(__amd64__ ) || \
+    defined(__LP64    ) || \
+    defined(_M_X64    ) || \
+    defined(_M_AMD64  ) || \
+    defined(_WIN64    )
+# define _MM_CVT_64_128 _mm_cvtsi64_si128
+# define _MM_CVT_128_64 _mm_cvtsi128_si64
+#else
+# define _MM_CVT_64_128(x) _mm_set_epi32(0, 0, (x) >> 32, (x) & 0xFFFFFFFF)
+# define _MM_CVT_128_64(x) ( \
+  (uint32_t)_mm_cvtsi128_si32(x) + \
+  ((uint64_t)((uint32_t)_mm_extract_epi32(x, 1)) << 32) \
+)
+#endif
+
 static
 inline
 gf_val_64_t gf_w64_inverse_from_divide (gf_t *gf, gf_val_64_t a)
@@ -79,7 +95,7 @@ xor)
   gf_do_initial_region_alignment(&rd);
 
   prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0xffffffffULL));
-  b = _mm_cvtsi64_si128 (val);
+  b = _MM_CVT_64_128 (val);
   m1 = _mm_set_epi32(0, 0, 0, (uint32_t)0xffffffff);
   m3 = _mm_slli_si128(m1, 8);
   m4 = _mm_slli_si128(m3, 4);
@@ -166,7 +182,7 @@ xor)
   gf_do_initial_region_alignment(&rd);
   
   prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0xffffffffULL));
-  b = _mm_cvtsi64_si128 (val);
+  b = _MM_CVT_64_128 (val);
   m1 = _mm_set_epi32(0, 0, 0, (uint32_t)0xffffffff);
   m3 = _mm_slli_si128(m1, 8);
   m4 = _mm_slli_si128(m3, 4);
@@ -353,8 +369,8 @@ gf_w64_clm_multiply_2 (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
         __m128i         v, w;
         gf_internal_t * h = gf->scratch;
 
-        a = _mm_cvtsi64_si128 (a64);
-        b = _mm_cvtsi64_si128 (b64); 
+        a = _MM_CVT_64_128 (a64);
+        b = _MM_CVT_64_128 (b64); 
         prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0xffffffffULL));
         /* Do the initial multiply */
    
@@ -375,7 +391,7 @@ gf_w64_clm_multiply_2 (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
         w = _mm_clmulepi64_si128 (prim_poly, v, 0);
         result = _mm_xor_si128 (result, w);
 
-        rv = ((gf_val_64_t)_mm_cvtsi128_si64(result));
+        rv = ((gf_val_64_t)_MM_CVT_128_64(result));
 #endif
         return rv;
 }
@@ -395,8 +411,8 @@ gf_w64_clm_multiply_4 (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
   __m128i         v, w;
   gf_internal_t * h = gf->scratch;
 
-  a = _mm_cvtsi64_si128 (a64);
-  b = _mm_cvtsi64_si128 (b64);
+  a = _MM_CVT_64_128 (a64);
+  b = _MM_CVT_64_128 (b64);
   prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0xffffffffULL));
  
   /* Do the initial multiply */
@@ -417,7 +433,7 @@ gf_w64_clm_multiply_4 (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
   w = _mm_clmulepi64_si128 (prim_poly, v, 0);
   result = _mm_xor_si128 (result, w);
 
-  rv = ((gf_val_64_t)_mm_cvtsi128_si64(result));
+  rv = ((gf_val_64_t)_MM_CVT_128_64(result));
 #endif
   return rv;
 }
@@ -444,7 +460,7 @@ gf_w64_clm_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int by
   d8 = (uint8_t *) rd.d_start;
   dtop = (uint8_t *) rd.d_top;
 
-  v = _mm_cvtsi64_si128(val);
+  v = _MM_CVT_64_128(val);
   m = _mm_set_epi32(0, 0, 0xffffffff, 0xffffffff);
   prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)(h->prim_poly & 0xffffffffULL));
 

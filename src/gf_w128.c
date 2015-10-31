@@ -383,7 +383,7 @@ gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
     if (topbit) {
       prod = _mm_xor_si128(prod, pp);
     }
-    if (((uint64_t)_mm_cvtsi128_si64(_mm_srli_si128(_mm_and_si128(a, amask), 8)))) {
+    if ((_mm_movemask_epi8(_mm_cmpeq_epi16(_mm_and_si128(a, amask), _mm_setzero_si128())) >> 8) != 0xff) {
       prod = _mm_xor_si128(prod, b);
     }
     amask = _mm_srli_epi64(amask, 1); /*so does this one, but we can just replace after loop*/
@@ -395,7 +395,7 @@ gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
     prod = _mm_slli_epi64(prod, 1);
     if (middlebit) prod = _mm_xor_si128(prod, u_middle_one);
     if (topbit) prod = _mm_xor_si128(prod, pp);
-    if (((uint64_t)_mm_cvtsi128_si64(_mm_and_si128(a, amask)))) {
+    if ((_mm_movemask_epi8(_mm_cmpeq_epi16(_mm_and_si128(a, amask), _mm_setzero_si128())) & 0xff) != 0xff) {
       prod = _mm_xor_si128(prod, b);
     }
     amask = _mm_srli_epi64(amask, 1);
@@ -440,8 +440,8 @@ gf_w128_sse_bytwo_b_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
       _mm_storeu_si128((__m128i*) c128, c);
       return;
     }
-    topbit = (_mm_cvtsi128_si64(_mm_srli_si128(_mm_and_si128(b, hmask), 8)));
-    middlebit = (_mm_cvtsi128_si64(_mm_and_si128(b, lmask)));
+    topbit = _mm_movemask_epi8(b) & 0x8000;
+    middlebit = _mm_movemask_epi8(b) & 0x80;
     b = _mm_slli_epi64(b, 1);
     if (middlebit) b = _mm_xor_si128(b, middle_one);
     if (topbit) b = _mm_xor_si128(b, pp);
