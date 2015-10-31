@@ -160,7 +160,7 @@ CONTENT  <span class="aligning_page_number"> 3 </span>
 
 
 <div class="sub_indices">
-4.1 Three Simple Command Line Tools: gf mult, gf div and gf add . . . . . . . . . .  . . . .  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . <span class="aligning_page_number"> 8</span>  <br>
+4.1 Three Simple Command Line Tools: gf_mult, gf_div and gf_add . . . . . . . . . .  . . . .  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . <span class="aligning_page_number"> 8</span>  <br>
 4.2 Quick Starting Example #1: Simple multiplication and division . .  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . . . . . . . . . . . . <span class="aligning_page_number">   9  </span> <br>
 4.3 Quick Starting Example #2: Multiplying a region by a constant    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . . . . . . . . . . . .  <span class="aligning_page_number"> 10   </span> <br>
 4.4 Quick Starting Example #3: Using w = 64 . . . . . . . . . . . . .  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . . . . . . . . . . . . . <span class="aligning_page_number">  11  </span>  <br>
@@ -231,7 +231,7 @@ CONTENT  <span class="aligning_page_number"> 3 </span>
 7.4 Arguments to <b>"SPLIT"</b> . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . . . . . . . . . . . . . . <span class="aligning_page_number"> 28</span>  <br>
 7.5 Arguments to <b>"GROUP"</b> . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . .  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  <span class="aligning_page_number">29 </span> <br>
 7.6 Considerations with <b>"COMPOSITE"</b> . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . .  . . . . . . . . . . . . . . . . . . . . . . . . . . . .  .  <span class="aligning_page_number">30 </span> <br>
-7.7 <b>"CARRY FREE"</b> and the Primitive Polynomial  . . . . . . . . . . . . . . .  . . . . .  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . .   <span class="aligning_page_number">31 </span> <br>
+7.7 <b>"CARRY_FREE"</b> and the Primitive Polynomial  . . . . . . . . . . . . . . .  . . . . .  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . .   <span class="aligning_page_number">31 </span> <br>
 7.8 More on Primitive Polynomials . .  . . . . . . . . . . . . . . . . . . .  . . . . .  . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . . . . ..   . . . . . . . . .  <span class="aligning_page_number">31 </span> <br>
 
 
@@ -426,7 +426,7 @@ defines some randomnumber generators to help test the programs. The randomnumber
 <ul>
 
 of All" random number generator [Mar94] which we've selected because it has no patent issues. <b>gf_unit</b> and
-gf time use these random number generators.<br><br>
+<b>gf_time</b> use these random number generators.<br><br>
 <li><b>gf_int.h:</b> This is an internal header file that the various source files use. This is <em>not</em> intended for applications to
 include.</li><br>
 <li><b>config.xx</b> and <b>stamp-h1</b> are created by autoconf, and should be ignored by applications. </li>
@@ -457,7 +457,7 @@ The following are tools to help you with Galois Field arithmetic, and with the l
 detail elsewhere in this manual.<br><br>
 <li> <b>gf_mult.c, gf_ div.c</b> and <b>gf_ add:</b> Command line tools to do multiplication, division and addition by single numbers</li><br>
 <li> <b>gf_time.c:</b> A program that times the procedures for given values of <em>w </em> and implementation options</li><br>
-<li> <b>time tool.sh:</b> A shell script that helps perform rough timings of the various multiplication, division and region
+<li> <b>time_tool.sh:</b> A shell script that helps perform rough timings of the various multiplication, division and region
 operations in GF-Complete</li><br>
 <li> <b>gf_methods.c:</b> A program that enumerates most of the implementation methods supported by GF-Complete</li><br>
 <li> <b> gf_poly.c:</b> A program to identify irreducible polynomials in regular and composite Galois Fields</li><br>
@@ -652,7 +652,7 @@ gf.multiply_region.w32 (&gf, r1, r2, a, 16, 0); <br><br>
 
 That last argument specifies whether to simply place the product into r2 or to XOR it with the contents that are already
 in r2. Zero means to place the product there. When we run it, it prints the results of the <b>multiply_region.w32</b> in
-hexadecimal. Again, you can verify it using gf mult:<br><br>
+hexadecimal. Again, you can verify it using <b>gf_mult</b>:<br><br>
 <div id="number_spacing">
 UNIX> gf_example_2 4 <br>
 12 * 2 = 11 <br>
@@ -917,7 +917,7 @@ memory consumption and their rough performance. The performance tests are on an 
 3.40 GHz, and are included solely to give a flavor of performance on a standard microprocessor. Some processors
 will be faster with some techniques and others will be slower, so we only put numbers in so that you can ballpark it.
 For other values of <em>w</em> between 1 and 31, we use table lookup when w &#8804 8, discrete logarithms when w &#8804 16 and
-"Bytwop" for w &#8804 32. </p>
+"Bytwo<sub>p</sub>" for w &#8804 32. </p>
 <br><br>
 <center> With SSE 
 <div id="data1">
@@ -972,15 +972,15 @@ For other values of <em>w</em> between 1 and 31, we use table lookup when w &#88
 <td>32 </td><td>16 </td> <td>2,135</td> </tr>
 
 <tr>
-<td>32 </td><td>4K </td><td>Bytwop</td><td>19</td><td>Split Table (32,4)</td>
+<td>32 </td><td>4K </td><td>Bytwo<sub>p</sub></td><td>19</td><td>Split Table (32,4)</td>
 <td>4 </td><td>4 </td> <td>1,149</td> </tr>
 
 <tr>
-<td>64 </td><td>16K </td><td>Bytwop</td><td>9</td><td>Split Table (64,4)</td>
+<td>64 </td><td>16K </td><td>Bytwo<sub>p</sub></td><td>9</td><td>Split Table (64,4)</td>
 <td>8 </td><td>8 </td> <td>987</td> </tr>
 
 <tr>
-<td>128 </td><td>64K </td><td>Bytwop</td><td>1.4</td><td>Split Table (128,4)</td>
+<td>128 </td><td>64K </td><td>Bytwo<sub>p</sub></td><td>1.4</td><td>Split Table (128,4)</td>
 <td>16 </td><td>8 </td> <td>833</td> </tr>
 </table>
 </div>
@@ -1194,30 +1194,30 @@ larger <em>w</em> than <b>"TABLE."</b> If the polynomial is not primitive (see s
 an implementation. In that case,<b> gf_init_hard()</b> or <b>create_gf_from_argv()</b> will fail</li><br>
 
 
-<li><b> "LOG ZERO:"</b> Discrete logarithm tables which include extra room for zero entries. This more than doubles
+<li><b> "LOG_ZERO:"</b> Discrete logarithm tables which include extra room for zero entries. This more than doubles
 the memory consumption to remove an <b>if</b> statement (please see [GMS08] or The Paper for more description). It
 doesn’t really make a huge deal of difference in performance</li><br>
 
-<li> <b>"LOG ZERO EXT:"</b> This expends even more memory to remove another <b>if</b> statement. Again, please see The
-Paper for an explanation. As with <b>"LOG ZERO,"</b> the performance difference is negligible</li><br>
+<li> <b>"LOG_ZERO_EXT:"</b> This expends even more memory to remove another <b>if</b> statement. Again, please see The
+Paper for an explanation. As with <b>"LOG_ZERO,"</b> the performance difference is negligible</li><br>
 
 <li> <b>"SHIFT:"</b> Implementation straight from the definition of Galois Field multiplication, by shifting and XOR-ing,
 then reducing the product using the polynomial. This is <em>slooooooooow,</em> so we don’t recommend you use it</li><br>
 
 
-<li> <b>"CARRY FREE:"</b> This is identical to <b>"SHIFT,"</b> however it leverages the SSE instruction PCLMUL to perform
+<li> <b>"CARRY_FREE:"</b> This is identical to <b>"SHIFT,"</b> however it leverages the SSE instruction PCLMUL to perform
 carry-freemultiplications in single instructions. As such, it is the fastest way to perform multiplication for large
 values of <em>w</em> when that instruction is available. Its performance depends on the polynomial used. See The Paper
 for details, and see section 7.7 below for the speedups available when <em>w </em>= 16 and <em>w</em> = 32 if you use a different
 polynomial than the default one</li><br>
 
 
-<li> <b>"BYTWO p:"</b> This implements multiplication by successively multiplying the product by two and selectively
+<li> <b>"BYTWO_p:"</b> This implements multiplication by successively multiplying the product by two and selectively
 XOR-ing the multiplicand. See The Paper for more detail. It can leverage Anvin’s optimization that multiplies
 64 and 128 bits of numbers in <em>GF(2<sup>w</sup>) </em> by two with just a few instructions. The SSE version requires SSE2</li><br>
 
 
-<li> <b>"BYTWO b:"</b> This implements multiplication by successively multiplying the multiplicand by two and selectively
+<li> <b>"BYTWO_b:"</b> This implements multiplication by successively multiplying the multiplicand by two and selectively
 XOR-ing it into the product. It can also leverage Anvin's optimization, and it has the feature that when
 you're multiplying a region by a very small constant (like 2), it can terminate the multiplication early. As such,
 if you are multiplying regions of bytes by two (as in the Linux RAID-6 Reed-Solomon code [Anv09]), this is
@@ -1269,7 +1269,7 @@ In order to specify the base field, put appropriate flags after specifying <em>k
 and after that, you may continue making specifications for the composite field. This process can be continued
 for multiple layers of <b>"COMPOSITE."</b> As an example, the following multiplies 1000000 and 2000000
 in <em>GF((2<sup>16</sup>)<sup>2</sup>),</em> where the base field uses <b>BYTWO_p</b> for multiplication: <br><br>
-<center>./gf mult 1000000 2000000 32 -m COMPOSITE 2 <span style="color:red">-m BYTWO p - -</span> </center><br>
+<center>./gf_mult 1000000 2000000 32 -m COMPOSITE 2 <span style="color:red">-m BYTWO_p - -</span> </center><br>
 
 In the above example, the red text applies to the base field, and the black text applies to the composite field.
 Composite fields have two defining polynomials - one for the composite field, and one for the base field. Thus, if
@@ -1278,7 +1278,7 @@ form x<sup>2</sup>+sx+1, where s is an element of <em>GF(2<sup>k</sup>).</em> To
 example below, we multiply 20000 and 30000 in <em>GF((2<sup>8</sup>)<sup>2</sup>) </em>, setting s to three, and using x<sup>8</sup>+x<sup>4</sup>+x<sup>3</sup>+x<sup>2</sup>+1
 as the polynomial for the base field: <br><br>
 
-<center>./gf mult 20000 30000 16 -m COMPOSITE 2 <span style="color:red">-p 0x11d </span> - -p 0x3 - </center> <br><br>
+<center>./gf_mult 20000 30000 16 -m COMPOSITE 2 <span style="color:red">-p 0x11d </span> - -p 0x3 - </center> <br><br>
 
 If you use composite fields, you should consider using <b>"ALTMAP"</b> as well. The reason is that the region
 operations will go much faster. Please see section 7.6.<br><br>
@@ -1340,13 +1340,13 @@ multiplication techniques which can leverage SSE instructions and which versions
 <td><b>"SPLIT"</b></td><td>-</td><td>Yes</td><td>SSSE3</td><td>Only when the second argument equals 4.</td>
 
 <tr>
-<td><b>"SPLIt"</b></td><td>- </td><td>Yes</td><td>SSE4</td><td>When <em>w </em> = 64 and not using <b>"ALTMAP".</b></td>
+<td><b>"SPLIT"</b></td><td>- </td><td>Yes</td><td>SSE4</td><td>When <em>w </em> = 64 and not using <b>"ALTMAP".</b></td>
 
 <tr>
-<td><b>"BYTWO p"</b></td><td>- </td><td>Yes</td><td>SSE2</td><td></td>
+<td><b>"BYTWO_p"</b></td><td>- </td><td>Yes</td><td>SSE2</td><td></td>
 
 <tr>
-<td><b>"BYTWO p"</b></td><td>- </td><td>Yes</td><td>SSE2</td><td></td>
+<td><b>"BYTWO_p"</b></td><td>- </td><td>Yes</td><td>SSE2</td><td></td>
 
 </table></div> <br><br>
 Table 2: Multiplication techniques which can leverage SSE instructions when they are available.
@@ -1425,12 +1425,12 @@ listed. If multiple region options are required, they should be specified indepe
 and independent options for command-line tools and <b>create_gf_from_argv()).</b> </p>
 
 
-<h3>6.2  &nbsp&nbsp&nbspDetermining Supported Techniques with gf methods </h3>
+<h3>6.2  &nbsp&nbsp&nbspDetermining Supported Techniques with gf_methods </h3>
 
 
 The program <b>gf_methods</b> prints a list of supported methods on standard output. It is called as follows:<br><br>
 <div id="number_spacing">
-<center>./gf methods <em>w </em> -BADC -LUMDRB <br><br> </center> </div>
+<center>./gf_methods <em>w </em> -BADC -LUMDRB <br><br> </center> </div>
 
 The first argument is <em>w </em>, which may be any legal value of <em>w </em>. The second argument has the following flags: <br><br>
 <ul>
@@ -1583,7 +1583,7 @@ The performance of "Region-By-Zero" and "Region-By-One" will not change from tes
 the same calls for these. "Region-By-Zero" with "XOR: 1" does nothing except set up the tests. Therefore, you may
 use it as a control.</p>
 
-<h3>6.3.1 &nbsp &nbsp &nbsp time tool.sh </h3> 
+<h3>6.3.1 &nbsp &nbsp &nbsp time_tool.sh </h3> 
 
 Finally, the shell script <b>time_tool.sh</b> makes a bunch of calls to <b>gf_time</b> to give a rough estimate of performance. It is
 called as follows:<br><br>
@@ -1637,7 +1637,7 @@ error may be minimized. </p>
 
 6 &nbsp &nbsp  <em>  THE DEFAULTS     </em>   <span id="index_number">23 </span> <br><br><br>
 
-<h3>6.3.2 &nbsp &nbsp &nbsp An example of gf methods and time tool.sh </h3><br><br>
+<h3>6.3.2 &nbsp &nbsp &nbsp An example of gf_methods and time_tool.sh </h3><br><br>
 Let's give an example of how some of these components fit together. Suppose we want to explore the basic techniques
 in <em>GF(2<sup>32</sup>).</em> First, let's take a look at what <b>gf_methods</b> suggests as "basic" methods: <br><br>
 <div id="number_spacing">
@@ -1656,7 +1656,7 @@ UNIX> <br><br>
 
 <p>
 
-You'll note, this is on my old Macbook Pro, which doesn't support (PCLMUL), so <b>"CARRY FREE"</b> is not included
+You'll note, this is on my old Macbook Pro, which doesn't support (PCLMUL), so <b>"CARRY_FREE"</b> is not included
 as an option. Now, let's run the unit tester on these to make sure they work, and to see their memory consumption: </p><br><br>
 
 <div id="number_spacing">
@@ -1739,7 +1739,7 @@ which is why we don't use "<b>-m SPLIT 32 4 -r ALTMAP -.</b>"</p>
 <p>
 <b>Test question:</b> Given the numbers above, it would appear that <b>"COMPOSITE"</b> yields the fastest performance of
 single multiplication, while "SPLIT 32 4" yields the fastest performance of region multiplication. Should I use two
-gf t's in my application – one for single multiplication that uses <b>"COMPOSITE,"</b> and one for region multiplication
+gf_t's in my application – one for single multiplication that uses <b>"COMPOSITE,"</b> and one for region multiplication
 that uses <b>"SPLIT 32 4?"</b></p>
 <p>
 The answer to this is "no." Why? Because composite fields are different from the "standard" fields, and if you mix
@@ -1780,7 +1780,7 @@ void *scratch_memory); </div><br><br>
 
 
 The arguments mult type, region type and divide type allow for the same specifications as above, except the
-types are integer constants defined in gf complete.h: <br><br>
+types are integer constants defined in gf_complete.h: <br><br>
 typedef enum {GF_MULT_DEFAULT,<br>
 <div style="padding-left:124px">
 GF_MULT_SHIFT<br>
@@ -2044,26 +2044,26 @@ The performance difference using <b>"ALTMAP"</b> can be significant: <br><br><br
 <div id="table_page28">
 <table cellpadding="6" cellspacing="0" style="text-align:center;font-size:19px">
 <tr>
-<td> gf time 16 G 0 1048576 100 -m SPLIT 16 4 -</td> <td>Speed = 8,389 MB/s </td> 
+<td> gf_time 16 G 0 1048576 100 -m SPLIT 16 4 -</td> <td>Speed = 8,389 MB/s </td> 
 </tr>
 <tr>
-<td>gf time 16 G 0 1048576 100 -m SPLIT 16 4 -r ALTMAP - </td> <td>Speed = 8,389 MB/s </td> 
-</tr>
-
-<tr>
-<td>gf time 32 G 0 1048576 100 -m SPLIT 32 4 -</td> <td> Speed = 5,304 MB/s</td> 
-</tr>
-<tr>
-<td>gf time 32 G 0 1048576 100 -m SPLIT 32 4 -r ALTMAP -</td> <td> Speed = 7,146 MB/s</td> 
-</tr>
-
-
-<tr>
-<td>gf time 64 G 0 1048576 100 -m SPLIT 64 4 - </td> <td>Speed = 2,595 MB/s </td> 
+<td>gf_time 16 G 0 1048576 100 -m SPLIT 16 4 -r ALTMAP - </td> <td>Speed = 8,389 MB/s </td> 
 </tr>
 
 <tr>
-<td>gf time 64 G 0 1048576 100 -m SPLIT 64 4 -r ALTMAP - </td> <td>Speed = 3,436 MB/s </td> 
+<td>gf_time 32 G 0 1048576 100 -m SPLIT 32 4 -</td> <td> Speed = 5,304 MB/s</td> 
+</tr>
+<tr>
+<td>gf_time 32 G 0 1048576 100 -m SPLIT 32 4 -r ALTMAP -</td> <td> Speed = 7,146 MB/s</td> 
+</tr>
+
+
+<tr>
+<td>gf_time 64 G 0 1048576 100 -m SPLIT 64 4 - </td> <td>Speed = 2,595 MB/s </td> 
+</tr>
+
+<tr>
+<td>gf_time 64 G 0 1048576 100 -m SPLIT 64 4 -r ALTMAP - </td> <td>Speed = 3,436 MB/s </td> 
 </tr>
 </div>
 
@@ -2179,15 +2179,15 @@ region(),</b> rather than simply calling <b>multiply()</b> on every word in the 
 
 <table cellpadding="6" cellspacing="0" style="text-align:center;font-size:19px"><tr>
 <td>
-gf time 32 G 0 10240 10240 -m COMPOSITE 2 - -
+gf_time 32 G 0 10240 10240 -m COMPOSITE 2 - -
 Speed = 322 MB/s </td> </tr>
 <tr>
-<td>gf time 32 G 0 10240 10240 -m COMPOSITE 2 - -r ALTMAP -
+<td>gf_time 32 G 0 10240 10240 -m COMPOSITE 2 - -r ALTMAP -
 Speed = 3,368 MB/s </td> </tr>
 
 <tr>
 <td>
-gf time 32 G 0 10240 10240 -m COMPOSITE 2 -m SPLIT 16 4 -r ALTMAP - -r ALTMAP -
+gf_time 32 G 0 10240 10240 -m COMPOSITE 2 -m SPLIT 16 4 -r ALTMAP - -r ALTMAP -
 Speed = 3,925 MB/s </td> </tr>
 </center>
 </table>
@@ -2207,10 +2207,10 @@ as fast. The difference is the inlining of multiplication in the base field when
 
     <table cellpadding="6" cellspacing="0" style="text-align:center;font-size:19px">
 
-      <tr><td>gf time 8 M 0 1048576 100 - Speed = 501 Mega-ops/s</td> </tr>
-      <tr><td>gf time 8 M 0 1048576 100 -m SPLIT 8 4 - Speed = 439 Mega-ops/s </td> </tr>
-      <tr><td>gf time 8 M 0 1048576 100 -m COMPOSITE 2 - - Speed = 207 Mega-ops/s </td> </tr>
-      <tr><td>gf time 8 M 0 1048576 100 -m COMPOSITE 2 -m SPLIT 8 4 - - Speed = 77 Mega-ops/s </td> </tr>
+      <tr><td>gf_time 8 M 0 1048576 100 - Speed = 501 Mega-ops/s</td> </tr>
+      <tr><td>gf_time 8 M 0 1048576 100 -m SPLIT 8 4 - Speed = 439 Mega-ops/s </td> </tr>
+      <tr><td>gf_time 8 M 0 1048576 100 -m COMPOSITE 2 - - Speed = 207 Mega-ops/s </td> </tr>
+      <tr><td>gf_time 8 M 0 1048576 100 -m COMPOSITE 2 -m SPLIT 8 4 - - Speed = 77 Mega-ops/s </td> </tr>
 
     </table> 
     </center>
@@ -2235,17 +2235,17 @@ region operations (641 MB/s):
 
 <div id="number_spacing">
 <center>
-gf time 128 G 0 1048576 100 -m COMPOSITE 2 <span style="color:red">-m COMPOSITE 2 </span> <span style="color:blue">-m COMPOSITE 2 </span> <br>
+gf_time 128 G 0 1048576 100 -m COMPOSITE 2 <span style="color:red">-m COMPOSITE 2 </span> <span style="color:blue">-m COMPOSITE 2 </span> <br>
 <span style="color:rgb(250, 149, 167)">-m SPLIT 16 4 -r ALTMAP -</span> <span style="color:blue">-r ALTMAP -</span> <span style="color:red"> -r ALTMAP -</span> -r ALTMAP -
 </center>
 </div><br>
 
 <p>Please see section 7.8.1 for a discussion of polynomials in composite fields.</p>
 
-<h2>7.7 &nbsp &nbsp &nbsp "CARRY FREE" and the Primitive Polynomial </h2>
+<h2>7.7 &nbsp &nbsp &nbsp "CARRY_FREE" and the Primitive Polynomial </h2>
 
 
-If your machine supports the PCLMUL instruction, then we leverage that in <b>"CARRY FREE."</b> This implementation
+If your machine supports the PCLMUL instruction, then we leverage that in <b>"CARRY_FREE."</b> This implementation
 first performs a carry free multiplication of two <em>w</em>-bit numbers, which yields a 2<em>w</em>-bit number. It does this with
 one PCLMUL instruction. To reduce the 2<em>w</em>-bit number back to a <em>w</em>-bit number requires some manipulation of the
 polynomial. As it turns out, if the polynomial has a lot of contiguous zeroes following its leftmost one, the number of
@@ -2260,9 +2260,9 @@ You can see the difference in performance:
 <table cellpadding="6" cellspacing="0" style="text-align:center;font-size:19px">
 <tr>
 
-<td>gf time 32 M 0 1048576 100 -m CARRY FREE - </td> <td> Speed = 48 Mega-ops/s</td> </tr>
+<td>gf_time 32 M 0 1048576 100 -m CARRY_FREE - </td> <td> Speed = 48 Mega-ops/s</td> </tr>
 
-<tr><td>gf time 32 M 0 1048576 100 -m CARRY FREE -p 0xc5 -</td> <td> Speed = 81 Mega-ops/s </td> </tr>
+<tr><td>gf_time 32 M 0 1048576 100 -m CARRY_FREE -p 0xc5 -</td> <td> Speed = 81 Mega-ops/s </td> </tr>
 
 </table></center>
 </div>
@@ -2270,8 +2270,8 @@ You can see the difference in performance:
 
 <p>
 This is relevant for <em>w </em> = 16 and <em>w </em> = 32, where the "standard" polynomials are sub-optimal with respect to
-<b>"CARRY FREE."</b> For <em>w </em> = 16, the polynomial 0x1002d has the desired property. It’s less important, of course,
-with <em>w </em> = 16, because <b>"LOG"</b> is so much faster than <b>CARRY FREE.</b> </p>
+<b>"CARRY_FREE."</b> For <em>w </em> = 16, the polynomial 0x1002d has the desired property. It’s less important, of course,
+with <em>w </em> = 16, because <b>"LOG"</b> is so much faster than <b>CARRY_FREE.</b> </p>
 
 <h2>7.8 &nbsp  More on Primitive Polynomials </h3>
 
@@ -2383,7 +2383,7 @@ GF-Complete will successfully select a default polynomial in the following compo
 6 &nbsp &nbsp  <em>  FURTHER INFORMATION ON OPTIONS AND ALGORITHMS     </em>   <span id="index_number">33  </span> <br><br><br>
 
 
-<h3>7.8.3 The Program gf poly for Verifying Irreducibility of Polynomials </h3>
+<h3>7.8.3 The Program gf_poly for Verifying Irreducibility of Polynomials </h3>
 
 The program <b>gf_poly</b> uses the Ben-Or algorithm[GP97] to determine whether a polynomial with coefficients in <em> GF(2<sup>w </sup>) </em>
 is reducible. Its syntax is:<br><br>
@@ -2640,8 +2640,8 @@ stored in 16 16-byte regions.</p><br>
 <h3>7.9.2 &nbsp Alternate mappings with "COMPOSITE" </h3>
 
 With <b>"COMPOSITE,"</b> the alternate mapping divides the middle region in half. The lower half of each word is stored
-in the first half of the middle region, and the higher half is stored in the second half. To illustrate, gf example 6
-performs the same example as gf example 5, except it is using <b>"COMPOSITE"</b> in GF((2<sup>16</sup>)<sup>2</sup>), and it is multiplying
+in the first half of the middle region, and the higher half is stored in the second half. To illustrate, gf_example_6
+performs the same example as gf_example_5, except it is using <b>"COMPOSITE"</b> in GF((2<sup>16</sup>)<sup>2</sup>), and it is multiplying
 a region of 120 bytes rather than 60. As before, the pointers are not aligned on 16-bit quantities, so the region is broken
 into three regions of 4 bytes, 96 bytes, and 20 bytes. In the first and third region, each consecutive four byte word is a
 word in <em>GF(2<sup>32</sup>).</em> For example, word 0 is 0x562c640b, and word 25 is 0x46bc47e0. In the middle region, the low two
@@ -2847,14 +2847,14 @@ section 7.1.</li><br>
 <li> <b>MOA_Random_W()</b> in <b>gf_rand.h:</b> Creates a random w-bit number, where <em>w </em> &#8804 32. </li><br>
 <li> <b>MOA_Seed()</b> in <b>gf_rand.h:</b> Sets the seed for the random number generator. </li><br>
 <li> <b>gf_errno</b> in <b>gf_complete.h:</b> This is to help figure out why an initialization call failed. See section 6.1.</li><br>
-<li> <b>gf_create_gf_from_argv()</b> in <b>gf method.h:</b> Creates a gf t using C style argc/argv. See section 6.1.1. </li><br>
+<li> <b>gf_create_gf_from_argv()</b> in <b>gf_method.h:</b> Creates a gf_t using C style argc/argv. See section 6.1.1. </li><br>
 <li> <b>gf_division_type_t</b> in <b>gf_complete.h:</b> the different ways to specify division when using <b>gf_init_hard().</b> See 
 section 6.4. </li><br>
 <li> <b>gf_error()</b> in <b>gf_complete.h:</b> This prints out why an initialization call failed. See section 6.1. </li><br>
 
-<li> <b>gf_extract</b> in <b>gf_complete.h:</b> This is the data type of <b>extract_word()</b> in a gf t. See section 7.9 for an example
+<li> <b>gf_extract</b> in <b>gf_complete.h:</b> This is the data type of <b>extract_word()</b> in a gf_t. See section 7.9 for an example
 of how to use extract word().</li>
-
+</ul>
 
 
 
@@ -3028,7 +3028,7 @@ composite field too. See 7.8.2 for the fields where GF-Complete will support def
 explanation</li><br>
 
 
-<li> <b>"ALTMAP" is confusing.</b> We agree. Please see section 7.9 for more explanation.
+<li> <b>"ALTMAP" is confusing.</b> We agree. Please see section 7.9 for more explanation.</li><br>
 
 <li> <b>I used "ALTMAP" and it doesn't appear to be functioning correctly.</b> With 7.9, the size of the region and
 its alignment both matter in terms of how <b>"ALTMAP"</b> performs <b>multiply_region()</b>. Please see section 7.9 for
@@ -3065,7 +3065,7 @@ per second.
 
 <p>As would be anticipated, the inlined operations (see section 7.1) outperform the others. Additionally, in all
 cases with the exception of <em>w</em> = 32, the defaults are the fastest performing implementations. With w = 32,
-"CARRY FREE" is the fastest with an alternate polynomial (see section 7.7). Because we require the defaults to
+"CARRY_FREE" is the fastest with an alternate polynomial (see section 7.7). Because we require the defaults to
 use a "standard" polynomial, we cannot use this implementation as the default. </p>
 
 <h2>11.2 &nbsp Divide() </h2>
@@ -3126,9 +3126,9 @@ For these tables, we performed 1GB worth of <b>multiply_region()</b> calls for a
 
 <tr><td>-m TABLE (Default) -</td> <td>11879.909</td> </tr>
 <tr><td>-m TABLE -r CAUCHY -</td> <td>9079.712</td> </tr>
-<tr><td>-m BYTWO b -</td> <td>5242.400</td> </tr>
-<tr><td>-m BYTWO p -</td> <td>4078.431</td> </tr>
-<tr><td>-m BYTWO b -r NOSSE -</td> <td>3799.699</td> </tr>
+<tr><td>-m BYTWO_b -</td> <td>5242.400</td> </tr>
+<tr><td>-m BYTWO_p -</td> <td>4078.431</td> </tr>
+<tr><td>-m BYTWO_b -r NOSSE -</td> <td>3799.699</td> </tr>
 <tr><td>-m TABLE -r QUAD -</td> <td>3014.315</td> </tr>
 
 <tr><td>-m TABLE -r DOUBLE -</td> <td>2253.627</td> </tr>
@@ -3138,7 +3138,7 @@ For these tables, we performed 1GB worth of <b>multiply_region()</b> calls for a
 
 
 <tr><td>m SHIFT -</td> <td>157.749</td> </tr>
-<tr><td>-m CARRY FREE -</td> <td>86.202</td> </tr>
+<tr><td>-m CARRY_FREE -</td> <td>86.202</td> </tr>
 </div>
 </table> <br><br>
 </div> </center>
@@ -3188,27 +3188,27 @@ of Computational Mathematics,</em> pages 346–361. Springer Verlag, 1997.
 <tr><td>-m SPLIT 8 4 (Default)</td> <td>13279.146</td> </tr>
 <tr><td>-m COMPOSITE 2 - -r ALTMAP -</td> <td>5516.588</td> </tr>
 <tr><td>-m TABLE -r CAUCHY -</td> <td>4968.721</td> </tr>
-<tr><td>-m BYTWO b -</td> <td>2656.463</td> </tr>
+<tr><td>-m BYTWO_b -</td> <td>2656.463</td> </tr>
 <tr><td>-m TABLE -r DOUBLE -</td> <td>2561.225</td> </tr>
 <tr><td>-m TABLE -</td> <td>1408.577</td> </tr>
 
-<tr><td>-m BYTWO b -r NOSSE -</td> <td>1382.409</td> </tr>
-<tr><td>-m BYTWO p -</td> <td>1376.661</td> </tr>
-<tr><td>-m LOG ZERO EXT -</td> <td>1175.739</td> </tr>
-<tr><td>-m LOG ZERO -</td> <td>1174.694</td> </tr>
+<tr><td>-m BYTWO_b -r NOSSE -</td> <td>1382.409</td> </tr>
+<tr><td>-m BYTWO_p -</td> <td>1376.661</td> </tr>
+<tr><td>-m LOG_ZERO_EXT -</td> <td>1175.739</td> </tr>
+<tr><td>-m LOG_ZERO -</td> <td>1174.694</td> </tr>
 
 
 <tr><td>-m LOG -</td> <td>997.838</td> </tr>
 <tr><td>-m SPLIT 8 4 -r NOSSE -</td> <td>885.897</td> </tr>
 
 
-<tr><td>-m BYTWO p -r NOSSE -</td> <td>589.520</td> </tr>
+<tr><td>-m BYTWO_p -r NOSSE -</td> <td>589.520</td> </tr>
 <tr><td>-m COMPOSITE 2 - -</td> <td>327.039</td> </tr>
 
 
 <tr><td>-m SHIFT -</td> <td>106.115</td> </tr>
 
-<tr><td>-m CARRY FREE -</td> <td>104.299</td> </tr>
+<tr><td>-m CARRY_FREE -</td> <td>104.299</td> </tr>
 
 
 </div>
@@ -3272,14 +3272,14 @@ Practice & Experience,</em> 27(9):995-1012, September 1997.
 <tr><td>-m SPLIT 8 8 -</td> <td>2163.993</td> </tr>
 <tr><td>-m SPLIT 16 4 -r NOSSE -</td> <td>1148.810</td> </tr>
 <tr><td>-m LOG -</td> <td>1019.896</td> </tr>
-<tr><td>-m LOG ZERO -</td> <td>1016.814</td> </tr>
-<tr><td>-m BYTWO b -</td> <td>738.879</td> </tr>
+<tr><td>-m LOG_ZERO -</td> <td>1016.814</td> </tr>
+<tr><td>-m BYTWO_b -</td> <td>738.879</td> </tr>
 <tr><td>-m COMPOSITE 2 - -</td> <td>596.819</td> </tr>
-<tr><td>-m BYTWO p -</td> <td>560.972</td> </tr>
+<tr><td>-m BYTWO_p -</td> <td>560.972</td> </tr>
 <tr><td>-m GROUP 4 4 -</td> <td>450.815</td> </tr>
-<tr><td>-m BYTWO b -r NOSSE -</td> <td>332.967</td> </tr>
-<tr><td>-m BYTWO p -r NOSSE -</td> <td>249.849</td> </tr>
-<tr><td>-m CARRY FREE -</td> <td>111.582</td> </tr>
+<tr><td>-m BYTWO_b -r NOSSE -</td> <td>332.967</td> </tr>
+<tr><td>-m BYTWO_p -r NOSSE -</td> <td>249.849</td> </tr>
+<tr><td>-m CARRY_FREE -</td> <td>111.582</td> </tr>
 <tr><td>-m SHIFT -</td> <td>95.813</td> </tr>
 
 
@@ -3321,21 +3321,21 @@ of the Association for Computing Machinery,</em> 36(2):335-348, April 1989.
 -m SPLIT 32 4 (Default)  <br>
 -m COMPOSITE 2 -m SPLIT 16 4 -r ALTMAP - -r ALTMAP - <br>
 -m COMPOSITE 2 - -r ALTMAP -  <br>
--m SPLIT 8 8 <br> 
--m SPLIT 32 8 <br> 
--m SPLIT 32 16 <br> 
+-m SPLIT 8 8 - <br> 
+-m SPLIT 32 8 - <br> 
+-m SPLIT 32 16 - <br> 
 -m SPLIT 8 8 -r CAUCHY <br> 
 -m SPLIT 32 4 -r NOSSE <br> 
--m CARRY FREE -p 0xc5 <br> 
+-m CARRY_FREE -p 0xc5 <br> 
 -m COMPOSITE 2 - <br> 
--m BYTWO b <br> 
--m BYTWO p <br> 
--m GROUP 4 8 <br> 
--m GROUP 4 4 <br> 
--m CARRY FREE <br> 
--m BYTWO b -r NOSSE <br> 
--m BYTWO p -r NOSSE <br>
--m SHIFT <br> 
+-m BYTWO_b - <br> 
+-m BYTWO_p - <br> 
+-m GROUP 4 8 - <br> 
+-m GROUP 4 4 - <br> 
+-m CARRY_FREE - <br> 
+-m BYTWO_b -r NOSSE - <br> 
+-m BYTWO_p -r NOSSE - <br>
+-m SHIFT - <br> 
 
 </td>
 
@@ -3382,16 +3382,16 @@ of the Association for Computing Machinery,</em> 36(2):335-348, April 1989.
 -m COMPOSITE 2 - -r ALTMAP -  <br>
 -m SPLIT 64 16 - <br>
 -m SPLIT 64 8 -  <br>
--m CARRY FREE -  <br>
+-m CARRY_FREE -  <br>
 -m SPLIT 64 4 -r NOSSE - <br>
 -m GROUP 4 4 -  <br>
 -m GROUP 4 8 -  <br>
--m BYTWO b -  <br>
--m BYTWO p -  <br>
+-m BYTWO_b -  <br>
+-m BYTWO_p -  <br>
 -m SPLIT 8 8 - <br>
--m BYTWO p -r NOSSE - <br>
+-m BYTWO_p -r NOSSE - <br>
 -m COMPOSITE 2 - - <br>
--m BYTWO b -r NOSSE - <br>
+-m BYTWO_b -r NOSSE - <br>
 -m SHIFT - <br>
 
 </td>
@@ -3446,17 +3446,17 @@ of the Association for Computing Machinery,</em> 36(2):335-348, April 1989.
  
 <td>
 
--m SPLIT 128 4 -r ALTMAP- <br>
--m COMPOSITE 2 -m SPLIT 64 4 -r ALTMAP - -r ALTMAP- <br> 
--m COMPOSITE 2 - -r ALTMAP- <br> 
--m SPLIT 128 8 (Default)- <br>
--m CARRY FREE -<br> 
+-m SPLIT 128 4 -r ALTMAP - <br>
+-m COMPOSITE 2 -m SPLIT 64 4 -r ALTMAP - -r ALTMAP - <br> 
+-m COMPOSITE 2 - -r ALTMAP - <br> 
+-m SPLIT 128 8 (Default) - <br>
+-m CARRY_FREE -<br> 
 -m SPLIT 128 4 -<br> 
 -m COMPOSITE 2 - <br>
 -m GROUP 4 8 -<br> 
 -m GROUP 4 4 -<br> 
--m BYTWO p -<br> 
--m BYTWO b -<br> 
+-m BYTWO_p -<br> 
+-m BYTWO_b -<br> 
 -m SHIFT -<br> 
 </td>
 
