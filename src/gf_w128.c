@@ -285,16 +285,16 @@ gf_w128_clm_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_
     __m128i     c,d,e,f;
     gf_internal_t * h = gf->scratch;
     
-    a = _mm_set_epi64x (a128[0], a128[1]);
-    b = _mm_set_epi64x (b128[0], b128[1]);
+    a = _mm_loadu_si128 ((__m128i*) a128);
+    b = _mm_loadu_si128 ((__m128i*) b128);
 
     prim_poly = _mm_set_epi32(0, 0, 0, (uint32_t)h->prim_poly);
 
     /* we need to test algorithm 2 later*/
-    c = _mm_clmulepi64_si128 (a, b, 0x00); /*low-low*/
-    f = _mm_clmulepi64_si128 (a, b, 0x01); /*high-low*/
-    e = _mm_clmulepi64_si128 (a, b, 0x10); /*low-high*/
-    d = _mm_clmulepi64_si128 (a, b, 0x11); /*high-high*/
+    c = _mm_clmulepi64_si128 (a, b, 0x11); /*low-low*/
+    f = _mm_clmulepi64_si128 (a, b, 0x10); /*high-low*/
+    e = _mm_clmulepi64_si128 (a, b, 0x01); /*low-high*/
+    d = _mm_clmulepi64_si128 (a, b, 0x00); /*high-high*/
     
     /* now reusing a and b as temporary variables*/
     a = _mm_xor_si128 (_mm_srli_si128 (e, 8), d);
@@ -366,8 +366,10 @@ gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
   h = (gf_internal_t *) gf->scratch;
   pp = _mm_set_epi32(0, 0, 0, (uint32_t)h->prim_poly);
   prod = _mm_setzero_si128();
-  a = _mm_set_epi64x(a128[0], a128[1]);
-  b = _mm_set_epi64x(b128[0], b128[1]);
+  a = _mm_loadu_si128((__m128i*)a128);
+  b = _mm_loadu_si128((__m128i*)b128);
+  a = _mm_shuffle_epi32(a, _MM_SHUFFLE(1, 0, 3, 2));
+  b = _mm_shuffle_epi32(b, _MM_SHUFFLE(1, 0, 3, 2));
   pmask = 0x80000000;
   amask = _mm_insert_epi32(prod, 0x80000000, 0x3);
   u_middle_one = _mm_insert_epi32(prod, 1, 0x2);
@@ -418,12 +420,14 @@ gf_w128_sse_bytwo_b_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
   h = (gf_internal_t *) gf->scratch;
   
   c = _mm_setzero_si128();
-  lmask = _mm_set_epi64x(0, 1ULL << 63);
-  hmask = _mm_set_epi64x(1ULL << 63, 0);
-  a = _mm_set_epi64x(b128[0], b128[1]);
-  b = _mm_set_epi64x(a128[0], a128[1]);
-  pp = _mm_set_epi64x(0, h->prim_poly);
-  middle_one = _mm_set_epi64x(1, 0);
+  lmask = _mm_set_epi32(0, 0, 1UL << 31, 0);
+  hmask = _mm_set_epi32(1UL << 31, 0, 0, 0);
+  a = _mm_loadu_si128((__m128i*)b128);
+  b = _mm_loadu_si128((__m128i*)a128);
+  a = _mm_shuffle_epi32(a, _MM_SHUFFLE(1, 0, 3, 2));
+  b = _mm_shuffle_epi32(b, _MM_SHUFFLE(1, 0, 3, 2));
+  pp = _mm_cvtsi64_si128(h->prim_poly);
+  middle_one = _mm_set_epi32(0, 1, 0, 0);
 
   while (1) {
     if (_mm_extract_epi32(a, 0x0) & 1) {
