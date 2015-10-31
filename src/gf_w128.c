@@ -119,16 +119,11 @@ int xor)
         d = _mm_clmulepi64_si128 (a, b, 0x00); /*high-high*/
 
         /* now reusing a and b as temporary variables*/
-        result0 = _mm_setzero_si128();
-        result1 = result0;
+        a = _mm_xor_si128 (_mm_srli_si128 (e, 8), d);
+        result0 = _mm_unpacklo_epi64 (_mm_xor_si128 (_mm_srli_si128 (f, 8), a), _mm_srli_si128 (d, 8));
 
-        result0 = _mm_xor_si128 (result0, _mm_insert_epi64 (d, 0, 0));
-        a = _mm_xor_si128 (_mm_srli_si128 (e, 8), _mm_insert_epi64 (d, 0, 1));
-        result0 = _mm_xor_si128 (result0, _mm_xor_si128 (_mm_srli_si128 (f, 8), a));
-
-        a = _mm_xor_si128 (_mm_slli_si128 (e, 8), _mm_insert_epi64 (c, 0, 0));
-        result1 = _mm_xor_si128 (result1, _mm_xor_si128 (_mm_slli_si128 (f, 8), a));
-        result1 = _mm_xor_si128 (result1, _mm_insert_epi64 (c, 0, 1));
+        a = _mm_xor_si128 (_mm_slli_si128 (e, 8), c);
+        result1 = _mm_unpackhi_epi64 (_mm_slli_si128 (c, 8), _mm_xor_si128 (_mm_slli_si128 (f, 8), a));
         /* now we have constructed our 'result' with result0 being the carry bits, and we have to reduce. */
 
         a = _mm_srli_si128 (result0, 8);
@@ -136,8 +131,7 @@ int xor)
         result0 = _mm_xor_si128 (result0, _mm_srli_si128 (b, 8));
         result1 = _mm_xor_si128 (result1, _mm_slli_si128 (b, 8));
 
-        a = _mm_insert_epi64 (result0, 0, 1);
-        b = _mm_clmulepi64_si128 (a, prim_poly, 0x00);
+        b = _mm_clmulepi64_si128 (result0, prim_poly, 0x00);
         result1 = _mm_xor_si128 (result1, b); 
         d128[i] ^= (uint64_t)_mm_cvtsi128_si64(_mm_srli_si128(result1,8));
         d128[i+1] ^= (uint64_t)_mm_cvtsi128_si64(result1);
@@ -153,16 +147,11 @@ int xor)
         d = _mm_clmulepi64_si128 (a, b, 0x00); /*high-high*/ 
 
         /* now reusing a and b as temporary variables*/
-        result0 = _mm_setzero_si128();
-        result1 = result0;
+        a = _mm_xor_si128 (_mm_srli_si128 (e, 8), d);
+        result0 = _mm_unpacklo_epi64 (_mm_xor_si128 (_mm_srli_si128 (f, 8), a), _mm_srli_si128 (d, 8));
 
-        result0 = _mm_xor_si128 (result0, _mm_insert_epi64 (d, 0, 0));
-        a = _mm_xor_si128 (_mm_srli_si128 (e, 8), _mm_insert_epi64 (d, 0, 1));
-        result0 = _mm_xor_si128 (result0, _mm_xor_si128 (_mm_srli_si128 (f, 8), a));
-
-        a = _mm_xor_si128 (_mm_slli_si128 (e, 8), _mm_insert_epi64 (c, 0, 0));
-        result1 = _mm_xor_si128 (result1, _mm_xor_si128 (_mm_slli_si128 (f, 8), a));
-        result1 = _mm_xor_si128 (result1, _mm_insert_epi64 (c, 0, 1));
+        a = _mm_xor_si128 (_mm_slli_si128 (e, 8), c);
+        result1 = _mm_unpackhi_epi64 (_mm_slli_si128 (c, 8), _mm_xor_si128 (_mm_slli_si128 (f, 8), a));
         /* now we have constructed our 'result' with result0 being the carry bits, and we have to reduce.*/
 
         a = _mm_srli_si128 (result0, 8);
@@ -170,8 +159,7 @@ int xor)
         result0 = _mm_xor_si128 (result0, _mm_srli_si128 (b, 8));
         result1 = _mm_xor_si128 (result1, _mm_slli_si128 (b, 8));
 
-        a = _mm_insert_epi64 (result0, 0, 1);
-        b = _mm_clmulepi64_si128 (a, prim_poly, 0x00);
+        b = _mm_clmulepi64_si128 (result0, prim_poly, 0x00);
         result1 = _mm_xor_si128 (result1, b);
         d128[i] = (uint64_t)_mm_cvtsi128_si64(_mm_srli_si128(result1,8));
         d128[i+1] = (uint64_t)_mm_cvtsi128_si64(result1);
@@ -309,16 +297,11 @@ gf_w128_clm_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_
     d = _mm_clmulepi64_si128 (a, b, 0x11); /*high-high*/
     
     /* now reusing a and b as temporary variables*/
-    result0 = _mm_setzero_si128();
-    result1 = result0;
+    a = _mm_xor_si128 (_mm_srli_si128 (e, 8), d);
+    result0 = _mm_unpacklo_epi64 (_mm_xor_si128 (_mm_srli_si128 (f, 8), a), _mm_srli_si128 (d, 8));
 
-    result0 = _mm_xor_si128 (result0, _mm_insert_epi64 (d, 0, 0));
-    a = _mm_xor_si128 (_mm_srli_si128 (e, 8), _mm_insert_epi64 (d, 0, 1));
-    result0 = _mm_xor_si128 (result0, _mm_xor_si128 (_mm_srli_si128 (f, 8), a));
-
-    a = _mm_xor_si128 (_mm_slli_si128 (e, 8), _mm_insert_epi64 (c, 0, 0));
-    result1 = _mm_xor_si128 (result1, _mm_xor_si128 (_mm_slli_si128 (f, 8), a));
-    result1 = _mm_xor_si128 (result1, _mm_insert_epi64 (c, 0, 1));
+    a = _mm_xor_si128 (_mm_slli_si128 (e, 8), c);
+    result1 = _mm_unpackhi_epi64 (_mm_slli_si128 (c, 8), _mm_xor_si128 (_mm_slli_si128 (f, 8), a));
     /* now we have constructed our 'result' with result0 being the carry bits, and we have to reduce.*/
     
     a = _mm_srli_si128 (result0, 8);
@@ -326,8 +309,7 @@ gf_w128_clm_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_
     result0 = _mm_xor_si128 (result0, _mm_srli_si128 (b, 8));
     result1 = _mm_xor_si128 (result1, _mm_slli_si128 (b, 8));
     
-    a = _mm_insert_epi64 (result0, 0, 1);
-    b = _mm_clmulepi64_si128 (a, prim_poly, 0x00);
+    b = _mm_clmulepi64_si128 (result0, prim_poly, 0x00);
     result1 = _mm_xor_si128 (result1, b);
 
     c128[0] = (uint64_t)_mm_cvtsi128_si64(_mm_srli_si128(result1,8));
