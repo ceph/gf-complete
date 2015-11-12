@@ -222,7 +222,7 @@ neon_w16_split_4_altmap_multiply_region(gf_t *gf, uint8_t *src,
 {
   unsigned i;
   uint8_t *high = tbl + 4 * 16;
-  uint8x8_t vh0, vh1, vl0, vl1, r0, r1, r2, r3;
+  uint8x8_t vh0, vh1, vl0, vl1, rh0, rh1, rl0, rl1;
   uint8x8_t loset;
 
   uint8x8x2_t tbl_h[4], tbl_l[4];
@@ -241,35 +241,43 @@ neon_w16_split_4_altmap_multiply_region(gf_t *gf, uint8_t *src,
       vl0 = vld1_u8(src + 16);
       vl1 = vld1_u8(src + 24);
 
-      r0 = vtbl2_u8(tbl_l[0], vand_u8(vh0, loset));
-      r1 = vtbl2_u8(tbl_h[0], vand_u8(vh1, loset));
-      r2 = vtbl2_u8(tbl_l[2], vand_u8(vl0, loset));
-      r3 = vtbl2_u8(tbl_h[2], vand_u8(vl1, loset));
+      rl0 = vtbl2_u8(tbl_l[0], vand_u8(vl0, loset));
+      rl1 = vtbl2_u8(tbl_l[0], vand_u8(vl1, loset));
+      rh0 = vtbl2_u8(tbl_h[0], vand_u8(vl0, loset));
+      rh1 = vtbl2_u8(tbl_h[0], vand_u8(vl1, loset));
+      rl0 = veor_u8(rl0, vtbl2_u8(tbl_l[2], vand_u8(vh0, loset)));
+      rl1 = veor_u8(rl1, vtbl2_u8(tbl_l[2], vand_u8(vh1, loset)));
+      rh0 = veor_u8(rh0, vtbl2_u8(tbl_h[2], vand_u8(vh0, loset)));
+      rh1 = veor_u8(rh1, vtbl2_u8(tbl_h[2], vand_u8(vh1, loset)));
 
       vh0 = vshr_n_u8(vh0, 4);
       vh1 = vshr_n_u8(vh1, 4);
       vl0 = vshr_n_u8(vl0, 4);
       vl1 = vshr_n_u8(vl1, 4);
 
-      r0 = veor_u8(r0, vtbl2_u8(tbl_l[1], vh0));
-      r1 = veor_u8(r1, vtbl2_u8(tbl_h[1], vh1));
-      r2 = veor_u8(r2, vtbl2_u8(tbl_l[3], vl0));
-      r3 = veor_u8(r3, vtbl2_u8(tbl_h[3], vl1));
+      rl0 = veor_u8(rl0, vtbl2_u8(tbl_l[1], vl0));
+      rl1 = veor_u8(rl1, vtbl2_u8(tbl_l[1], vl1));
+      rh0 = veor_u8(rh0, vtbl2_u8(tbl_h[1], vl0));
+      rh1 = veor_u8(rh1, vtbl2_u8(tbl_h[1], vl1));
+      rl0 = veor_u8(rl0, vtbl2_u8(tbl_l[3], vh0));
+      rl1 = veor_u8(rl1, vtbl2_u8(tbl_l[3], vh1));
+      rh0 = veor_u8(rh0, vtbl2_u8(tbl_h[3], vh0));
+      rh1 = veor_u8(rh1, vtbl2_u8(tbl_h[3], vh1));
 
       if (xor) {
           vh0 = vld1_u8(dst);
           vh1 = vld1_u8(dst + 8);
           vl0 = vld1_u8(dst + 16);
           vl1 = vld1_u8(dst + 24);
-          r0  = veor_u8(r0, vh0);
-          r1  = veor_u8(r1, vh1);
-          r2  = veor_u8(r2, vl0);
-          r3  = veor_u8(r3, vl1);
+          rh0  = veor_u8(rh0, vh0);
+          rh1  = veor_u8(rh1, vh1);
+          rl0  = veor_u8(rl0, vl0);
+          rl1  = veor_u8(rl1, vl1);
       }
-      vst1_u8(dst,      r0);
-      vst1_u8(dst +  8, r1);
-      vst1_u8(dst + 16, r2);
-      vst1_u8(dst + 24, r3);
+      vst1_u8(dst,      rh0);
+      vst1_u8(dst +  8, rh1);
+      vst1_u8(dst + 16, rl0);
+      vst1_u8(dst + 24, rl1);
 
       src += 32;
       dst += 32;
