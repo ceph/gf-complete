@@ -219,7 +219,7 @@ int gf_error_check(int w, int mult_type, int region_type, int divide_type,
 #endif
 
 #ifdef ARM_NEON
-  pclmul = 1;
+  pclmul = (w == 4 || w == 8);
   sse3 = 1;
 #endif
 
