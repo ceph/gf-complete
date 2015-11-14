@@ -81,7 +81,34 @@ neon_w16_split_4_multiply_region(gf_t *gf, uint16_t *src, uint16_t *dst,
 
   loset = vdupq_n_u8(0xf);
 
-  while (dst < d_end) {
+  if (xor) {
+    uint8x16x2_t vb;
+    while (dst < d_end) {
+      va = vld2q_u8((uint8_t*)src);
+      vb = vld2q_u8((uint8_t*)dst);
+
+      rl = vqtbl1q_u8(tbl_l[0], vandq_u8(va.val[0], loset));
+      rh = vqtbl1q_u8(tbl_h[0], vandq_u8(va.val[0], loset));
+      rl = veorq_u8(rl, vqtbl1q_u8(tbl_l[2], vandq_u8(va.val[1], loset)));
+      rh = veorq_u8(rh, vqtbl1q_u8(tbl_h[2], vandq_u8(va.val[1], loset)));
+
+      va.val[0] = vshrq_n_u8(va.val[0], 4);
+      va.val[1] = vshrq_n_u8(va.val[1], 4);
+
+      rl = veorq_u8(rl, vqtbl1q_u8(tbl_l[1], va.val[0]));
+      rh = veorq_u8(rh, vqtbl1q_u8(tbl_h[1], va.val[0]));
+      va.val[0] = veorq_u8(rl, vqtbl1q_u8(tbl_l[3], va.val[1]));
+      va.val[1] = veorq_u8(rh, vqtbl1q_u8(tbl_h[3], va.val[1]));
+
+      va.val[0] = veorq_u8(va.val[0], vb.val[0]);
+      va.val[1] = veorq_u8(va.val[1], vb.val[1]);
+      vst2q_u8((uint8_t*)dst, va);
+
+      src += 16;
+      dst += 16;
+    }
+  } else {
+    while (dst < d_end) {
       va = vld2q_u8((uint8_t*)src);
 
       rl = vqtbl1q_u8(tbl_l[0], vandq_u8(va.val[0], loset));
@@ -97,15 +124,11 @@ neon_w16_split_4_multiply_region(gf_t *gf, uint16_t *src, uint16_t *dst,
       va.val[0] = veorq_u8(rl, vqtbl1q_u8(tbl_l[3], va.val[1]));
       va.val[1] = veorq_u8(rh, vqtbl1q_u8(tbl_h[3], va.val[1]));
 
-      if (xor) {
-          uint8x16x2_t vb = vld2q_u8((uint8_t*)dst);
-          va.val[0] = veorq_u8(va.val[0], vb.val[0]);
-          va.val[1] = veorq_u8(va.val[1], vb.val[1]);
-      }
       vst2q_u8((uint8_t*)dst, va);
 
       src += 16;
       dst += 16;
+    }
   }
 }
 
