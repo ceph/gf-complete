@@ -56,7 +56,7 @@ struct gf_bytwo_data {
     uint64_t mask2;
 };
 
-// ARM NEON init functions
+/* ARM NEON init functions */
 int gf_w4_neon_cfm_init(gf_t *gf);
 void gf_w4_neon_single_table_init(gf_t *gf);
 

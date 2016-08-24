@@ -137,7 +137,7 @@ int main(int argc, char **argv)
   if (posix_memalign((void **) &rd, 16, sizeof(char)*REGION_SIZE))
     rd = NULL;
 #else
-  //15 bytes extra to make sure it's 16byte aligned
+  /*15 bytes extra to make sure it's 16byte aligned*/
   malloc_ra = (char *) malloc(sizeof(char)*REGION_SIZE+15);
   malloc_rb = (char *) malloc(sizeof(char)*REGION_SIZE+15);
   malloc_rc = (char *) malloc(sizeof(char)*REGION_SIZE+15);
@@ -186,9 +186,9 @@ int main(int argc, char **argv)
         a->w32 = i % (1 << w);
         b->w32 = (i >> w);
 
-      //Allen: the following conditions were being run 10 times each. That didn't seem like nearly enough to
-      //me for these special cases, so I converted to doing this mod stuff to easily make the number of times
-      //run both larger and proportional to the total size of the run.
+      /*Allen: the following conditions were being run 10 times each. That didn't seem like nearly enough to
+       *me for these special cases, so I converted to doing this mod stuff to easily make the number of times
+       *run both larger and proportional to the total size of the run.*/
       } else {
         switch (i % 32)
         {
@@ -214,11 +214,11 @@ int main(int argc, char **argv)
         }
       }
 
-      //Allen: the following special cases for w=64 are based on the code below for w=128.
-      //These w=64 cases are based on Dr. Plank's suggestion because some of the methods for w=64
-      //involve splitting it in two. I think they're less likely to give errors than the 128-bit case
-      //though, because the 128 bit case is always split in two.
-      //As with w=128, I'm arbitrarily deciding to do this sort of thing with a quarter of the cases
+      /*Allen: the following special cases for w=64 are based on the code below for w=128.
+       *These w=64 cases are based on Dr. Plank's suggestion because some of the methods for w=64
+       *involve splitting it in two. I think they're less likely to give errors than the 128-bit case
+       *though, because the 128 bit case is always split in two.
+       *As with w=128, I'm arbitrarily deciding to do this sort of thing with a quarter of the cases*/
       if (w == 64) {
         switch (i % 32)
         {
@@ -233,11 +233,11 @@ int main(int argc, char **argv)
         }
       }
 
-      //Allen: for w=128, we have important special cases where one half or the other of the number is all
-      //zeros. The probability of hitting such a number randomly is 1^-64, so if we don't force these cases
-      //we'll probably never hit them. This could be implemented more efficiently by changing the set-random
-      //function for w=128, but I think this is easier to follow.
-      //I'm arbitrarily deciding to do this sort of thing with a quarter of the cases
+      /*Allen: for w=128, we have important special cases where one half or the other of the number is all
+       *zeros. The probability of hitting such a number randomly is 1^-64, so if we don't force these cases
+       *we'll probably never hit them. This could be implemented more efficiently by changing the set-random
+       *function for w=128, but I think this is easier to follow.
+       *I'm arbitrarily deciding to do this sort of thing with a quarter of the cases*/
       if (w == 128) {
         switch (i % 32)
         {
@@ -360,7 +360,7 @@ int main(int argc, char **argv)
   if (region) {
     if (verbose) { printf("Testing region multiplications\n"); fflush(stdout); }
     for (i = 0; i < 1024; i++) {
-      //Allen: changing to a switch thing as with the single ops to make things proportional
+      /*Allen: changing to a switch thing as with the single ops to make things proportional*/
       switch (i % 32)
       {
         case 0:

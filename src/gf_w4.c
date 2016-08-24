@@ -19,7 +19,7 @@
   t2 = ((t2 << 1) - (t2 >> (GF_FIELD_WIDTH-1))); \
   b = (t1 ^ (t2 & ip));}
 
-// ToDo(KMG/JSP): Why is 0x88 hard-coded?
+/* ToDo(KMG/JSP): Why is 0x88 hard-coded? */
 #define SSE_AB2(pp, m1, va, t1, t2) {\
           t1 = _mm_and_si128(_mm_slli_epi64(va, 1), m1); \
           t2 = _mm_and_si128(va, _mm_set1_epi8(0x88)); \
@@ -433,8 +433,8 @@ int gf_w4_single_table_init(gf_t *gf)
   h = (gf_internal_t *) gf->scratch;
   std = (struct gf_single_table_data *)h->private;
 
-  bzero(std->mult, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
-  bzero(std->div, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+  memset(std->mult, 0, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+  memset(std->div, 0, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
 
   for (a = 1; a < GF_FIELD_SIZE; a++) {
     for (b = 1; b < GF_FIELD_SIZE; b++) {
@@ -528,8 +528,8 @@ int gf_w4_double_table_init(gf_t *gf)
   h = (gf_internal_t *) gf->scratch;
   std = (struct gf_double_table_data *)h->private;
 
-  bzero(mult, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
-  bzero(std->div, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+  memset(mult, 0, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+  memset(std->div, 0, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
 
   for (a = 1; a < GF_FIELD_SIZE; a++) {
     for (b = 1; b < GF_FIELD_SIZE; b++) {
@@ -538,7 +538,7 @@ int gf_w4_double_table_init(gf_t *gf)
       std->div[prod][b] = a;
     }
   }
-  bzero(std->mult, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE * GF_FIELD_SIZE);
+  memset(std->mult, 0, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE * GF_FIELD_SIZE);
   for (a = 0; a < GF_FIELD_SIZE; a++) {
     for (b = 0; b < GF_FIELD_SIZE; b++) {
       ab = mult[a][b];
@@ -655,8 +655,8 @@ int gf_w4_quad_table_init(gf_t *gf)
   h = (gf_internal_t *) gf->scratch;
   std = (struct gf_quad_table_data *)h->private;
 
-  bzero(mult, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
-  bzero(std->div, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+  memset(mult, 0, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+  memset(std->div, 0, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
 
   for (a = 1; a < GF_FIELD_SIZE; a++) {
     for (b = 1; b < GF_FIELD_SIZE; b++) {
@@ -711,8 +711,8 @@ int gf_w4_quad_table_lazy_init(gf_t *gf)
       }
   }
 
-  bzero(std->smult, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
-  bzero(std->div, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+  memset(std->smult, 0, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
+  memset(std->div, 0, sizeof(uint8_t) * GF_FIELD_SIZE * GF_FIELD_SIZE);
 
   for (a = 1; a < GF_FIELD_SIZE; a++) {
     loga = log_tbl[a];
