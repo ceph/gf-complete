@@ -50,6 +50,10 @@ config.sub
 ltmain.sh
 m4/libtool.m4
 m4/ltversion.m4
+m4/ltoptions.m4
+m4/ltsugar.m4
+m4/lt~obsolete.m4
+test-driver
 src/.dirstamp
 test-driver
 
@@ -68,3 +72,6 @@ tools/gf_methods
 tools/gf_mult
 tools/gf_poly
 tools/gf_time
+tools/gf_unit_w*
+tools/test-suite.log
+
