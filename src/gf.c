@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "gf_cpu.h"
 
 int _gf_errno = GF_E_DEFAULT;
 
@@ -207,20 +208,28 @@ int gf_error_check(int w, int mult_type, int region_type, int divide_type,
   if (region_type & (~tmp)) { _gf_errno = GF_E_UNK_REG; return 0; }
 
 #ifdef INTEL_SSE2
-  sse2 = 1;
+  if (gf_cpu_supports_intel_sse2) {
+    sse2 = 1;
+  }
 #endif
 
 #ifdef INTEL_SSSE3
-  sse3 = 1;
+  if (gf_cpu_supports_intel_ssse3) {
+    sse3 = 1;
+  }
 #endif
 
 #ifdef INTEL_SSE4_PCLMUL
-  pclmul = 1;
+  if (gf_cpu_supports_intel_pclmul) {
+    pclmul = 1;
+  }
 #endif
 
 #ifdef ARM_NEON
-  pclmul = (w == 4 || w == 8);
-  sse3 = 1;
+  if (gf_cpu_supports_arm_neon) {
+    pclmul = (w == 4 || w == 8);
+    sse3 = 1;
+  }
 #endif
 
 
@@ -473,6 +482,8 @@ int gf_init_hard(gf_t *gf, int w, int mult_type,
   int sz;
   gf_internal_t *h;
  
+  gf_cpu_identify();
+
   if (gf_error_check(w, mult_type, region_type, divide_type, 
                      arg1, arg2, prim_poly, base_gf) == 0) return 0;
 

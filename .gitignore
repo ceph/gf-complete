@@ -75,4 +75,4 @@ tools/gf_time
 tools/gf_unit_w*
 tools/test-suite.log
 tools/.qemu/
-tools/test_simd*.results
+tools/test_simd*.results*

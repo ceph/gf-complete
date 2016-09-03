@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "gf_w16.h"
+#include "gf_cpu.h"
 
 #define AB2(ip, am1 ,am2, b, t1, t2) {\
   t1 = (b << 1) & am1;\
@@ -391,14 +392,13 @@ gf_val_32_t gf_w16_matrix (gf_t *gf, gf_val_32_t b)
    extra memory.  
  */
 
+#if defined(INTEL_SSE4_PCLMUL)
 static
 inline
 gf_val_32_t
 gf_w16_clm_multiply_2 (gf_t *gf, gf_val_32_t a16, gf_val_32_t b16)
 {
   gf_val_32_t rv = 0;
-
-#if defined(INTEL_SSE4_PCLMUL)
 
   __m128i         a, b;
   __m128i         result;
@@ -433,11 +433,11 @@ gf_w16_clm_multiply_2 (gf_t *gf, gf_val_32_t a16, gf_val_32_t b16)
   
   rv = ((gf_val_32_t)_mm_extract_epi32(result, 0));
 
-
-#endif
   return rv;
 }
+#endif
 
+#if defined(INTEL_SSE4_PCLMUL)
 static
 inline
 gf_val_32_t
@@ -445,8 +445,6 @@ gf_w16_clm_multiply_3 (gf_t *gf, gf_val_32_t a16, gf_val_32_t b16)
 {
   gf_val_32_t rv = 0;
 
-#if defined(INTEL_SSE4_PCLMUL)
-
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
@@ -473,11 +471,11 @@ gf_w16_clm_multiply_3 (gf_t *gf, gf_val_32_t a16, gf_val_32_t b16)
   
   rv = ((gf_val_32_t)_mm_extract_epi32(result, 0));
 
-
-#endif
   return rv;
 }
+#endif
 
+#if defined(INTEL_SSE4_PCLMUL)
 static
 inline
 gf_val_32_t
@@ -485,8 +483,6 @@ gf_w16_clm_multiply_4 (gf_t *gf, gf_val_32_t a16, gf_val_32_t b16)
 {
   gf_val_32_t rv = 0;
 
-#if defined(INTEL_SSE4_PCLMUL)
-
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
@@ -515,10 +511,9 @@ gf_w16_clm_multiply_4 (gf_t *gf, gf_val_32_t a16, gf_val_32_t b16)
   
   rv = ((gf_val_32_t)_mm_extract_epi32(result, 0));
 
-
-#endif
   return rv;
 }
+#endif
 
 
 static
@@ -556,25 +551,27 @@ static
 int gf_w16_cfm_init(gf_t *gf)
 {
 #if defined(INTEL_SSE4_PCLMUL)
-  gf_internal_t *h;
+  if (gf_cpu_supports_intel_pclmul) {
+    gf_internal_t *h;
 
-  h = (gf_internal_t *) gf->scratch;
-  
-  /*Ben: Determining how many reductions to do */
-  
-  if ((0xfe00 & h->prim_poly) == 0) {
-    SET_FUNCTION(gf,multiply,w32,gf_w16_clm_multiply_2)
-    SET_FUNCTION(gf,multiply_region,w32,gf_w16_clm_multiply_region_from_single_2)
-  } else if((0xf000 & h->prim_poly) == 0) {
-    SET_FUNCTION(gf,multiply,w32,gf_w16_clm_multiply_3)
-    SET_FUNCTION(gf,multiply_region,w32,gf_w16_clm_multiply_region_from_single_3)
-  } else if ((0xe000 & h->prim_poly) == 0) {
-    SET_FUNCTION(gf,multiply,w32,gf_w16_clm_multiply_4)
-    SET_FUNCTION(gf,multiply_region,w32,gf_w16_clm_multiply_region_from_single_4)
-  } else {
-    return 0;
-  } 
-  return 1;
+    h = (gf_internal_t *) gf->scratch;
+    
+    /*Ben: Determining how many reductions to do */
+    
+    if ((0xfe00 & h->prim_poly) == 0) {
+      SET_FUNCTION(gf,multiply,w32,gf_w16_clm_multiply_2)
+      SET_FUNCTION(gf,multiply_region,w32,gf_w16_clm_multiply_region_from_single_2)
+    } else if((0xf000 & h->prim_poly) == 0) {
+      SET_FUNCTION(gf,multiply,w32,gf_w16_clm_multiply_3)
+      SET_FUNCTION(gf,multiply_region,w32,gf_w16_clm_multiply_region_from_single_3)
+    } else if ((0xe000 & h->prim_poly) == 0) {
+      SET_FUNCTION(gf,multiply,w32,gf_w16_clm_multiply_4)
+      SET_FUNCTION(gf,multiply_region,w32,gf_w16_clm_multiply_region_from_single_4)
+    } else {
+      return 0;
+    } 
+    return 1;
+  }
 #endif
 
   return 0;
@@ -688,10 +685,9 @@ int gf_w16_log_init(gf_t *gf)
 
   if (check) {
     if (h->mult_type != GF_MULT_LOG_TABLE) {
-
-#if defined(INTEL_SSE4_PCLMUL)
-      return gf_w16_cfm_init(gf);
-#endif
+      if (gf_cpu_supports_intel_pclmul) {
+        return gf_w16_cfm_init(gf);
+      }
       return gf_w16_shift_init(gf);
     } else {
       _gf_errno = GF_E_LOGPOLY;
@@ -948,11 +944,11 @@ gf_w16_table_lazy_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t v
   gf_do_final_region_alignment(&rd);
 }
 
+#ifdef INTEL_SSSE3
 static
 void
 gf_w16_split_4_16_lazy_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSSE3
   uint64_t i, j, *s64, *d64, *top64;;
   uint64_t c, prod;
   uint8_t low[4][16];
@@ -1078,14 +1074,14 @@ gf_w16_split_4_16_lazy_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_v
   }
 
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
+#ifdef INTEL_SSSE3
 static
 void
 gf_w16_split_4_16_lazy_sse_altmap_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSSE3
   uint64_t i, j, *s64, *d64, *top64;;
   uint64_t c, prod;
   uint8_t low[4][16];
@@ -1187,8 +1183,8 @@ gf_w16_split_4_16_lazy_sse_altmap_multiply_region(gf_t *gf, void *src, void *des
   }
   gf_do_final_region_alignment(&rd);
 
-#endif
 }
+#endif
 
 uint32_t 
 gf_w16_split_8_8_multiply(gf_t *gf, gf_val_32_t a, gf_val_32_t b)
@@ -1216,20 +1212,10 @@ int gf_w16_split_init(gf_t *gf)
 {
   gf_internal_t *h;
   struct gf_w16_split_8_8_data *d8;
-  int i, j, exp, issse3;
-  int isneon = 0;
+  int i, j, exp;
   uint32_t p, basep, tmp;
 
   h = (gf_internal_t *) gf->scratch;
-
-#ifdef INTEL_SSSE3
-  issse3 = 1;
-#else
-  issse3 = 0;
-#endif
-#ifdef ARM_NEON
-  isneon = 1;
-#endif
 
   if (h->arg1 == 8 && h->arg2 == 8) {
     d8 = (struct gf_w16_split_8_8_data *) h->private;
@@ -1273,36 +1259,45 @@ int gf_w16_split_init(gf_t *gf)
 
   /* Defaults */
 
-  if (issse3) {
+#ifdef INTEL_SSSE3
+  if (gf_cpu_supports_intel_ssse3) {
     SET_FUNCTION(gf,multiply_region,w32,gf_w16_split_4_16_lazy_sse_multiply_region)
-  } else if (isneon) {
-#ifdef ARM_NEON
-    gf_w16_neon_split_init(gf);
-#endif
   } else {
+#elif ARM_NEON
+  if (gf_cpu_supports_arm_neon) {
+    gf_w16_neon_split_init(gf);
+  } else {
+#endif
     SET_FUNCTION(gf,multiply_region,w32,gf_w16_split_8_16_lazy_multiply_region)
+#if defined(INTEL_SSSE3) || defined(ARM_NEON)
   }
-
+#endif
 
   if ((h->arg1 == 8 && h->arg2 == 16) || (h->arg2 == 8 && h->arg1 == 16)) {
     SET_FUNCTION(gf,multiply_region,w32,gf_w16_split_8_16_lazy_multiply_region)
 
   } else if ((h->arg1 == 4 && h->arg2 == 16) || (h->arg2 == 4 && h->arg1 == 16)) {
-    if (issse3 || isneon) {
+#if defined(INTEL_SSSE3) || defined(ARM_NEON)
+    if (gf_cpu_supports_intel_ssse3 || gf_cpu_supports_arm_neon) {
       if(h->region_type & GF_REGION_ALTMAP && h->region_type & GF_REGION_NOSIMD)
         SET_FUNCTION(gf,multiply_region,w32,gf_w16_split_4_16_lazy_nosse_altmap_multiply_region)
       else if(h->region_type & GF_REGION_NOSIMD)
         SET_FUNCTION(gf,multiply_region,w32,gf_w16_split_4_16_lazy_multiply_region)
-      else if(h->region_type & GF_REGION_ALTMAP && issse3)
+#if defined(INTEL_SSSE3)
+      else if(h->region_type & GF_REGION_ALTMAP && gf_cpu_supports_intel_ssse3)
         SET_FUNCTION(gf,multiply_region,w32,gf_w16_split_4_16_lazy_sse_altmap_multiply_region)
+#endif        
     } else {
+#endif
       if(h->region_type & GF_REGION_SIMD)
         return 0;
       else if(h->region_type & GF_REGION_ALTMAP)
         SET_FUNCTION(gf,multiply_region,w32,gf_w16_split_4_16_lazy_nosse_altmap_multiply_region)
       else
         SET_FUNCTION(gf,multiply_region,w32,gf_w16_split_4_16_lazy_multiply_region)
+#if defined(INTEL_SSSE3) || defined(ARM_NEON)
     }
+#endif
   }
 
   return 1;
@@ -1846,26 +1841,28 @@ int gf_w16_bytwo_init(gf_t *gf)
   if (h->mult_type == GF_MULT_BYTWO_p) {
     SET_FUNCTION(gf,multiply,w32,gf_w16_bytwo_p_multiply)
     #ifdef INTEL_SSE2
-      if (h->region_type & GF_REGION_NOSIMD)
-        SET_FUNCTION(gf,multiply_region,w32,gf_w16_bytwo_p_nosse_multiply_region)
-      else
-        SET_FUNCTION(gf,multiply_region,w32,gf_w16_bytwo_p_sse_multiply_region)
-    #else
+    if (gf_cpu_supports_intel_sse2 && !(h->region_type & GF_REGION_NOSIMD)) {
+      SET_FUNCTION(gf,multiply_region,w32,gf_w16_bytwo_p_sse_multiply_region)
+    } else {
+    #endif
       SET_FUNCTION(gf,multiply_region,w32,gf_w16_bytwo_p_nosse_multiply_region)
       if(h->region_type & GF_REGION_SIMD)
         return 0;
+    #ifdef INTEL_SSE2
+    }
     #endif
   } else {
     SET_FUNCTION(gf,multiply,w32,gf_w16_bytwo_b_multiply)
     #ifdef INTEL_SSE2
-      if (h->region_type & GF_REGION_NOSIMD)
-        SET_FUNCTION(gf,multiply_region,w32,gf_w16_bytwo_b_nosse_multiply_region)
-      else
+    if (gf_cpu_supports_intel_sse2 && !(h->region_type & GF_REGION_NOSIMD)) {
         SET_FUNCTION(gf,multiply_region,w32,gf_w16_bytwo_b_sse_multiply_region)
-    #else
+    } else {
+    #endif
       SET_FUNCTION(gf,multiply_region,w32,gf_w16_bytwo_b_nosse_multiply_region)
       if(h->region_type & GF_REGION_SIMD)
         return 0;
+    #ifdef INTEL_SSE2
+    }
     #endif
   }
 

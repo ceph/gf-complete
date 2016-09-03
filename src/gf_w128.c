@@ -11,6 +11,7 @@
 #include "gf_int.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "gf_cpu.h"
 
 #define GF_FIELD_WIDTH (128)
 
@@ -290,11 +291,11 @@ gf_w128_shift_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_12
   return;
 }
 
+#if defined(INTEL_SSE4_PCLMUL)
+
 void
 gf_w128_clm_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_t c128)
 {
-#if defined(INTEL_SSE4_PCLMUL)
-
     __m128i     a,b;
     __m128i     result0,result1;
     __m128i     prim_poly;
@@ -338,9 +339,8 @@ gf_w128_clm_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_
 
     c128[0] = (uint64_t)_mm_extract_epi64(result1,1);
     c128[1] = (uint64_t)_mm_extract_epi64(result1,0);
-#endif
-return;
 }
+#endif
 
 void
 gf_w128_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_t c128)
@@ -376,10 +376,10 @@ gf_w128_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_
   return;
 }
 
+#if defined(INTEL_SSE4)
 void
 gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_t c128)
 {
-#if defined(INTEL_SSE4)
   int i;
   __m128i a, b, pp, prod, amask, u_middle_one; 
   /*John: pmask is always the highest bit set, and the rest zeros. amask changes, it's a countdown.*/
@@ -427,16 +427,16 @@ gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
   }
   c128[0] = (uint64_t)_mm_extract_epi64(prod, 1);
   c128[1] = (uint64_t)_mm_extract_epi64(prod, 0);
-#endif
   return;
 }
+#endif
 
 
 /* Ben: This slow function implements sse instrutions for bytwo_b because why not */
+#if defined(INTEL_SSE4)
 void
 gf_w128_sse_bytwo_b_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_t c128)
 {
-#if defined(INTEL_SSE4)
   __m128i a, b, lmask, hmask, pp, c, middle_one;
   gf_internal_t *h;
   uint64_t topbit, middlebit;
@@ -471,8 +471,8 @@ gf_w128_sse_bytwo_b_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
     if (middlebit) b = _mm_xor_si128(b, middle_one);
     if (topbit) b = _mm_xor_si128(b, pp);
   }
-#endif
 }
+#endif
 
 void
 gf_w128_bytwo_b_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_t c128)
@@ -1146,7 +1146,7 @@ gf_w128_group_multiply_region(gf_t *gf, void *src, void *dest, gf_val_128_t val,
 }
 
 /* a^-1 -> b */
-  void
+void
 gf_w128_euclid(GFP gf, gf_val_128_t a128, gf_val_128_t b128)
 {
   uint64_t e_i[2], e_im1[2], e_ip1[2];
@@ -1239,7 +1239,7 @@ gf_w128_euclid(GFP gf, gf_val_128_t a128, gf_val_128_t b128)
   return;
 }
 
-  void
+void
 gf_w128_divide_from_inverse(GFP gf, gf_val_128_t a128, gf_val_128_t b128, gf_val_128_t c128)
 {
   uint64_t d[2];
@@ -1248,7 +1248,7 @@ gf_w128_divide_from_inverse(GFP gf, gf_val_128_t a128, gf_val_128_t b128, gf_val
   return;
 }
 
-  void
+void
 gf_w128_inverse_from_divide(GFP gf, gf_val_128_t a128, gf_val_128_t b128)
 {
   uint64_t one128[2];
@@ -1260,7 +1260,7 @@ gf_w128_inverse_from_divide(GFP gf, gf_val_128_t a128, gf_val_128_t b128)
 
 
 static
-  void
+void
 gf_w128_composite_inverse(gf_t *gf, gf_val_128_t a, gf_val_128_t inv)
 {
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
@@ -1421,10 +1421,12 @@ static
 int gf_w128_cfm_init(gf_t *gf)
 {
 #if defined(INTEL_SSE4_PCLMUL)
-  SET_FUNCTION(gf,inverse,w128,gf_w128_euclid)
-  SET_FUNCTION(gf,multiply,w128,gf_w128_clm_multiply)
-  SET_FUNCTION(gf,multiply_region,w128,gf_w128_clm_multiply_region_from_single)
-  return 1;
+  if (gf_cpu_supports_intel_pclmul) {
+    SET_FUNCTION(gf,inverse,w128,gf_w128_euclid)
+    SET_FUNCTION(gf,multiply,w128,gf_w128_clm_multiply)
+    SET_FUNCTION(gf,multiply_region,w128,gf_w128_clm_multiply_region_from_single)
+    return 1;
+  }
 #endif
 
   return 0;
@@ -1527,7 +1529,7 @@ int gf_w128_split_init(gf_t *gf)
 
   SET_FUNCTION(gf,multiply,w128,gf_w128_bytwo_p_multiply)
 #if defined(INTEL_SSE4_PCLMUL)
-  if (!(h->region_type & GF_REGION_NOSIMD)){
+  if (gf_cpu_supports_intel_pclmul && !(h->region_type & GF_REGION_NOSIMD)){
     SET_FUNCTION(gf,multiply,w128,gf_w128_clm_multiply)
   }
 #endif
@@ -1546,23 +1548,19 @@ int gf_w128_split_init(gf_t *gf)
     if((h->region_type & GF_REGION_ALTMAP))
     {
       #ifdef INTEL_SSE4
-        if(!(h->region_type & GF_REGION_NOSIMD))
+        if(gf_cpu_supports_intel_sse4 && !(h->region_type & GF_REGION_NOSIMD))
           SET_FUNCTION(gf,multiply_region,w128,gf_w128_split_4_128_sse_altmap_multiply_region)
         else
-          return 0;
-      #else
-        return 0;
       #endif
+          return 0;
     }
     else {
       #ifdef INTEL_SSE4
-        if(!(h->region_type & GF_REGION_NOSIMD))
+        if(gf_cpu_supports_intel_sse4 && !(h->region_type & GF_REGION_NOSIMD))
           SET_FUNCTION(gf,multiply_region,w128,gf_w128_split_4_128_sse_multiply_region)
         else
-          SET_FUNCTION(gf,multiply_region,w128,gf_w128_split_4_128_multiply_region)
-      #else
-      SET_FUNCTION(gf,multiply_region,w128,gf_w128_split_4_128_multiply_region)
       #endif
+        SET_FUNCTION(gf,multiply_region,w128,gf_w128_split_4_128_multiply_region)
     }
   }
   return 1;

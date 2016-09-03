@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "gf_cpu.h"
 
 #define AB2(ip, am1 ,am2, b, t1, t2) {\
   t1 = (b << 1) & am1;\
@@ -127,14 +128,13 @@ uint32_t gf_w8_matrix (gf_t *gf, uint32_t b)
 }
 
 
+#if defined(INTEL_SSE4_PCLMUL)
 static
 inline
 gf_val_32_t
 gf_w8_clm_multiply_2 (gf_t *gf, gf_val_32_t a8, gf_val_32_t b8)
 {
   gf_val_32_t rv = 0;
-
-#if defined(INTEL_SSE4_PCLMUL)
 
   __m128i         a, b;
   __m128i         result;
@@ -169,10 +169,11 @@ gf_w8_clm_multiply_2 (gf_t *gf, gf_val_32_t a8, gf_val_32_t b8)
   
   rv = ((gf_val_32_t)_mm_extract_epi32(result, 0));
 
-#endif
   return rv;
 }
+#endif
 
+#if defined(INTEL_SSE4_PCLMUL)
 static
 inline
 gf_val_32_t
@@ -180,8 +181,6 @@ gf_w8_clm_multiply_3 (gf_t *gf, gf_val_32_t a8, gf_val_32_t b8)
 {
   gf_val_32_t rv = 0;
 
-#if defined(INTEL_SSE4_PCLMUL)
-
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
@@ -208,10 +207,11 @@ gf_w8_clm_multiply_3 (gf_t *gf, gf_val_32_t a8, gf_val_32_t b8)
   
   rv = ((gf_val_32_t)_mm_extract_epi32(result, 0));
 
-#endif
   return rv;
 }
+#endif
 
+#if defined(INTEL_SSE4_PCLMUL)
 static
 inline
 gf_val_32_t
@@ -219,8 +219,6 @@ gf_w8_clm_multiply_4 (gf_t *gf, gf_val_32_t a8, gf_val_32_t b8)
 {
   gf_val_32_t rv = 0;
 
-#if defined(INTEL_SSE4_PCLMUL)
-
   __m128i         a, b;
   __m128i         result;
   __m128i         prim_poly;
@@ -248,9 +246,9 @@ gf_w8_clm_multiply_4 (gf_t *gf, gf_val_32_t a8, gf_val_32_t b8)
   /* Extracts 32 bit value from result. */
   rv = ((gf_val_32_t)_mm_extract_epi32(result, 0));
 
-#endif
   return rv;
 }
+#endif
 
 
 static
@@ -509,25 +507,29 @@ static
 int gf_w8_cfm_init(gf_t *gf)
 { 
 #if defined(INTEL_SSE4_PCLMUL)
-  gf_internal_t *h;
+  if (gf_cpu_supports_intel_pclmul) {
+    gf_internal_t *h;
 
-  h = (gf_internal_t *) gf->scratch;
+    h = (gf_internal_t *) gf->scratch;
 
-    if ((0xe0 & h->prim_poly) == 0){
-      SET_FUNCTION(gf,multiply,w32,gf_w8_clm_multiply_2)
-      SET_FUNCTION(gf,multiply_region,w32,gf_w8_clm_multiply_region_from_single_2)
-    }else if ((0xc0 & h->prim_poly) == 0){
-      SET_FUNCTION(gf,multiply,w32,gf_w8_clm_multiply_3)
-      SET_FUNCTION(gf,multiply_region,w32,gf_w8_clm_multiply_region_from_single_3)
-    }else if ((0x80 & h->prim_poly) == 0){ 
-      SET_FUNCTION(gf,multiply,w32,gf_w8_clm_multiply_4)
-      SET_FUNCTION(gf,multiply_region,w32,gf_w8_clm_multiply_region_from_single_4)
-    }else{
-      return 0;
-    }
-  return 1;
+      if ((0xe0 & h->prim_poly) == 0){
+        SET_FUNCTION(gf,multiply,w32,gf_w8_clm_multiply_2)
+        SET_FUNCTION(gf,multiply_region,w32,gf_w8_clm_multiply_region_from_single_2)
+      }else if ((0xc0 & h->prim_poly) == 0){
+        SET_FUNCTION(gf,multiply,w32,gf_w8_clm_multiply_3)
+        SET_FUNCTION(gf,multiply_region,w32,gf_w8_clm_multiply_region_from_single_3)
+      }else if ((0x80 & h->prim_poly) == 0){ 
+        SET_FUNCTION(gf,multiply,w32,gf_w8_clm_multiply_4)
+        SET_FUNCTION(gf,multiply_region,w32,gf_w8_clm_multiply_region_from_single_4)
+      }else{
+        return 0;
+      }
+    return 1;
+  }
 #elif defined(ARM_NEON)
-  return gf_w8_neon_cfm_init(gf);
+  if (gf_cpu_supports_arm_neon) {
+    return gf_w8_neon_cfm_init(gf);
+  }
 #endif
 
   return 0;
@@ -1103,20 +1105,21 @@ int gf_w8_split_init(gf_t *gf)
   }
 
   SET_FUNCTION(gf,multiply,w32,gf_w8_split_multiply)
-  
-  #if defined(INTEL_SSSE3) || defined(ARM_NEON)
-    if (h->region_type & GF_REGION_NOSIMD)
-      SET_FUNCTION(gf,multiply_region,w32,gf_w8_split_multiply_region)
-    else
-    #if defined(INTEL_SSSE3)
+
+  #if defined(INTEL_SSSE3)
+    if (gf_cpu_supports_intel_ssse3 && !(h->region_type & GF_REGION_NOSIMD)) {
       SET_FUNCTION(gf,multiply_region,w32,gf_w8_split_multiply_region_sse)
-    #elif defined(ARM_NEON)
+    } else {
+  #elif defined(ARM_NEON)
+    if (gf_cpu_supports_arm_neon && !(h->region_type & GF_REGION_NOSIMD)) {
       gf_w8_neon_split_init(gf);
-    #endif
-  #else
+    } else {
+  #endif
     SET_FUNCTION(gf,multiply_region,w32,gf_w8_split_multiply_region)
     if(h->region_type & GF_REGION_SIMD)
       return 0;
+  #if defined(INTEL_SSSE3) || defined(ARM_NEON)
+    }
   #endif
 
   return 1;
@@ -1134,17 +1137,12 @@ int gf_w8_table_init(gf_t *gf)
   struct gf_w8_double_table_data *dtd = NULL;
   struct gf_w8_double_table_lazy_data *ltd = NULL;
   struct gf_w8_default_data *dd = NULL;
-  int a, b, c, prod, scase, use_simd;
+  int a, b, c, prod, scase;
 
   h = (gf_internal_t *) gf->scratch;
 
-#if defined(INTEL_SSSE3) || defined(ARM_NEON)
-  use_simd = 1;
-#else
-  use_simd = 0;
-#endif
-
-  if (h->mult_type == GF_MULT_DEFAULT && use_simd) {
+  if (h->mult_type == GF_MULT_DEFAULT &&
+      (gf_cpu_supports_intel_ssse3 || gf_cpu_supports_arm_neon)) {
     dd = (struct gf_w8_default_data *)h->private;
     scase = 3;
     bzero(dd->high, sizeof(uint8_t) * GF_FIELD_SIZE * GF_HALF_SIZE);
@@ -1220,13 +1218,19 @@ int gf_w8_table_init(gf_t *gf)
       break;
     case 3:
 #if defined(INTEL_SSSE3) || defined(ARM_NEON)
-      SET_FUNCTION(gf,divide,w32,gf_w8_default_divide)
-      SET_FUNCTION(gf,multiply,w32,gf_w8_default_multiply)
+      if (gf_cpu_supports_intel_ssse3 || gf_cpu_supports_arm_neon) {
+        SET_FUNCTION(gf,divide,w32,gf_w8_default_divide)
+        SET_FUNCTION(gf,multiply,w32,gf_w8_default_multiply)
 #if defined(INTEL_SSSE3)
-      SET_FUNCTION(gf,multiply_region,w32,gf_w8_split_multiply_region_sse)
+        if (gf_cpu_supports_intel_ssse3) {
+          SET_FUNCTION(gf,multiply_region,w32,gf_w8_split_multiply_region_sse)
+        }
 #elif defined(ARM_NEON)
-      gf_w8_neon_split_init(gf);
+        if (gf_cpu_supports_arm_neon) {
+          gf_w8_neon_split_init(gf);
+        }
 #endif
+      }
 #endif
       break;
   }
@@ -2192,26 +2196,28 @@ int gf_w8_bytwo_init(gf_t *gf)
   if (h->mult_type == GF_MULT_BYTWO_p) {
     SET_FUNCTION(gf,multiply,w32,gf_w8_bytwo_p_multiply)
 #ifdef INTEL_SSE2
-    if (h->region_type & GF_REGION_NOSIMD)
-      SET_FUNCTION(gf,multiply_region,w32,gf_w8_bytwo_p_nosse_multiply_region)
-    else
+    if (gf_cpu_supports_intel_sse2 && !(h->region_type & GF_REGION_NOSIMD)) {
       SET_FUNCTION(gf,multiply_region,w32,gf_w8_bytwo_p_sse_multiply_region)
-#else
-    SET_FUNCTION(gf,multiply_region,w32,gf_w8_bytwo_p_nosse_multiply_region)
-    if(h->region_type & GF_REGION_SIMD)
-      return 0;
+    } else {
+#endif
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_bytwo_p_nosse_multiply_region)
+      if(h->region_type & GF_REGION_SIMD)
+        return 0;
+#ifdef INTEL_SSE2
+    }
 #endif
   } else {
     SET_FUNCTION(gf,multiply,w32,gf_w8_bytwo_b_multiply)
 #ifdef INTEL_SSE2
-    if (h->region_type & GF_REGION_NOSIMD)
-      SET_FUNCTION(gf,multiply_region,w32,gf_w8_bytwo_b_nosse_multiply_region)
-    else
+    if (gf_cpu_supports_intel_sse2 && !(h->region_type & GF_REGION_NOSIMD)) {
       SET_FUNCTION(gf,multiply_region,w32,gf_w8_bytwo_b_sse_multiply_region)
-#else
+    } else {
+#endif
     SET_FUNCTION(gf,multiply_region,w32,gf_w8_bytwo_b_nosse_multiply_region)
     if(h->region_type & GF_REGION_SIMD)
       return 0;
+#ifdef INTEL_SSE2
+    }
 #endif
   }
   return 1;
@@ -2229,9 +2235,9 @@ int gf_w8_scratch_size(int mult_type, int region_type, int divide_type, int arg1
   switch(mult_type)
   {
     case GF_MULT_DEFAULT:
-#if defined(INTEL_SSSE3) || defined(ARM_NEON)
-      return sizeof(gf_internal_t) + sizeof(struct gf_w8_default_data) + 64;
-#endif
+      if (gf_cpu_supports_intel_ssse3 || gf_cpu_supports_arm_neon) {
+        return sizeof(gf_internal_t) + sizeof(struct gf_w8_default_data) + 64;
+      }
       return sizeof(gf_internal_t) + sizeof(struct gf_w8_single_table_data) + 64;
     case GF_MULT_TABLE:
       if (region_type == GF_REGION_CAUCHY) {

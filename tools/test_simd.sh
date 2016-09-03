@@ -118,6 +118,237 @@ test_compile() {
     esac
 }
 
+# disable through build flags
+runtime_arm_flags() {
+    failed=0
+
+    echo "====NO SIMD support..." >> ${1}
+    { ./configure --disable-neon && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "Compile FAILED" >> ${1}; return 1; }
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====FULL SIMD support..." >> ${1}
+    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "Compile FAILED" >> ${1}; return 1; }
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    return ${failed}
+}
+
+# build once with FULL SIMD and disable at runtime through environment
+runtime_arm_env() {
+    failed=0
+
+    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "Compile FAILED" >> ${1}; return 1; }
+
+    echo "====NO SIMD support..." >> ${1}
+    export GF_COMPLETE_DISABLE_NEON=1
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====FULL SIMD support..." >> ${1}
+    unset GF_COMPLETE_DISABLE_NEON
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    return ${failed}
+}
+
+runtime_intel_flags() {
+    failed=0
+
+    echo "====NO SIMD support..." >> ${1}
+    { ./configure --disable-sse && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====SSE2 support..." >> ${1}
+    export ax_cv_have_sse_ext=no 
+    export ax_cv_have_sse2_ext=yes
+    export ax_cv_have_sse3_ext=no
+    export ax_cv_have_ssse3_ext=no
+    export ax_cv_have_sse41_ext=no
+    export ax_cv_have_sse42_ext=no
+    export ax_cv_have_pclmuldq_ext=no
+    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====SSE2,SSE3 support..." >> ${1}
+    export ax_cv_have_sse_ext=no 
+    export ax_cv_have_sse2_ext=yes
+    export ax_cv_have_sse3_ext=yes
+    export ax_cv_have_ssse3_ext=no
+    export ax_cv_have_sse41_ext=no
+    export ax_cv_have_sse42_ext=no
+    export ax_cv_have_pclmuldq_ext=no
+    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====SSE2,SSE3,SSSE3 support..." >> ${1}
+    export ax_cv_have_sse_ext=no 
+    export ax_cv_have_sse2_ext=yes
+    export ax_cv_have_sse3_ext=yes
+    export ax_cv_have_ssse3_ext=yes
+    export ax_cv_have_sse41_ext=no
+    export ax_cv_have_sse42_ext=no
+    export ax_cv_have_pclmuldq_ext=no
+    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====SSE2,SSE3,SSSE3,SSE4_1 support..." >> ${1}
+    export ax_cv_have_sse_ext=no 
+    export ax_cv_have_sse2_ext=yes
+    export ax_cv_have_sse3_ext=yes
+    export ax_cv_have_ssse3_ext=yes
+    export ax_cv_have_sse41_ext=yes
+    export ax_cv_have_sse42_ext=no
+    export ax_cv_have_pclmuldq_ext=no
+    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====SSE2,SSE3,SSSE3,SSE4_2 support..." >> ${1}
+    export ax_cv_have_sse_ext=no 
+    export ax_cv_have_sse2_ext=yes
+    export ax_cv_have_sse3_ext=yes
+    export ax_cv_have_ssse3_ext=yes
+    export ax_cv_have_sse41_ext=no
+    export ax_cv_have_sse42_ext=yes
+    export ax_cv_have_pclmuldq_ext=no
+    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====FULL SIMD support..." >> ${1}
+    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    return ${failed}
+}
+
+runtime_intel_env() {
+    failed=0
+
+    # compile a build with full SIMD support
+    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "Compile FAILED" >> ${1}; return 1; }
+
+    echo "====NO SIMD support..." >> ${1}
+    export GF_COMPLETE_DISABLE_SSE2=1
+    export GF_COMPLETE_DISABLE_SSE3=1
+    export GF_COMPLETE_DISABLE_SSSE3=1
+    export GF_COMPLETE_DISABLE_SSE4=1
+    export GF_COMPLETE_DISABLE_SSE4_PCLMUL=1
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====SSE2 support..." >> ${1}
+    unset GF_COMPLETE_DISABLE_SSE2
+    export GF_COMPLETE_DISABLE_SSE3=1
+    export GF_COMPLETE_DISABLE_SSSE3=1
+    export GF_COMPLETE_DISABLE_SSE4=1
+    export GF_COMPLETE_DISABLE_SSE4_PCLMUL=1
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====SSE2,SSE3 support..." >> ${1}
+    unset GF_COMPLETE_DISABLE_SSE2
+    unset GF_COMPLETE_DISABLE_SSE3
+    export GF_COMPLETE_DISABLE_SSSE3=1
+    export GF_COMPLETE_DISABLE_SSE4=1
+    export GF_COMPLETE_DISABLE_SSE4_PCLMUL=1
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====SSE2,SSE3,SSSE3 support..." >> ${1}
+    unset GF_COMPLETE_DISABLE_SSE2
+    unset GF_COMPLETE_DISABLE_SSE3
+    unset GF_COMPLETE_DISABLE_SSSE3
+    export GF_COMPLETE_DISABLE_SSE4=1
+    export GF_COMPLETE_DISABLE_SSE4_PCLMUL=1
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====SSE2,SSE3,SSSE3,SSE4_1 support..." >> ${1}
+    unset GF_COMPLETE_DISABLE_SSE2
+    unset GF_COMPLETE_DISABLE_SSE3
+    unset GF_COMPLETE_DISABLE_SSSE3
+    unset GF_COMPLETE_DISABLE_SSE4
+    export GF_COMPLETE_DISABLE_SSE4_PCLMUL=1
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====SSE2,SSE3,SSSE3,SSE4_2 support..." >> ${1}
+    unset GF_COMPLETE_DISABLE_SSE2
+    unset GF_COMPLETE_DISABLE_SSE3
+    unset GF_COMPLETE_DISABLE_SSSE3
+    unset GF_COMPLETE_DISABLE_SSE4
+    export GF_COMPLETE_DISABLE_SSE4_PCLMUL=1
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    echo "====FULL SIMD support..." >> ${1}
+    unset GF_COMPLETE_DISABLE_SSE2
+    unset GF_COMPLETE_DISABLE_SSE3
+    unset GF_COMPLETE_DISABLE_SSSE3
+    unset GF_COMPLETE_DISABLE_SSE4
+    unset GF_COMPLETE_DISABLE_SSE4_PCLMUL
+    for i in 128 64 32 16 8 4; do
+        { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
+    done
+
+    return ${failed}
+}
+
+test_runtime() {
+    rm -f ${results}.left
+    rm -f ${results}.right
+    
+    case $host_cpu in
+        aarch64*|arm*) 
+            runtime_arm_flags ${results}.left
+            runtime_arm_env ${results}.right
+            ;;
+        i[[3456]]86*|x86_64*|amd64*)
+            runtime_intel_flags ${results}.left
+            runtime_intel_env ${results}.right
+            ;;
+    esac
+
+    echo "======LEFT======" > ${results}
+    cat ${results}.left >> ${results}
+    echo "======RIGHT======" >> ${results}
+    cat ${results}.right >> ${results}
+    echo "======RESULT======" >> ${results}
+    if diff "${results}.left" "${results}.right"; then
+        echo SUCCESS >> ${results}
+        return 0
+    else
+        echo SUCCESS >> ${results}
+        return 1
+    fi
+}
+
 cd ${script_dir}/..
 rm -f ${results}
 
