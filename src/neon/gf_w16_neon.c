@@ -270,7 +270,7 @@ void gf_w16_neon_split_init(gf_t *gf)
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
 
   if (h->region_type & GF_REGION_ALTMAP)
-    gf->multiply_region.w32 = gf_w16_split_4_16_lazy_altmap_multiply_region_neon;
+    SET_FUNCTION(gf,multiply_region,w32,gf_w16_split_4_16_lazy_altmap_multiply_region_neon)
   else
-    gf->multiply_region.w32 = gf_w16_split_4_16_lazy_multiply_region_neon;
+    SET_FUNCTION(gf,multiply_region,w32,gf_w16_split_4_16_lazy_multiply_region_neon)
 }

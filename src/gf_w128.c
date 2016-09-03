@@ -1405,14 +1405,14 @@ int gf_w128_composite_init(gf_t *gf)
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
 
   if (h->region_type & GF_REGION_ALTMAP) {
-    gf->multiply_region.w128 = gf_w128_composite_multiply_region_alt;   
+    SET_FUNCTION(gf,multiply_region,w128,gf_w128_composite_multiply_region_alt)   
   } else {
-    gf->multiply_region.w128 = gf_w128_composite_multiply_region;
+    SET_FUNCTION(gf,multiply_region,w128,gf_w128_composite_multiply_region)
   }
 
-  gf->multiply.w128 = gf_w128_composite_multiply;
-  gf->divide.w128 = gf_w128_divide_from_inverse;
-  gf->inverse.w128 = gf_w128_composite_inverse;
+  SET_FUNCTION(gf,multiply,w128,gf_w128_composite_multiply)
+  SET_FUNCTION(gf,divide,w128,gf_w128_divide_from_inverse)
+  SET_FUNCTION(gf,inverse,w128,gf_w128_composite_inverse)
 
   return 1;
 }
@@ -1421,9 +1421,9 @@ static
 int gf_w128_cfm_init(gf_t *gf)
 {
 #if defined(INTEL_SSE4_PCLMUL)
-  gf->inverse.w128 = gf_w128_euclid;
-  gf->multiply.w128 = gf_w128_clm_multiply;
-  gf->multiply_region.w128 = gf_w128_clm_multiply_region_from_single;
+  SET_FUNCTION(gf,inverse,w128,gf_w128_euclid)
+  SET_FUNCTION(gf,multiply,w128,gf_w128_clm_multiply)
+  SET_FUNCTION(gf,multiply_region,w128,gf_w128_clm_multiply_region_from_single)
   return 1;
 #endif
 
@@ -1433,9 +1433,9 @@ int gf_w128_cfm_init(gf_t *gf)
 static
 int gf_w128_shift_init(gf_t *gf)
 {
-  gf->multiply.w128 = gf_w128_shift_multiply;
-  gf->inverse.w128 = gf_w128_euclid;
-  gf->multiply_region.w128 = gf_w128_multiply_region_from_single;
+  SET_FUNCTION(gf,multiply,w128,gf_w128_shift_multiply)
+  SET_FUNCTION(gf,inverse,w128,gf_w128_euclid)
+  SET_FUNCTION(gf,multiply_region,w128,gf_w128_multiply_region_from_single)
   return 1;
 }
 
@@ -1446,16 +1446,16 @@ int gf_w128_bytwo_init(gf_t *gf)
   h = (gf_internal_t *) gf->scratch;
 
   if (h->mult_type == GF_MULT_BYTWO_p) {
-    gf->multiply.w128 = gf_w128_bytwo_p_multiply;
-    /*gf->multiply.w128 = gf_w128_sse_bytwo_p_multiply;*/
+    SET_FUNCTION(gf,multiply,w128,gf_w128_bytwo_p_multiply)
+    /*SET_FUNCTION(gf,multiply,w128,gf_w128_sse_bytwo_p_multiply)*/
     /* John: the sse function is slower.*/
   } else {
-    gf->multiply.w128 = gf_w128_bytwo_b_multiply;
-    /*gf->multiply.w128 = gf_w128_sse_bytwo_b_multiply;
+    SET_FUNCTION(gf,multiply,w128,gf_w128_bytwo_b_multiply)
+    /*SET_FUNCTION(gf,multiply,w128,gf_w128_sse_bytwo_b_multiply)
 Ben: This sse function is also slower. */
   }
-  gf->inverse.w128 = gf_w128_euclid;
-  gf->multiply_region.w128 = gf_w128_bytwo_b_multiply_region;
+  SET_FUNCTION(gf,inverse,w128,gf_w128_euclid)
+  SET_FUNCTION(gf,multiply_region,w128,gf_w128_bytwo_b_multiply_region)
   return 1;
 }
 
@@ -1525,20 +1525,20 @@ int gf_w128_split_init(gf_t *gf)
 
   h = (gf_internal_t *) gf->scratch;
 
-  gf->multiply.w128 = gf_w128_bytwo_p_multiply;
+  SET_FUNCTION(gf,multiply,w128,gf_w128_bytwo_p_multiply)
 #if defined(INTEL_SSE4_PCLMUL)
   if (!(h->region_type & GF_REGION_NOSIMD)){
-    gf->multiply.w128 = gf_w128_clm_multiply;
+    SET_FUNCTION(gf,multiply,w128,gf_w128_clm_multiply)
   }
 #endif
 
-  gf->inverse.w128 = gf_w128_euclid;
+  SET_FUNCTION(gf,inverse,w128,gf_w128_euclid)
 
   if ((h->arg1 != 4 && h->arg2 != 4) || h->mult_type == GF_MULT_DEFAULT) {
     sd8 = (struct gf_w128_split_8_128_data *) h->private;
     sd8->last_value[0] = 0;
     sd8->last_value[1] = 0;
-    gf->multiply_region.w128 = gf_w128_split_8_128_multiply_region;
+    SET_FUNCTION(gf,multiply_region,w128,gf_w128_split_8_128_multiply_region)
   } else {
     sd4 = (struct gf_w128_split_4_128_data *) h->private;
     sd4->last_value[0] = 0;
@@ -1547,7 +1547,7 @@ int gf_w128_split_init(gf_t *gf)
     {
       #ifdef INTEL_SSE4
         if(!(h->region_type & GF_REGION_NOSIMD))
-          gf->multiply_region.w128 = gf_w128_split_4_128_sse_altmap_multiply_region;
+          SET_FUNCTION(gf,multiply_region,w128,gf_w128_split_4_128_sse_altmap_multiply_region)
         else
           return 0;
       #else
@@ -1557,11 +1557,11 @@ int gf_w128_split_init(gf_t *gf)
     else {
       #ifdef INTEL_SSE4
         if(!(h->region_type & GF_REGION_NOSIMD))
-          gf->multiply_region.w128 = gf_w128_split_4_128_sse_multiply_region;
+          SET_FUNCTION(gf,multiply_region,w128,gf_w128_split_4_128_sse_multiply_region)
         else
-          gf->multiply_region.w128 = gf_w128_split_4_128_multiply_region;
+          SET_FUNCTION(gf,multiply_region,w128,gf_w128_split_4_128_multiply_region)
       #else
-      gf->multiply_region.w128 = gf_w128_split_4_128_multiply_region;
+      SET_FUNCTION(gf,multiply_region,w128,gf_w128_split_4_128_multiply_region)
       #endif
     }
   }
@@ -1586,9 +1586,9 @@ int gf_w128_group_init(gf_t *gf)
   gt->m_table[2] = 0;
   gt->m_table[3] = 0;
 
-  gf->multiply.w128 = gf_w128_group_multiply;
-  gf->inverse.w128 = gf_w128_euclid;
-  gf->multiply_region.w128 = gf_w128_group_multiply_region;
+  SET_FUNCTION(gf,multiply,w128,gf_w128_group_multiply)
+  SET_FUNCTION(gf,inverse,w128,gf_w128_euclid)
+  SET_FUNCTION(gf,multiply_region,w128,gf_w128_group_multiply_region)
 
   gf_w128_group_r_init(gf);
 
@@ -1738,10 +1738,10 @@ int gf_w128_init(gf_t *gf)
     }
   }
 
-  gf->multiply.w128 = NULL;
-  gf->divide.w128 = NULL;
-  gf->inverse.w128 = NULL;
-  gf->multiply_region.w128 = NULL;
+  SET_FUNCTION(gf,multiply,w128,NULL)
+  SET_FUNCTION(gf,divide,w128,NULL)
+  SET_FUNCTION(gf,inverse,w128,NULL)
+  SET_FUNCTION(gf,multiply_region,w128,NULL)
   switch(h->mult_type) {
     case GF_MULT_BYTWO_p:
     case GF_MULT_BYTWO_b:      if (gf_w128_bytwo_init(gf) == 0) return 0; break;
@@ -1757,22 +1757,22 @@ int gf_w128_init(gf_t *gf)
   /* Ben: Used to be h->region_type == GF_REGION_ALTMAP, but failed since there
      are multiple flags in h->region_type */
   if (h->mult_type == GF_MULT_SPLIT_TABLE && (h->region_type & GF_REGION_ALTMAP)) {
-    gf->extract_word.w128 = gf_w128_split_extract_word;
+    SET_FUNCTION(gf,extract_word,w128,gf_w128_split_extract_word)
   } else if (h->mult_type == GF_MULT_COMPOSITE && h->region_type == GF_REGION_ALTMAP) {
-    gf->extract_word.w128 = gf_w128_composite_extract_word;
+    SET_FUNCTION(gf,extract_word,w128,gf_w128_composite_extract_word)
   } else {
-    gf->extract_word.w128 = gf_w128_extract_word;
+    SET_FUNCTION(gf,extract_word,w128,gf_w128_extract_word)
   }
 
   if (h->divide_type == GF_DIVIDE_EUCLID) {
-    gf->divide.w128 = gf_w128_divide_from_inverse;
+    SET_FUNCTION(gf,divide,w128,gf_w128_divide_from_inverse)
   } 
 
   if (gf->inverse.w128 != NULL && gf->divide.w128 == NULL) {
-    gf->divide.w128 = gf_w128_divide_from_inverse;
+    SET_FUNCTION(gf,divide,w128,gf_w128_divide_from_inverse)
   }
   if (gf->inverse.w128 == NULL && gf->divide.w128 != NULL) {
-    gf->inverse.w128 = gf_w128_inverse_from_divide;
+    SET_FUNCTION(gf,inverse,w128,gf_w128_inverse_from_divide)
   }
   return 1;
 }

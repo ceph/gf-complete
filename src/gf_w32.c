@@ -589,15 +589,15 @@ gf_w32_shift_multiply (gf_t *gf, uint32_t a32, uint32_t b32)
   static 
 int gf_w32_cfmgk_init(gf_t *gf)
 {
-  gf->inverse.w32 = gf_w32_euclid;
-  gf->multiply_region.w32 = gf_w32_multiply_region_from_single;
+  SET_FUNCTION(gf,inverse,w32,gf_w32_euclid)
+  SET_FUNCTION(gf,multiply_region,w32,gf_w32_multiply_region_from_single)
   
 #if defined(INTEL_SSE4_PCLMUL)
   gf_internal_t *h;
 
   h = (gf_internal_t *) gf->scratch;
-  gf->multiply.w32 = gf_w32_cfmgk_multiply;
-  gf->multiply_region.w32 = gf_w32_cfmgk_multiply_region_from_single;
+  SET_FUNCTION(gf,multiply,w32,gf_w32_cfmgk_multiply)
+  SET_FUNCTION(gf,multiply_region,w32,gf_w32_cfmgk_multiply_region_from_single)
 
   uint64_t *q_plus = (uint64_t *) h->private;
   uint64_t *g_star = (uint64_t *) h->private + 1;
@@ -624,8 +624,8 @@ int gf_w32_cfmgk_init(gf_t *gf)
   static 
 int gf_w32_cfm_init(gf_t *gf)
 {
-  gf->inverse.w32 = gf_w32_euclid;
-  gf->multiply_region.w32 = gf_w32_multiply_region_from_single;
+  SET_FUNCTION(gf,inverse,w32,gf_w32_euclid)
+  SET_FUNCTION(gf,multiply_region,w32,gf_w32_multiply_region_from_single)
   
   /*Ben: We also check to see if the prim poly will work for pclmul */
   /*Ben: Check to see how many reduction steps it will take*/
@@ -636,14 +636,14 @@ int gf_w32_cfm_init(gf_t *gf)
   h = (gf_internal_t *) gf->scratch;
 
   if ((0xfffe0000 & h->prim_poly) == 0){ 
-    gf->multiply.w32 = gf_w32_clm_multiply_2;
-    gf->multiply_region.w32 = gf_w32_clm_multiply_region_from_single_2;
+    SET_FUNCTION(gf,multiply,w32,gf_w32_clm_multiply_2)
+    SET_FUNCTION(gf,multiply_region,w32,gf_w32_clm_multiply_region_from_single_2)
   }else if ((0xffc00000 & h->prim_poly) == 0){
-    gf->multiply.w32 = gf_w32_clm_multiply_3;
-    gf->multiply_region.w32 = gf_w32_clm_multiply_region_from_single_3;
+    SET_FUNCTION(gf,multiply,w32,gf_w32_clm_multiply_3)
+    SET_FUNCTION(gf,multiply_region,w32,gf_w32_clm_multiply_region_from_single_3)
   }else if ((0xfe000000 & h->prim_poly) == 0){
-    gf->multiply.w32 = gf_w32_clm_multiply_4;
-    gf->multiply_region.w32 = gf_w32_clm_multiply_region_from_single_4;
+    SET_FUNCTION(gf,multiply,w32,gf_w32_clm_multiply_4)
+    SET_FUNCTION(gf,multiply_region,w32,gf_w32_clm_multiply_region_from_single_4)
   } else {
     return 0;
   }
@@ -656,9 +656,9 @@ int gf_w32_cfm_init(gf_t *gf)
   static 
 int gf_w32_shift_init(gf_t *gf)
 {
-  gf->inverse.w32 = gf_w32_euclid;
-  gf->multiply_region.w32 = gf_w32_multiply_region_from_single;
-  gf->multiply.w32 = gf_w32_shift_multiply;
+  SET_FUNCTION(gf,inverse,w32,gf_w32_euclid)
+  SET_FUNCTION(gf,multiply_region,w32,gf_w32_multiply_region_from_single)
+  SET_FUNCTION(gf,multiply,w32,gf_w32_shift_multiply)
   return 1;
 }
 
@@ -1380,32 +1380,32 @@ int gf_w32_bytwo_init(gf_t *gf)
   }
 
   if (h->mult_type == GF_MULT_BYTWO_p) {
-    gf->multiply.w32 = gf_w32_bytwo_p_multiply;
+    SET_FUNCTION(gf,multiply,w32,gf_w32_bytwo_p_multiply)
     #ifdef INTEL_SSE2
       if (h->region_type & GF_REGION_NOSIMD)
-        gf->multiply_region.w32 = gf_w32_bytwo_p_nosse_multiply_region; 
+        SET_FUNCTION(gf,multiply_region,w32,gf_w32_bytwo_p_nosse_multiply_region) 
       else
-        gf->multiply_region.w32 = gf_w32_bytwo_p_sse_multiply_region; 
+        SET_FUNCTION(gf,multiply_region,w32,gf_w32_bytwo_p_sse_multiply_region) 
     #else
-      gf->multiply_region.w32 = gf_w32_bytwo_p_nosse_multiply_region; 
+      SET_FUNCTION(gf,multiply_region,w32,gf_w32_bytwo_p_nosse_multiply_region) 
       if(h->region_type & GF_REGION_SIMD)
         return 0;
     #endif
   } else {
-    gf->multiply.w32 = gf_w32_bytwo_b_multiply; 
+    SET_FUNCTION(gf,multiply,w32,gf_w32_bytwo_b_multiply) 
     #ifdef INTEL_SSE2
       if (h->region_type & GF_REGION_NOSIMD)
-        gf->multiply_region.w32 = gf_w32_bytwo_b_nosse_multiply_region; 
+        SET_FUNCTION(gf,multiply_region,w32,gf_w32_bytwo_b_nosse_multiply_region) 
       else
-        gf->multiply_region.w32 = gf_w32_bytwo_b_sse_multiply_region; 
+        SET_FUNCTION(gf,multiply_region,w32,gf_w32_bytwo_b_sse_multiply_region) 
     #else
-      gf->multiply_region.w32 = gf_w32_bytwo_b_nosse_multiply_region; 
+      SET_FUNCTION(gf,multiply_region,w32,gf_w32_bytwo_b_nosse_multiply_region) 
       if(h->region_type & GF_REGION_SIMD)
         return 0;
     #endif
   }
 
-  gf->inverse.w32 = gf_w32_euclid;
+  SET_FUNCTION(gf,inverse,w32,gf_w32_euclid)
   return 1;
 }
 
@@ -2252,7 +2252,7 @@ int gf_w32_split_init(gf_t *gf)
 
   /* Defaults */
   
-  gf->inverse.w32 = gf_w32_euclid;
+  SET_FUNCTION(gf,inverse,w32,gf_w32_euclid)
 
   /* JSP: First handle single multiplication:  
      If args == 8, then we're doing split 8 8.  
@@ -2261,17 +2261,17 @@ int gf_w32_split_init(gf_t *gf)
    */
 
   if (h->arg1 == 8 && h->arg2 == 8) {
-    gf->multiply.w32 = gf_w32_split_8_8_multiply;
+    SET_FUNCTION(gf,multiply,w32,gf_w32_split_8_8_multiply)
   } else if (ispclmul) {
     if ((0xfffe0000 & h->prim_poly) == 0){
-      gf->multiply.w32 = gf_w32_clm_multiply_2;
+      SET_FUNCTION(gf,multiply,w32,gf_w32_clm_multiply_2)
     } else if ((0xffc00000 & h->prim_poly) == 0){
-      gf->multiply.w32 = gf_w32_clm_multiply_3;
+      SET_FUNCTION(gf,multiply,w32,gf_w32_clm_multiply_3)
     } else if ((0xfe000000 & h->prim_poly) == 0){
-     gf->multiply.w32 = gf_w32_clm_multiply_4;
+     SET_FUNCTION(gf,multiply,w32,gf_w32_clm_multiply_4)
     }
   } else {
-    gf->multiply.w32 = gf_w32_bytwo_p_multiply;
+    SET_FUNCTION(gf,multiply,w32,gf_w32_bytwo_p_multiply)
   }
 
   /* Easy cases: 16/32 and 2/32 */
@@ -2279,7 +2279,7 @@ int gf_w32_split_init(gf_t *gf)
   if ((h->arg1 == 16 && h->arg2 == 32) || (h->arg1 == 32 && h->arg2 == 16)) {
     d16 = (struct gf_split_16_32_lazy_data *) h->private;
     d16->last_value = 0;
-    gf->multiply_region.w32 = gf_w32_split_16_32_lazy_multiply_region;
+    SET_FUNCTION(gf,multiply_region,w32,gf_w32_split_16_32_lazy_multiply_region)
     return 1;
   }
 
@@ -2288,11 +2288,11 @@ int gf_w32_split_init(gf_t *gf)
     ld2->last_value = 0;
     #ifdef INTEL_SSSE3
       if (!(h->region_type & GF_REGION_NOSIMD))
-        gf->multiply_region.w32 = gf_w32_split_2_32_lazy_sse_multiply_region;
+        SET_FUNCTION(gf,multiply_region,w32,gf_w32_split_2_32_lazy_sse_multiply_region)
       else
-        gf->multiply_region.w32 = gf_w32_split_2_32_lazy_multiply_region;
+        SET_FUNCTION(gf,multiply_region,w32,gf_w32_split_2_32_lazy_multiply_region)
     #else
-      gf->multiply_region.w32 = gf_w32_split_2_32_lazy_multiply_region;
+      SET_FUNCTION(gf,multiply_region,w32,gf_w32_split_2_32_lazy_multiply_region)
       if(h->region_type & GF_REGION_SIMD) return 0;
     #endif
     return 1;
@@ -2305,15 +2305,15 @@ int gf_w32_split_init(gf_t *gf)
     ld4 = (struct gf_split_4_32_lazy_data *) h->private;
     ld4->last_value = 0;
     if ((h->region_type & GF_REGION_NOSIMD) || !(issse3 || isneon)) {
-      gf->multiply_region.w32 = gf_w32_split_4_32_lazy_multiply_region;
+      SET_FUNCTION(gf,multiply_region,w32,gf_w32_split_4_32_lazy_multiply_region)
     } else if (isneon) {
 #ifdef ARM_NEON
       gf_w32_neon_split_init(gf);
 #endif
     } else if (h->region_type & GF_REGION_ALTMAP) {
-      gf->multiply_region.w32 = gf_w32_split_4_32_lazy_sse_altmap_multiply_region;
+      SET_FUNCTION(gf,multiply_region,w32,gf_w32_split_4_32_lazy_sse_altmap_multiply_region)
     } else {
-      gf->multiply_region.w32 = gf_w32_split_4_32_lazy_sse_multiply_region;
+      SET_FUNCTION(gf,multiply_region,w32,gf_w32_split_4_32_lazy_sse_multiply_region)
     }
     return 1;
   } 
@@ -2324,7 +2324,7 @@ int gf_w32_split_init(gf_t *gf)
        h->mult_type == GF_MULT_DEFAULT) {
     d32 = (struct gf_split_8_32_lazy_data *) h->private;
     d32->last_value = 0;
-    gf->multiply_region.w32 = gf_w32_split_8_32_lazy_multiply_region;
+    SET_FUNCTION(gf,multiply_region,w32,gf_w32_split_8_32_lazy_multiply_region)
     return 1;
   }
 
@@ -2333,8 +2333,8 @@ int gf_w32_split_init(gf_t *gf)
   if (h->arg1 == 8 && h->arg2 == 8) {
     d8 = (struct gf_w32_split_8_8_data *) h->private;
     d8->last_value = 0;
-    gf->multiply.w32 = gf_w32_split_8_8_multiply;
-    gf->multiply_region.w32 = gf_w32_split_8_32_lazy_multiply_region;
+    SET_FUNCTION(gf,multiply,w32,gf_w32_split_8_8_multiply)
+    SET_FUNCTION(gf,multiply_region,w32,gf_w32_split_8_32_lazy_multiply_region)
     basep = 1;
     for (exp = 0; exp < 7; exp++) {
       for (j = 0; j < 256; j++) d8->tables[exp][0][j] = 0;
@@ -2407,14 +2407,14 @@ int gf_w32_group_init(gf_t *gf)
   }
 
   if (g_s == g_r) {
-    gf->multiply.w32 = gf_w32_group_s_equals_r_multiply;
-    gf->multiply_region.w32 = gf_w32_group_s_equals_r_multiply_region; 
+    SET_FUNCTION(gf,multiply,w32,gf_w32_group_s_equals_r_multiply)
+    SET_FUNCTION(gf,multiply_region,w32,gf_w32_group_s_equals_r_multiply_region) 
   } else {
-    gf->multiply.w32 = gf_w32_group_multiply;
-    gf->multiply_region.w32 = gf_w32_group_multiply_region;
+    SET_FUNCTION(gf,multiply,w32,gf_w32_group_multiply)
+    SET_FUNCTION(gf,multiply_region,w32,gf_w32_group_multiply_region)
   }
-  gf->divide.w32 = NULL;
-  gf->inverse.w32 = gf_w32_euclid;
+  SET_FUNCTION(gf,divide,w32,NULL)
+  SET_FUNCTION(gf,inverse,w32,gf_w32_euclid)
 
   return 1;
 }
@@ -2666,18 +2666,18 @@ int gf_w32_composite_init(gf_t *gf)
   cd->alog = gf_w16_get_mult_alog_table(h->base_gf);
 
   if (h->region_type & GF_REGION_ALTMAP) {
-    gf->multiply_region.w32 = gf_w32_composite_multiply_region_alt;
+    SET_FUNCTION(gf,multiply_region,w32,gf_w32_composite_multiply_region_alt)
   } else {
-    gf->multiply_region.w32 = gf_w32_composite_multiply_region;
+    SET_FUNCTION(gf,multiply_region,w32,gf_w32_composite_multiply_region)
   }
 
   if (cd->log == NULL) {
-    gf->multiply.w32 = gf_w32_composite_multiply_recursive;
+    SET_FUNCTION(gf,multiply,w32,gf_w32_composite_multiply_recursive)
   } else {
-    gf->multiply.w32 = gf_w32_composite_multiply_inline; 
+    SET_FUNCTION(gf,multiply,w32,gf_w32_composite_multiply_inline) 
   }
-  gf->divide.w32 = NULL;
-  gf->inverse.w32 = gf_w32_composite_inverse;
+  SET_FUNCTION(gf,divide,w32,NULL)
+  SET_FUNCTION(gf,inverse,w32,gf_w32_composite_inverse)
 
   return 1;
 }
@@ -2776,10 +2776,10 @@ int gf_w32_init(gf_t *gf)
 
   if(h->mult_type != GF_MULT_COMPOSITE) h->prim_poly &= 0xffffffff;
     
-  gf->multiply.w32 = NULL;
-  gf->divide.w32 = NULL;
-  gf->inverse.w32 = NULL;
-  gf->multiply_region.w32 = NULL;
+  SET_FUNCTION(gf,multiply,w32,NULL)
+  SET_FUNCTION(gf,divide,w32,NULL)
+  SET_FUNCTION(gf,inverse,w32,NULL)
+  SET_FUNCTION(gf,multiply_region,w32,NULL)
 
   switch(h->mult_type) {
     case GF_MULT_CARRY_FREE:    if (gf_w32_cfm_init(gf) == 0) return 0; break;
@@ -2794,30 +2794,30 @@ int gf_w32_init(gf_t *gf)
     default: return 0;
   }
   if (h->divide_type == GF_DIVIDE_EUCLID) {
-    gf->divide.w32 = gf_w32_divide_from_inverse;
-    gf->inverse.w32 = gf_w32_euclid;
+    SET_FUNCTION(gf,divide,w32,gf_w32_divide_from_inverse)
+    SET_FUNCTION(gf,inverse,w32,gf_w32_euclid)
   } else if (h->divide_type == GF_DIVIDE_MATRIX) {
-    gf->divide.w32 = gf_w32_divide_from_inverse;
-    gf->inverse.w32 = gf_w32_matrix;
+    SET_FUNCTION(gf,divide,w32,gf_w32_divide_from_inverse)
+    SET_FUNCTION(gf,inverse,w32,gf_w32_matrix)
   }
 
   if (gf->inverse.w32 != NULL && gf->divide.w32 == NULL) {
-    gf->divide.w32 = gf_w32_divide_from_inverse;
+    SET_FUNCTION(gf,divide,w32,gf_w32_divide_from_inverse)
   }
   if (gf->inverse.w32 == NULL && gf->divide.w32 != NULL) {
-    gf->inverse.w32 = gf_w32_inverse_from_divide;
+    SET_FUNCTION(gf,inverse,w32,gf_w32_inverse_from_divide)
   }
   if (h->region_type == GF_REGION_CAUCHY) {
-    gf->extract_word.w32 = gf_wgen_extract_word;
-    gf->multiply_region.w32 = gf_wgen_cauchy_region;
+    SET_FUNCTION(gf,extract_word,w32,gf_wgen_extract_word)
+    SET_FUNCTION(gf,multiply_region,w32,gf_wgen_cauchy_region)
   } else if (h->region_type & GF_REGION_ALTMAP) {
     if (h->mult_type == GF_MULT_COMPOSITE) {
-      gf->extract_word.w32 = gf_w32_composite_extract_word;
+      SET_FUNCTION(gf,extract_word,w32,gf_w32_composite_extract_word)
     } else {
-      gf->extract_word.w32 = gf_w32_split_extract_word;
+      SET_FUNCTION(gf,extract_word,w32,gf_w32_split_extract_word)
     }
   } else {
-    gf->extract_word.w32 = gf_w32_extract_word;
+    SET_FUNCTION(gf,extract_word,w32,gf_w32_extract_word)
   }
   return 1;
 }

@@ -514,14 +514,14 @@ int gf_w8_cfm_init(gf_t *gf)
   h = (gf_internal_t *) gf->scratch;
 
     if ((0xe0 & h->prim_poly) == 0){
-      gf->multiply.w32 = gf_w8_clm_multiply_2;
-      gf->multiply_region.w32 = gf_w8_clm_multiply_region_from_single_2;
+      SET_FUNCTION(gf,multiply,w32,gf_w8_clm_multiply_2)
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_clm_multiply_region_from_single_2)
     }else if ((0xc0 & h->prim_poly) == 0){
-      gf->multiply.w32 = gf_w8_clm_multiply_3;
-      gf->multiply_region.w32 = gf_w8_clm_multiply_region_from_single_3;
+      SET_FUNCTION(gf,multiply,w32,gf_w8_clm_multiply_3)
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_clm_multiply_region_from_single_3)
     }else if ((0x80 & h->prim_poly) == 0){ 
-      gf->multiply.w32 = gf_w8_clm_multiply_4;
-      gf->multiply_region.w32 = gf_w8_clm_multiply_region_from_single_4;
+      SET_FUNCTION(gf,multiply,w32,gf_w8_clm_multiply_4)
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_clm_multiply_region_from_single_4)
     }else{
       return 0;
     }
@@ -537,7 +537,7 @@ int gf_w8_cfm_init(gf_t *gf)
 static 
 int gf_w8_shift_init(gf_t *gf)
 { 
-  gf->multiply.w32 = gf_w8_shift_multiply;  /* The others will be set automatically */
+  SET_FUNCTION(gf,multiply,w32,gf_w8_shift_multiply)  /* The others will be set automatically */
   return 1;
 }
 
@@ -809,20 +809,20 @@ int gf_w8_log_init(gf_t *gf)
   } while (i != 1);
 
   if (h->mult_type == GF_MULT_LOG_TABLE) {
-    gf->inverse.w32 = gf_w8_log_inverse;
-    gf->divide.w32 = gf_w8_log_divide;
-    gf->multiply.w32 = gf_w8_log_multiply;
-    gf->multiply_region.w32 = gf_w8_log_multiply_region;
+    SET_FUNCTION(gf,inverse,w32,gf_w8_log_inverse)
+    SET_FUNCTION(gf,divide,w32,gf_w8_log_divide)
+    SET_FUNCTION(gf,multiply,w32,gf_w8_log_multiply)
+    SET_FUNCTION(gf,multiply_region,w32,gf_w8_log_multiply_region)
   } else if (h->mult_type == GF_MULT_LOG_ZERO) {
-    gf->inverse.w32 = gf_w8_logzero_small_inverse;
-    gf->divide.w32 = gf_w8_logzero_small_divide;
-    gf->multiply.w32 = gf_w8_logzero_small_multiply;
-    gf->multiply_region.w32 = gf_w8_logzero_multiply_region;
+    SET_FUNCTION(gf,inverse,w32,gf_w8_logzero_small_inverse)
+    SET_FUNCTION(gf,divide,w32,gf_w8_logzero_small_divide)
+    SET_FUNCTION(gf,multiply,w32,gf_w8_logzero_small_multiply)
+    SET_FUNCTION(gf,multiply_region,w32,gf_w8_logzero_multiply_region)
   } else {
-    gf->inverse.w32 = gf_w8_logzero_inverse;
-    gf->divide.w32 = gf_w8_logzero_divide;
-    gf->multiply.w32 = gf_w8_logzero_multiply;
-    gf->multiply_region.w32 = gf_w8_logzero_multiply_region;
+    SET_FUNCTION(gf,inverse,w32,gf_w8_logzero_inverse)
+    SET_FUNCTION(gf,divide,w32,gf_w8_logzero_divide)
+    SET_FUNCTION(gf,multiply,w32,gf_w8_logzero_multiply)
+    SET_FUNCTION(gf,multiply_region,w32,gf_w8_logzero_multiply_region)
   }
   return 1;
 }
@@ -1102,19 +1102,19 @@ int gf_w8_split_init(gf_t *gf)
     }
   }
 
-  gf->multiply.w32 = gf_w8_split_multiply;
+  SET_FUNCTION(gf,multiply,w32,gf_w8_split_multiply)
   
   #if defined(INTEL_SSSE3) || defined(ARM_NEON)
     if (h->region_type & GF_REGION_NOSIMD)
-      gf->multiply_region.w32 = gf_w8_split_multiply_region;
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_split_multiply_region)
     else
     #if defined(INTEL_SSSE3)
-      gf->multiply_region.w32 = gf_w8_split_multiply_region_sse;
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_split_multiply_region_sse)
     #elif defined(ARM_NEON)
       gf_w8_neon_split_init(gf);
     #endif
   #else
-    gf->multiply_region.w32 = gf_w8_split_multiply_region;
+    SET_FUNCTION(gf,multiply_region,w32,gf_w8_split_multiply_region)
     if(h->region_type & GF_REGION_SIMD)
       return 0;
   #endif
@@ -1201,29 +1201,29 @@ int gf_w8_table_init(gf_t *gf)
     }
   }
 
-  gf->inverse.w32 = NULL; /* Will set from divide */
+  SET_FUNCTION(gf,inverse,w32,NULL) /* Will set from divide */
   switch (scase) {
     case 0: 
-      gf->divide.w32 = gf_w8_table_divide;
-      gf->multiply.w32 = gf_w8_table_multiply;
-      gf->multiply_region.w32 = gf_w8_table_multiply_region;
+      SET_FUNCTION(gf,divide,w32,gf_w8_table_divide)
+      SET_FUNCTION(gf,multiply,w32,gf_w8_table_multiply)
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_table_multiply_region)
       break;
     case 1:
-      gf->divide.w32 = gf_w8_double_table_divide;
-      gf->multiply.w32 = gf_w8_double_table_multiply;
-      gf->multiply_region.w32 = gf_w8_double_table_multiply_region;
+      SET_FUNCTION(gf,divide,w32,gf_w8_double_table_divide)
+      SET_FUNCTION(gf,multiply,w32,gf_w8_double_table_multiply)
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_double_table_multiply_region)
       break;
     case 2:
-      gf->divide.w32 = gf_w8_double_table_lazy_divide;
-      gf->multiply.w32 = gf_w8_double_table_lazy_multiply;
-      gf->multiply_region.w32 = gf_w8_double_table_multiply_region;
+      SET_FUNCTION(gf,divide,w32,gf_w8_double_table_lazy_divide)
+      SET_FUNCTION(gf,multiply,w32,gf_w8_double_table_lazy_multiply)
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_double_table_multiply_region)
       break;
     case 3:
 #if defined(INTEL_SSSE3) || defined(ARM_NEON)
-      gf->divide.w32 = gf_w8_default_divide;
-      gf->multiply.w32 = gf_w8_default_multiply;
+      SET_FUNCTION(gf,divide,w32,gf_w8_default_divide)
+      SET_FUNCTION(gf,multiply,w32,gf_w8_default_multiply)
 #if defined(INTEL_SSSE3)
-      gf->multiply_region.w32 = gf_w8_split_multiply_region_sse;
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_split_multiply_region_sse)
 #elif defined(ARM_NEON)
       gf_w8_neon_split_init(gf);
 #endif
@@ -1472,18 +1472,18 @@ int gf_w8_composite_init(gf_t *gf)
   cd->mult_table = gf_w4_get_mult_table(h->base_gf);
 
   if (h->region_type & GF_REGION_ALTMAP) {
-    gf->multiply_region.w32 = gf_w8_composite_multiply_region_alt;
+    SET_FUNCTION(gf,multiply_region,w32,gf_w8_composite_multiply_region_alt)
   } else {
-    gf->multiply_region.w32 = gf_w8_composite_multiply_region;
+    SET_FUNCTION(gf,multiply_region,w32,gf_w8_composite_multiply_region)
   }
 
   if (cd->mult_table == NULL) {
-    gf->multiply.w32 = gf_w8_composite_multiply_recursive;
+    SET_FUNCTION(gf,multiply,w32,gf_w8_composite_multiply_recursive)
   } else {
-    gf->multiply.w32 = gf_w8_composite_multiply_inline;
+    SET_FUNCTION(gf,multiply,w32,gf_w8_composite_multiply_inline)
   }
-  gf->divide.w32 = NULL;
-  gf->inverse.w32 = gf_w8_composite_inverse;
+  SET_FUNCTION(gf,divide,w32,NULL)
+  SET_FUNCTION(gf,inverse,w32,gf_w8_composite_inverse)
 
   return 1;
 }
@@ -2190,26 +2190,26 @@ int gf_w8_bytwo_init(gf_t *gf)
   }
 
   if (h->mult_type == GF_MULT_BYTWO_p) {
-    gf->multiply.w32 = gf_w8_bytwo_p_multiply;
+    SET_FUNCTION(gf,multiply,w32,gf_w8_bytwo_p_multiply)
 #ifdef INTEL_SSE2
     if (h->region_type & GF_REGION_NOSIMD)
-      gf->multiply_region.w32 = gf_w8_bytwo_p_nosse_multiply_region;
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_bytwo_p_nosse_multiply_region)
     else
-      gf->multiply_region.w32 = gf_w8_bytwo_p_sse_multiply_region;
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_bytwo_p_sse_multiply_region)
 #else
-    gf->multiply_region.w32 = gf_w8_bytwo_p_nosse_multiply_region;
+    SET_FUNCTION(gf,multiply_region,w32,gf_w8_bytwo_p_nosse_multiply_region)
     if(h->region_type & GF_REGION_SIMD)
       return 0;
 #endif
   } else {
-    gf->multiply.w32 = gf_w8_bytwo_b_multiply;
+    SET_FUNCTION(gf,multiply,w32,gf_w8_bytwo_b_multiply)
 #ifdef INTEL_SSE2
     if (h->region_type & GF_REGION_NOSIMD)
-      gf->multiply_region.w32 = gf_w8_bytwo_b_nosse_multiply_region;
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_bytwo_b_nosse_multiply_region)
     else
-      gf->multiply_region.w32 = gf_w8_bytwo_b_sse_multiply_region;
+      SET_FUNCTION(gf,multiply_region,w32,gf_w8_bytwo_b_sse_multiply_region)
 #else
-    gf->multiply_region.w32 = gf_w8_bytwo_b_nosse_multiply_region;
+    SET_FUNCTION(gf,multiply_region,w32,gf_w8_bytwo_b_nosse_multiply_region)
     if(h->region_type & GF_REGION_SIMD)
       return 0;
 #endif
@@ -2304,11 +2304,11 @@ int gf_w8_init(gf_t *gf)
     h->prim_poly |= 0x100;
   }
 
-  gf->multiply.w32 = NULL;
-  gf->divide.w32 = NULL;
-  gf->inverse.w32 = NULL;
-  gf->multiply_region.w32 = NULL;
-  gf->extract_word.w32 = gf_w8_extract_word;
+  SET_FUNCTION(gf,multiply,w32,NULL)
+  SET_FUNCTION(gf,divide,w32,NULL)
+  SET_FUNCTION(gf,inverse,w32,NULL)
+  SET_FUNCTION(gf,multiply_region,w32,NULL)
+  SET_FUNCTION(gf,extract_word,w32,gf_w8_extract_word)
 
   switch(h->mult_type) {
     case GF_MULT_DEFAULT:      
@@ -2326,31 +2326,31 @@ int gf_w8_init(gf_t *gf)
   }
 
   if (h->divide_type == GF_DIVIDE_EUCLID) {
-    gf->divide.w32 = gf_w8_divide_from_inverse;
-    gf->inverse.w32 = gf_w8_euclid;
+    SET_FUNCTION(gf,divide,w32,gf_w8_divide_from_inverse)
+    SET_FUNCTION(gf,inverse,w32,gf_w8_euclid)
   } else if (h->divide_type == GF_DIVIDE_MATRIX) {
-    gf->divide.w32 = gf_w8_divide_from_inverse;
-    gf->inverse.w32 = gf_w8_matrix;
+    SET_FUNCTION(gf,divide,w32,gf_w8_divide_from_inverse)
+    SET_FUNCTION(gf,inverse,w32,gf_w8_matrix)
   }
 
   if (gf->divide.w32 == NULL) {
-    gf->divide.w32 = gf_w8_divide_from_inverse;
-    if (gf->inverse.w32 == NULL) gf->inverse.w32 = gf_w8_euclid;
+    SET_FUNCTION(gf,divide,w32,gf_w8_divide_from_inverse)
+    if (gf->inverse.w32 == NULL) SET_FUNCTION(gf,inverse,w32,gf_w8_euclid)
   }
 
-  if (gf->inverse.w32 == NULL)  gf->inverse.w32 = gf_w8_inverse_from_divide;
+  if (gf->inverse.w32 == NULL)  SET_FUNCTION(gf,inverse,w32,gf_w8_inverse_from_divide)
 
   if (h->mult_type == GF_MULT_COMPOSITE && (h->region_type & GF_REGION_ALTMAP)) {
-    gf->extract_word.w32 = gf_w8_composite_extract_word;
+    SET_FUNCTION(gf,extract_word,w32,gf_w8_composite_extract_word)
   }
 
   if (h->region_type == GF_REGION_CAUCHY) {
-    gf->multiply_region.w32 = gf_wgen_cauchy_region;
-    gf->extract_word.w32 = gf_wgen_extract_word;
+    SET_FUNCTION(gf,multiply_region,w32,gf_wgen_cauchy_region)
+    SET_FUNCTION(gf,extract_word,w32,gf_wgen_extract_word)
   }
 
   if (gf->multiply_region.w32 == NULL) {
-    gf->multiply_region.w32 = gf_w8_multiply_region_from_single;
+    SET_FUNCTION(gf,multiply_region,w32,gf_w8_multiply_region_from_single)
   }
 
   return 1;

@@ -178,8 +178,8 @@ gf_wgen_shift_multiply (gf_t *gf, uint32_t a32, uint32_t b32)
 static 
 int gf_wgen_shift_init(gf_t *gf)
 {
-  gf->multiply.w32 = gf_wgen_shift_multiply;
-  gf->inverse.w32 = gf_wgen_euclid;
+  SET_FUNCTION(gf,multiply,w32,gf_wgen_shift_multiply)
+  SET_FUNCTION(gf,inverse,w32,gf_wgen_euclid)
   return 1;
 }
 
@@ -211,8 +211,8 @@ gf_wgen_bytwo_b_multiply (gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 static 
 int gf_wgen_bytwo_b_init(gf_t *gf)
 {
-  gf->multiply.w32 = gf_wgen_bytwo_b_multiply;
-  gf->inverse.w32 = gf_wgen_euclid;
+  SET_FUNCTION(gf,multiply,w32,gf_wgen_bytwo_b_multiply)
+  SET_FUNCTION(gf,inverse,w32,gf_wgen_euclid)
   return 1;
 }
 
@@ -247,8 +247,8 @@ gf_wgen_bytwo_p_multiply (gf_t *gf, gf_val_32_t a, gf_val_32_t b)
 static 
 int gf_wgen_bytwo_p_init(gf_t *gf)
 {
-  gf->multiply.w32 = gf_wgen_bytwo_p_multiply;
-  gf->inverse.w32 = gf_wgen_euclid;
+  SET_FUNCTION(gf,multiply,w32,gf_wgen_bytwo_p_multiply)
+  SET_FUNCTION(gf,inverse,w32,gf_wgen_euclid)
   return 1;
 }
 
@@ -453,12 +453,12 @@ int gf_wgen_group_init(gf_t *gf)
   }
 
   if (g_s == g_r) {
-    gf->multiply.w32 = gf_wgen_group_s_equals_r_multiply;
+    SET_FUNCTION(gf,multiply,w32,gf_wgen_group_s_equals_r_multiply)
   } else {
-    gf->multiply.w32 = gf_wgen_group_multiply; 
+    SET_FUNCTION(gf,multiply,w32,gf_wgen_group_multiply) 
   }
-  gf->divide.w32 = NULL;
-  gf->divide.w32 = NULL;
+  SET_FUNCTION(gf,divide,w32,NULL)
+  SET_FUNCTION(gf,divide,w32,NULL)
   return 1;
 }
 
@@ -519,8 +519,8 @@ int gf_wgen_table_8_init(gf_t *gf)
     }
   }
 
-  gf->multiply.w32 = gf_wgen_table_8_multiply;
-  gf->divide.w32 = gf_wgen_table_8_divide;
+  SET_FUNCTION(gf,multiply,w32,gf_wgen_table_8_multiply)
+  SET_FUNCTION(gf,divide,w32,gf_wgen_table_8_divide)
   return 1;
 }
 
@@ -580,8 +580,8 @@ int gf_wgen_table_16_init(gf_t *gf)
     }
   }
 
-  gf->multiply.w32 = gf_wgen_table_16_multiply;
-  gf->divide.w32 = gf_wgen_table_16_divide;
+  SET_FUNCTION(gf,multiply,w32,gf_wgen_table_16_multiply)
+  SET_FUNCTION(gf,divide,w32,gf_wgen_table_16_divide)
   return 1;
 }
 
@@ -670,8 +670,8 @@ int gf_wgen_log_8_init(gf_t *gf)
     return 0;
   }
 
-  gf->multiply.w32 = gf_wgen_log_8_multiply;
-  gf->divide.w32 = gf_wgen_log_8_divide;
+  SET_FUNCTION(gf,multiply,w32,gf_wgen_log_8_multiply)
+  SET_FUNCTION(gf,divide,w32,gf_wgen_log_8_divide)
   return 1;
 }
 
@@ -746,8 +746,8 @@ int gf_wgen_log_16_init(gf_t *gf)
     return 0;
   }
   
-  gf->multiply.w32 = gf_wgen_log_16_multiply;
-  gf->divide.w32 = gf_wgen_log_16_divide;
+  SET_FUNCTION(gf,multiply,w32,gf_wgen_log_16_multiply)
+  SET_FUNCTION(gf,divide,w32,gf_wgen_log_16_divide)
   return 1;
 }
 
@@ -821,8 +821,8 @@ int gf_wgen_log_32_init(gf_t *gf)
     return 0;
   }
 
-  gf->multiply.w32 = gf_wgen_log_32_multiply;
-  gf->divide.w32 = gf_wgen_log_32_divide;
+  SET_FUNCTION(gf,multiply,w32,gf_wgen_log_32_multiply)
+  SET_FUNCTION(gf,divide,w32,gf_wgen_log_32_divide)
   return 1;
 }
 
@@ -975,11 +975,11 @@ int gf_wgen_init(gf_t *gf)
     }
   }
 
-  gf->multiply.w32 = NULL;
-  gf->divide.w32 = NULL;
-  gf->inverse.w32 = NULL;
-  gf->multiply_region.w32 = gf_wgen_cauchy_region;
-  gf->extract_word.w32 = gf_wgen_extract_word;
+  SET_FUNCTION(gf,multiply,w32,NULL)
+  SET_FUNCTION(gf,divide,w32,NULL)
+  SET_FUNCTION(gf,inverse,w32,NULL)
+  SET_FUNCTION(gf,multiply_region,w32,gf_wgen_cauchy_region)
+  SET_FUNCTION(gf,extract_word,w32,gf_wgen_extract_word)
 
   switch(h->mult_type) {
     case GF_MULT_DEFAULT:
@@ -1000,20 +1000,20 @@ int gf_wgen_init(gf_t *gf)
     default: return 0;
   }
   if (h->divide_type == GF_DIVIDE_EUCLID) {
-    gf->divide.w32 = gf_wgen_divide_from_inverse;
-    gf->inverse.w32 = gf_wgen_euclid;
+    SET_FUNCTION(gf,divide,w32,gf_wgen_divide_from_inverse)
+    SET_FUNCTION(gf,inverse,w32,gf_wgen_euclid)
   } else if (h->divide_type == GF_DIVIDE_MATRIX) {
-    gf->divide.w32 = gf_wgen_divide_from_inverse;
-    gf->inverse.w32 = gf_wgen_matrix;
+    SET_FUNCTION(gf,divide,w32,gf_wgen_divide_from_inverse)
+    SET_FUNCTION(gf,inverse,w32,gf_wgen_matrix)
   }
 
-  if (gf->inverse.w32== NULL && gf->divide.w32 == NULL) gf->inverse.w32 = gf_wgen_euclid;
+  if (gf->inverse.w32== NULL && gf->divide.w32 == NULL) SET_FUNCTION(gf,inverse,w32,gf_wgen_euclid)
 
   if (gf->inverse.w32 != NULL && gf->divide.w32 == NULL) {
-    gf->divide.w32 = gf_wgen_divide_from_inverse;
+    SET_FUNCTION(gf,divide,w32,gf_wgen_divide_from_inverse)
   }
   if (gf->inverse.w32 == NULL && gf->divide.w32 != NULL) {
-    gf->inverse.w32 = gf_wgen_inverse_from_divide;
+    SET_FUNCTION(gf,inverse,w32,gf_wgen_inverse_from_divide)
   }
   return 1;
 }
