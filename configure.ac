@@ -66,5 +66,14 @@ AC_ARG_ENABLE([valgrind],
             [enable_valgrind=no])
 AM_CONDITIONAL(ENABLE_VALGRIND, test "x$enable_valgrind" != xno)
 
+AC_ARG_ENABLE([avx], AS_HELP_STRING([--enable-avx], [Build with AVX optimizations]))
+AX_CHECK_COMPILE_FLAG(-mavx, [ax_cv_support_avx=yes], [])
+
+AS_IF([test "x$enable_avx" = "xyes"],
+      [AS_IF([test "x$ax_cv_support_avx" = "xno"],
+             [AC_MSG_ERROR([AVX requested but compiler does not support -mavx])],
+             [SIMD_FLAGS="$SIMD_FLAGS -mavx"])
+      ])
+
 AC_CONFIG_FILES([Makefile src/Makefile tools/Makefile test/Makefile examples/Makefile])
 AC_OUTPUT

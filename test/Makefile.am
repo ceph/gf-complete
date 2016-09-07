@@ -1,7 +1,7 @@
 # GF-Complete 'test' AM file
 
 AM_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include
-AM_CFLAGS = -O3 $(SIMD_FLAGS) -fPIC
+AM_CFLAGS = -O3 -fPIC
 
 bin_PROGRAMS = gf_unit 
 

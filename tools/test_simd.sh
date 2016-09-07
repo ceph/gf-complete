@@ -27,6 +27,16 @@ test_functions() {
     return ${failed}
 }
 
+# build with DEBUG_CPU_FUNCTIONS and print out CPU detection
+test_detection() {
+    failed=0
+
+    { ./configure && make clean && make CFLAGS="-DDEBUG_CPU_DETECTION"; } || { echo "Compile FAILED" >> ${results}; return 1; }
+    { ${script_dir}/gf_methods 32 -ACD -L | grep '#' >> ${results}; } || { echo "gf_methods $i FAILED" >> ${results}; ((++failed)); }
+
+    return ${failed}
+}
+
 compile_arm() {
     failed=0
 
@@ -167,7 +177,7 @@ runtime_intel_flags() {
         { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
     done
 
-    echo "====SSE2 support..." >> ${1}
+   echo "====SSE2 support..." >> ${1}
     export ax_cv_have_sse_ext=no 
     export ax_cv_have_sse2_ext=yes
     export ax_cv_have_sse3_ext=no

@@ -224,6 +224,8 @@ run_test_simd_basic() {
     { run_test $arch $cpu "unit" && echo "SUCCESS"; } || { echo "FAILED"; ((++failed)); }
     echo "=====running functions test"
     { run_test $arch $cpu "functions" && echo "SUCCESS"; } || { echo "FAILED"; ((++failed)); }
+    echo "=====running detection test"
+    { run_test $arch $cpu "detection" && echo "SUCCESS"; } || { echo "FAILED"; ((++failed)); }
     echo "=====running runtime test"
     { run_test $arch $cpu "runtime" && echo "SUCCESS"; } || { echo "FAILED"; ((++failed)); }
     stop_qemu
