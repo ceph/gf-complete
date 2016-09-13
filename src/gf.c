@@ -912,9 +912,6 @@ static void gf_unaligned_xor(void *src, void *dest, int bytes);
 
 void gf_multby_one(void *src, void *dest, int bytes, int xor) 
 {
-#ifdef   INTEL_SSE2
-  __m128i ms, md;
-#endif
   unsigned long uls, uld;
   uint8_t *s8, *d8;
   uint64_t *s64, *d64, *dtop64;
@@ -929,84 +926,89 @@ void gf_multby_one(void *src, void *dest, int bytes, int xor)
   uld = (unsigned long) dest;
 
 #ifdef   INTEL_SSE2
-  int abytes;
-  s8 = (uint8_t *) src;
-  d8 = (uint8_t *) dest;
-  if (uls % 16 == uld % 16) {
-    gf_set_region_data(&rd, NULL, src, dest, bytes, 1, xor, 16);
-    while (s8 != rd.s_start) {
-      *d8 ^= *s8;
-      d8++;
-      s8++;
+  if (gf_cpu_supports_intel_sse2) {
+    __m128i ms, md;
+    int abytes;
+    s8 = (uint8_t *) src;
+    d8 = (uint8_t *) dest;
+    if (uls % 16 == uld % 16) {
+      gf_set_region_data(&rd, NULL, src, dest, bytes, 1, xor, 16);
+      while (s8 != rd.s_start) {
+        *d8 ^= *s8;
+        d8++;
+        s8++;
+      }
+      while (s8 < (uint8_t *) rd.s_top) {
+        ms = _mm_load_si128 ((__m128i *)(s8));
+        md = _mm_load_si128 ((__m128i *)(d8));
+        md = _mm_xor_si128(md, ms);
+        _mm_store_si128((__m128i *)(d8), md);
+        s8 += 16;
+        d8 += 16;
+      }
+      while (s8 != (uint8_t *) src + bytes) {
+        *d8 ^= *s8;
+        d8++;
+        s8++;
+      }
+      return;
     }
-    while (s8 < (uint8_t *) rd.s_top) {
-      ms = _mm_load_si128 ((__m128i *)(s8));
-      md = _mm_load_si128 ((__m128i *)(d8));
+
+    abytes = (bytes & 0xfffffff0);
+
+    while (d8 < (uint8_t *) dest + abytes) {
+      ms = _mm_loadu_si128 ((__m128i *)(s8));
+      md = _mm_loadu_si128 ((__m128i *)(d8));
       md = _mm_xor_si128(md, ms);
-      _mm_store_si128((__m128i *)(d8), md);
+      _mm_storeu_si128((__m128i *)(d8), md);
       s8 += 16;
       d8 += 16;
     }
-    while (s8 != (uint8_t *) src + bytes) {
+    while (d8 != (uint8_t *) dest+bytes) {
       *d8 ^= *s8;
       d8++;
       s8++;
     }
     return;
   }
-
-  abytes = (bytes & 0xfffffff0);
-
-  while (d8 < (uint8_t *) dest + abytes) {
-    ms = _mm_loadu_si128 ((__m128i *)(s8));
-    md = _mm_loadu_si128 ((__m128i *)(d8));
-    md = _mm_xor_si128(md, ms);
-    _mm_storeu_si128((__m128i *)(d8), md);
-    s8 += 16;
-    d8 += 16;
-  }
-  while (d8 != (uint8_t *) dest+bytes) {
-    *d8 ^= *s8;
-    d8++;
-    s8++;
-  }
-  return;
 #endif
 #if defined(ARM_NEON)
-  s8 = (uint8_t *) src;
-  d8 = (uint8_t *) dest;
+  if (gf_cpu_supports_arm_neon) {
+    s8 = (uint8_t *) src;
+    d8 = (uint8_t *) dest;
 
-  if (uls % 16 == uld % 16) {
-    gf_set_region_data(&rd, NULL, src, dest, bytes, 1, xor, 16);
-    while (s8 != rd.s_start) {
+    if (uls % 16 == uld % 16) {
+      gf_set_region_data(&rd, NULL, src, dest, bytes, 1, xor, 16);
+      while (s8 != rd.s_start) {
+        *d8 ^= *s8;
+        s8++;
+        d8++;
+      }
+      while (s8 < (uint8_t *) rd.s_top) {
+        uint8x16_t vs = vld1q_u8 (s8);
+        uint8x16_t vd = vld1q_u8 (d8);
+        uint8x16_t vr = veorq_u8 (vs, vd);
+        vst1q_u8 (d8, vr);
+        s8 += 16;
+        d8 += 16;
+      }
+    } else {
+      while (s8 + 15 < (uint8_t *) src + bytes) {
+        uint8x16_t vs = vld1q_u8 (s8);
+        uint8x16_t vd = vld1q_u8 (d8);
+        uint8x16_t vr = veorq_u8 (vs, vd);
+        vst1q_u8 (d8, vr);
+        s8 += 16;
+        d8 += 16;
+      }
+    }
+    while (s8 < (uint8_t *) src + bytes) {
       *d8 ^= *s8;
       s8++;
       d8++;
     }
-    while (s8 < (uint8_t *) rd.s_top) {
-      uint8x16_t vs = vld1q_u8 (s8);
-      uint8x16_t vd = vld1q_u8 (d8);
-      uint8x16_t vr = veorq_u8 (vs, vd);
-      vst1q_u8 (d8, vr);
-      s8 += 16;
-      d8 += 16;
-    }
-  } else {
-    while (s8 + 15 < (uint8_t *) src + bytes) {
-      uint8x16_t vs = vld1q_u8 (s8);
-      uint8x16_t vd = vld1q_u8 (d8);
-      uint8x16_t vr = veorq_u8 (vs, vd);
-      vst1q_u8 (d8, vr);
-      s8 += 16;
-      d8 += 16;
-    }
+    return;
   }
-  while (s8 < (uint8_t *) src + bytes) {
-    *d8 ^= *s8;
-    s8++;
-    d8++;
-  }
-  return;
 #endif
   if (uls % 8 != uld % 8) {
     gf_unaligned_xor(src, dest, bytes);
