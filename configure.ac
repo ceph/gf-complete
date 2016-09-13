@@ -29,6 +29,14 @@ AC_CHECK_FUNCS([posix_memalign],
 
 AS_IF([test "x$found_memalign" != "xyes"], [AC_MSG_WARN([No function for aligned memory allocation found])])
 
+AC_ARG_ENABLE([debug-functions],
+              AS_HELP_STRING([--enable-debug-func], [Enable debugging of functions selected]))
+AS_IF([test "x$enable_debug_func" = "xyes"], [CPPFLAGS="$CPPFLAGS -DDEBUG_FUNCTIONS"])
+
+AC_ARG_ENABLE([debug-cpu],
+              AS_HELP_STRING([--enable-debug-cpu], [Enable debugging of SIMD detection]))
+AS_IF([test "x$enable_debug_cpu" = "xyes"], [CPPFLAGS="$CPPFLAGS -DDEBUG_CPU_DETECTION"])
+
 AX_EXT()
 
 AC_ARG_ENABLE([neon],

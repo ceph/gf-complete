@@ -6,11 +6,12 @@
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 host_cpu=`uname -p`
 results=${script_dir}/test_simd.results
+nprocs=$(grep -c ^processor /proc/cpuinfo)
 
 # runs unit tests and save the results
 test_unit(){
     { ./configure && make clean && make; } || { echo "Compile FAILED" >> ${results}; return 1; }
-    make check || { echo "gf_methods $i FAILED" >> ${results}; ((++failed)); }
+    make -j$nprocs check || { echo "gf_methods $i FAILED" >> ${results}; ((++failed)); }
     cat tools/test-suite.log >> ${results} || true
 }
 
@@ -19,7 +20,7 @@ test_unit(){
 test_functions() {
     failed=0
 
-    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "Compile FAILED" >> ${results}; return 1; }
+    { ./configure --enable-debug-func && make clean && make; } || { echo "Compile FAILED" >> ${results}; return 1; }
     for i in 128 64 32 16 8 4; do
         { ${script_dir}/gf_methods $i -ACD -X >> ${results}; } || { echo "gf_methods $i FAILED" >> ${results}; ((++failed)); }
     done
@@ -31,7 +32,7 @@ test_functions() {
 test_detection() {
     failed=0
 
-    { ./configure && make clean && make CFLAGS="-DDEBUG_CPU_DETECTION"; } || { echo "Compile FAILED" >> ${results}; return 1; }
+    { ./configure --enable-debug-cpu && make clean && make; } || { echo "Compile FAILED" >> ${results}; return 1; }
     { ${script_dir}/gf_methods 32 -ACD -L | grep '#' >> ${results}; } || { echo "gf_methods $i FAILED" >> ${results}; ((++failed)); }
 
     return ${failed}
@@ -133,13 +134,13 @@ runtime_arm_flags() {
     failed=0
 
     echo "====NO SIMD support..." >> ${1}
-    { ./configure --disable-neon && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "Compile FAILED" >> ${1}; return 1; }
+    { ./configure --disable-neon --enable-debug-func && make clean && make; } || { echo "Compile FAILED" >> ${1}; return 1; }
     for i in 128 64 32 16 8 4; do
         { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
     done
 
     echo "====FULL SIMD support..." >> ${1}
-    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "Compile FAILED" >> ${1}; return 1; }
+    { ./configure --enable-debug-func && make clean && make; } || { echo "Compile FAILED" >> ${1}; return 1; }
     for i in 128 64 32 16 8 4; do
         { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
     done
@@ -151,7 +152,7 @@ runtime_arm_flags() {
 runtime_arm_env() {
     failed=0
 
-    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "Compile FAILED" >> ${1}; return 1; }
+    { ./configure --enable-debug-func && make clean && make; } || { echo "Compile FAILED" >> ${1}; return 1; }
 
     echo "====NO SIMD support..." >> ${1}
     export GF_COMPLETE_DISABLE_NEON=1
@@ -172,7 +173,7 @@ runtime_intel_flags() {
     failed=0
 
     echo "====NO SIMD support..." >> ${1}
-    { ./configure --disable-sse && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    { ./configure --disable-sse --enable-debug-func && make clean && make; } || { echo "FAIL" >> ${1}; ((++failed)); }
     for i in 128 64 32 16 8 4; do
         { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
     done
@@ -185,7 +186,7 @@ runtime_intel_flags() {
     export ax_cv_have_sse41_ext=no
     export ax_cv_have_sse42_ext=no
     export ax_cv_have_pclmuldq_ext=no
-    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    { ./configure --enable-debug-func && make clean && make; } || { echo "FAIL" >> ${1}; ((++failed)); }
     for i in 128 64 32 16 8 4; do
         { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
     done
@@ -198,7 +199,7 @@ runtime_intel_flags() {
     export ax_cv_have_sse41_ext=no
     export ax_cv_have_sse42_ext=no
     export ax_cv_have_pclmuldq_ext=no
-    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    { ./configure --enable-debug-func && make clean && make; } || { echo "FAIL" >> ${1}; ((++failed)); }
     for i in 128 64 32 16 8 4; do
         { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
     done
@@ -211,7 +212,7 @@ runtime_intel_flags() {
     export ax_cv_have_sse41_ext=no
     export ax_cv_have_sse42_ext=no
     export ax_cv_have_pclmuldq_ext=no
-    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    { ./configure --enable-debug-func && make clean && make; } || { echo "FAIL" >> ${1}; ((++failed)); }
     for i in 128 64 32 16 8 4; do
         { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
     done
@@ -224,7 +225,7 @@ runtime_intel_flags() {
     export ax_cv_have_sse41_ext=yes
     export ax_cv_have_sse42_ext=no
     export ax_cv_have_pclmuldq_ext=no
-    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    { ./configure --enable-debug-func && make clean && make; } || { echo "FAIL" >> ${1}; ((++failed)); }
     for i in 128 64 32 16 8 4; do
         { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
     done
@@ -237,13 +238,13 @@ runtime_intel_flags() {
     export ax_cv_have_sse41_ext=no
     export ax_cv_have_sse42_ext=yes
     export ax_cv_have_pclmuldq_ext=no
-    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    { ./configure --enable-debug-func && make clean && make; } || { echo "FAIL" >> ${1}; ((++failed)); }
     for i in 128 64 32 16 8 4; do
         { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
     done
 
     echo "====FULL SIMD support..." >> ${1}
-    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "FAIL" >> ${1}; ((++failed)); }
+    { ./configure --enable-debug-func && make clean && make; } || { echo "FAIL" >> ${1}; ((++failed)); }
     for i in 128 64 32 16 8 4; do
         { ${script_dir}/gf_methods $i -ACD -X >> ${1}; } || { echo "gf_methods $i FAILED" >> ${1}; ((++failed)); }
     done
@@ -255,7 +256,7 @@ runtime_intel_env() {
     failed=0
 
     # compile a build with full SIMD support
-    { ./configure && make clean && make CFLAGS="-DDEBUG_FUNCTIONS"; } || { echo "Compile FAILED" >> ${1}; return 1; }
+    { ./configure --enable-debug-func && make clean && make; } || { echo "Compile FAILED" >> ${1}; return 1; }
 
     echo "====NO SIMD support..." >> ${1}
     export GF_COMPLETE_DISABLE_SSE2=1
