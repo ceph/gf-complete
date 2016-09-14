@@ -29,6 +29,14 @@ AC_CHECK_FUNCS([posix_memalign],
 
 AS_IF([test "x$found_memalign" != "xyes"], [AC_MSG_WARN([No function for aligned memory allocation found])])
 
+AC_ARG_ENABLE([debug-functions],
+              AS_HELP_STRING([--enable-debug-func], [Enable debugging of functions selected]))
+AS_IF([test "x$enable_debug_func" = "xyes"], [CPPFLAGS="$CPPFLAGS -DDEBUG_FUNCTIONS"])
+
+AC_ARG_ENABLE([debug-cpu],
+              AS_HELP_STRING([--enable-debug-cpu], [Enable debugging of SIMD detection]))
+AS_IF([test "x$enable_debug_cpu" = "xyes"], [CPPFLAGS="$CPPFLAGS -DDEBUG_CPU_DETECTION"])
+
 AX_EXT()
 
 AC_ARG_ENABLE([neon],
@@ -59,6 +67,21 @@ AC_ARG_ENABLE([sse],
                 echo "DISABLED SSE!!!"
               fi]
 )
+
+AC_ARG_ENABLE([valgrind],
+            [AS_HELP_STRING([--enable-valgrind], [run tests with valgrind])],
+            [],
+            [enable_valgrind=no])
+AM_CONDITIONAL(ENABLE_VALGRIND, test "x$enable_valgrind" != xno)
+
+AC_ARG_ENABLE([avx], AS_HELP_STRING([--enable-avx], [Build with AVX optimizations]))
+AX_CHECK_COMPILE_FLAG(-mavx, [ax_cv_support_avx=yes], [])
+
+AS_IF([test "x$enable_avx" = "xyes"],
+      [AS_IF([test "x$ax_cv_support_avx" = "xno"],
+             [AC_MSG_ERROR([AVX requested but compiler does not support -mavx])],
+             [SIMD_FLAGS="$SIMD_FLAGS -mavx"])
+      ])
 
 AC_CONFIG_FILES([Makefile src/Makefile tools/Makefile test/Makefile examples/Makefile])
 AC_OUTPUT

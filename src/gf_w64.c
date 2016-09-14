@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "gf_w64.h"
+#include "gf_cpu.h"
 
 static
 inline
@@ -338,14 +339,14 @@ gf_w64_shift_multiply (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
  * ELM: Use the Intel carryless multiply instruction to do very fast 64x64 multiply.
  */
 
+#if defined(INTEL_SSE4_PCLMUL) 
+
 static
 inline
 gf_val_64_t
 gf_w64_clm_multiply_2 (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
 {
        gf_val_64_t rv = 0;
-
-#if defined(INTEL_SSE4_PCLMUL) 
 
         __m128i         a, b;
         __m128i         result;
@@ -376,18 +377,18 @@ gf_w64_clm_multiply_2 (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
         result = _mm_xor_si128 (result, w);
 
         rv = ((gf_val_64_t)_mm_extract_epi64(result, 0));
-#endif
         return rv;
 }
+#endif
  
+#if defined(INTEL_SSE4_PCLMUL) 
+
 static
 inline
 gf_val_64_t
 gf_w64_clm_multiply_4 (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
 {
   gf_val_64_t rv = 0;
-
-#if defined(INTEL_SSE4_PCLMUL) 
 
   __m128i         a, b;
   __m128i         result;
@@ -418,15 +419,15 @@ gf_w64_clm_multiply_4 (gf_t *gf, gf_val_64_t a64, gf_val_64_t b64)
   result = _mm_xor_si128 (result, w);
 
   rv = ((gf_val_64_t)_mm_extract_epi64(result, 0));
-#endif
   return rv;
 }
+#endif
 
 
+#if defined(INTEL_SSE4_PCLMUL) 
   void
 gf_w64_clm_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
 {
-#if defined(INTEL_SSE4_PCLMUL) 
   gf_internal_t *h;
   uint8_t *s8, *d8, *dtop;
   gf_region_data rd;
@@ -504,8 +505,8 @@ gf_w64_clm_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int by
     }
   }
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
 void
 gf_w64_split_4_64_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint64_t val, int bytes, int xor)
@@ -697,33 +698,35 @@ gf_w64_split_16_64_lazy_multiply_region(gf_t *gf, void *src, void *dest, uint64_
 static 
 int gf_w64_shift_init(gf_t *gf)
 {
-  gf->multiply.w64 = gf_w64_shift_multiply;
-  gf->inverse.w64 = gf_w64_euclid;
-  gf->multiply_region.w64 = gf_w64_multiply_region_from_single;
+  SET_FUNCTION(gf,multiply,w64,gf_w64_shift_multiply)
+  SET_FUNCTION(gf,inverse,w64,gf_w64_euclid)
+  SET_FUNCTION(gf,multiply_region,w64,gf_w64_multiply_region_from_single)
   return 1;
 }
 
 static 
 int gf_w64_cfm_init(gf_t *gf)
 {
-  gf->inverse.w64 = gf_w64_euclid;
-  gf->multiply_region.w64 = gf_w64_multiply_region_from_single;
+  SET_FUNCTION(gf,inverse,w64,gf_w64_euclid)
+  SET_FUNCTION(gf,multiply_region,w64,gf_w64_multiply_region_from_single)
 
-#if defined(INTEL_SSE4_PCLMUL) 
-  gf_internal_t *h;
+#if defined(INTEL_SSE4_PCLMUL)
+  if (gf_cpu_supports_intel_pclmul) {
+    gf_internal_t *h;
 
-  h = (gf_internal_t *) gf->scratch;
+    h = (gf_internal_t *) gf->scratch;
 
-  if ((0xfffffffe00000000ULL & h->prim_poly) == 0){ 
-    gf->multiply.w64 = gf_w64_clm_multiply_2;
-    gf->multiply_region.w64 = gf_w64_clm_multiply_region_from_single_2; 
-  }else if((0xfffe000000000000ULL & h->prim_poly) == 0){
-    gf->multiply.w64 = gf_w64_clm_multiply_4;
-    gf->multiply_region.w64 = gf_w64_clm_multiply_region_from_single_4;
-  } else {
-    return 0;
+    if ((0xfffffffe00000000ULL & h->prim_poly) == 0){ 
+      SET_FUNCTION(gf,multiply,w64,gf_w64_clm_multiply_2)
+      SET_FUNCTION(gf,multiply_region,w64,gf_w64_clm_multiply_region_from_single_2) 
+    }else if((0xfffe000000000000ULL & h->prim_poly) == 0){
+      SET_FUNCTION(gf,multiply,w64,gf_w64_clm_multiply_4)
+      SET_FUNCTION(gf,multiply_region,w64,gf_w64_clm_multiply_region_from_single_4)
+    } else {
+      return 0;
+    }
+    return 1;
   }
-  return 1;
 #endif
 
   return 0;
@@ -1008,14 +1011,14 @@ int gf_w64_group_init(gf_t *gf)
   }
 
   if (g_s == g_r) {
-    gf->multiply.w64 = gf_w64_group_s_equals_r_multiply;
-    gf->multiply_region.w64 = gf_w64_group_s_equals_r_multiply_region; 
+    SET_FUNCTION(gf,multiply,w64,gf_w64_group_s_equals_r_multiply)
+    SET_FUNCTION(gf,multiply_region,w64,gf_w64_group_s_equals_r_multiply_region) 
   } else {
-    gf->multiply.w64 = gf_w64_group_multiply;
-    gf->multiply_region.w64 = gf_w64_group_multiply_region; 
+    SET_FUNCTION(gf,multiply,w64,gf_w64_group_multiply)
+    SET_FUNCTION(gf,multiply_region,w64,gf_w64_group_multiply_region) 
   }
-  gf->divide.w64 = NULL;
-  gf->inverse.w64 = gf_w64_euclid;
+  SET_FUNCTION(gf,divide,w64,NULL)
+  SET_FUNCTION(gf,inverse,w64,gf_w64_euclid)
 
   return 1;
 }
@@ -1261,9 +1264,9 @@ gf_w64_bytwo_b_nosse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_64_
       v = _mm_srli_epi64(v, 1); }
 
 
+#ifdef INTEL_SSE2
 void gf_w64_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_64_t val, int bytes, int xor)
 {
-#ifdef INTEL_SSE2
   int i;
   uint8_t *s8, *d8;
   uint64_t vrev, one64;
@@ -1322,8 +1325,8 @@ void gf_w64_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_
     s8 += 16;
   }
   gf_do_final_region_alignment(&rd);
-#endif
 }
+#endif
 
 #ifdef INTEL_SSE2
 static
@@ -1455,31 +1458,33 @@ int gf_w64_bytwo_init(gf_t *gf)
   h = (gf_internal_t *) gf->scratch;
 
   if (h->mult_type == GF_MULT_BYTWO_p) {
-    gf->multiply.w64 = gf_w64_bytwo_p_multiply;
+    SET_FUNCTION(gf,multiply,w64,gf_w64_bytwo_p_multiply)
     #ifdef INTEL_SSE2 
-      if (h->region_type & GF_REGION_NOSIMD)
-        gf->multiply_region.w64 = gf_w64_bytwo_p_nosse_multiply_region; 
-      else
-        gf->multiply_region.w64 = gf_w64_bytwo_p_sse_multiply_region; 
-    #else
-      gf->multiply_region.w64 = gf_w64_bytwo_p_nosse_multiply_region; 
-      if(h->region_type & GF_REGION_SIMD)
-        return 0;
+      if (gf_cpu_supports_intel_sse2 && !(h->region_type & GF_REGION_NOSIMD)) {
+        SET_FUNCTION(gf,multiply_region,w64,gf_w64_bytwo_p_sse_multiply_region) 
+      } else {
+    #endif
+        SET_FUNCTION(gf,multiply_region,w64,gf_w64_bytwo_p_nosse_multiply_region) 
+        if(h->region_type & GF_REGION_SIMD)
+          return 0;
+    #ifdef INTEL_SSE2
+      } 
     #endif
   } else {
-    gf->multiply.w64 = gf_w64_bytwo_b_multiply;
+    SET_FUNCTION(gf,multiply,w64,gf_w64_bytwo_b_multiply)
     #ifdef INTEL_SSE2 
-      if (h->region_type & GF_REGION_NOSIMD)
-        gf->multiply_region.w64 = gf_w64_bytwo_b_nosse_multiply_region; 
-      else
-        gf->multiply_region.w64 = gf_w64_bytwo_b_sse_multiply_region; 
-    #else
-      gf->multiply_region.w64 = gf_w64_bytwo_b_nosse_multiply_region; 
+      if (gf_cpu_supports_intel_sse2 && !(h->region_type & GF_REGION_NOSIMD)) {
+        SET_FUNCTION(gf,multiply_region,w64,gf_w64_bytwo_b_sse_multiply_region) 
+      } else {
+    #endif
+      SET_FUNCTION(gf,multiply_region,w64,gf_w64_bytwo_b_nosse_multiply_region) 
       if(h->region_type & GF_REGION_SIMD)
         return 0;
+    #ifdef INTEL_SSE2
+      } 
     #endif
   }
-  gf->inverse.w64 = gf_w64_euclid;
+  SET_FUNCTION(gf,inverse,w64,gf_w64_euclid)
   return 1;
 }
 
@@ -1653,14 +1658,14 @@ int gf_w64_composite_init(gf_t *gf)
   gf_internal_t *h = (gf_internal_t *) gf->scratch;
 
   if (h->region_type & GF_REGION_ALTMAP) {
-    gf->multiply_region.w64 = gf_w64_composite_multiply_region_alt;
+    SET_FUNCTION(gf,multiply_region,w64,gf_w64_composite_multiply_region_alt)
   } else {
-    gf->multiply_region.w64 = gf_w64_composite_multiply_region;
+    SET_FUNCTION(gf,multiply_region,w64,gf_w64_composite_multiply_region)
   }
 
-  gf->multiply.w64 = gf_w64_composite_multiply;
-  gf->divide.w64 = NULL;
-  gf->inverse.w64 = gf_w64_composite_inverse;
+  SET_FUNCTION(gf,multiply,w64,gf_w64_composite_multiply)
+  SET_FUNCTION(gf,divide,w64,NULL)
+  SET_FUNCTION(gf,inverse,w64,gf_w64_composite_inverse)
 
   return 1;
 }
@@ -1970,49 +1975,55 @@ int gf_w64_split_init(gf_t *gf)
 
   /* Defaults */
 
-  gf->multiply_region.w64 = gf_w64_multiply_region_from_single;
+  SET_FUNCTION(gf,multiply_region,w64,gf_w64_multiply_region_from_single)
 
-  gf->multiply.w64 = gf_w64_bytwo_p_multiply; 
+  SET_FUNCTION(gf,multiply,w64,gf_w64_bytwo_p_multiply) 
 
 #if defined(INTEL_SSE4_PCLMUL) 
-  if ((!(h->region_type & GF_REGION_NOSIMD) &&
-     (h->arg1 == 64 || h->arg2 == 64)) ||
-     h->mult_type == GF_MULT_DEFAULT){
-   
-    if ((0xfffffffe00000000ULL & h->prim_poly) == 0){ 
-      gf->multiply.w64 = gf_w64_clm_multiply_2;
-      gf->multiply_region.w64 = gf_w64_clm_multiply_region_from_single_2; 
-    }else if((0xfffe000000000000ULL & h->prim_poly) == 0){
-      gf->multiply.w64 = gf_w64_clm_multiply_4;
-      gf->multiply_region.w64 = gf_w64_clm_multiply_region_from_single_4; 
-    }else{
-      return 0;
+  if (gf_cpu_supports_intel_pclmul) {
+    if ((!(h->region_type & GF_REGION_NOSIMD) &&
+        (h->arg1 == 64 || h->arg2 == 64)) ||
+        h->mult_type == GF_MULT_DEFAULT){
+    
+      if ((0xfffffffe00000000ULL & h->prim_poly) == 0){ 
+        SET_FUNCTION(gf,multiply,w64,gf_w64_clm_multiply_2)
+        SET_FUNCTION(gf,multiply_region,w64,gf_w64_clm_multiply_region_from_single_2) 
+      }else if((0xfffe000000000000ULL & h->prim_poly) == 0){
+        SET_FUNCTION(gf,multiply,w64,gf_w64_clm_multiply_4)
+        SET_FUNCTION(gf,multiply_region,w64,gf_w64_clm_multiply_region_from_single_4) 
+      }else{
+        return 0;
+      }
     }
   }
 #endif
 
-  gf->inverse.w64 = gf_w64_euclid;
+  SET_FUNCTION(gf,inverse,w64,gf_w64_euclid)
 
   /* Allen: set region pointers for default mult type. Single pointers are
    * taken care of above (explicitly for sse, implicitly for no sse). */
 
+  if (h->mult_type == GF_MULT_DEFAULT) {
 #if defined(INTEL_SSE4) || defined(ARCH_AARCH64)
-  if (h->mult_type == GF_MULT_DEFAULT) {
-    d4 = (struct gf_split_4_64_lazy_data *) h->private;
-    d4->last_value = 0;
+    if (gf_cpu_supports_intel_sse4 || gf_cpu_supports_arm_neon) {
+      d4 = (struct gf_split_4_64_lazy_data *) h->private;
+      d4->last_value = 0;
 #if defined(INTEL_SSE4)
-    gf->multiply_region.w64 = gf_w64_split_4_64_lazy_sse_multiply_region; 
+      if (gf_cpu_supports_intel_sse4)
+        SET_FUNCTION(gf,multiply_region,w64,gf_w64_split_4_64_lazy_sse_multiply_region)
 #elif defined(ARCH_AARCH64)
-    gf_w64_neon_split_init(gf);
+      if (gf_cpu_supports_arm_neon)
+        gf_w64_neon_split_init(gf);
+#endif
+    } else {
+#endif
+      d8 = (struct gf_split_8_64_lazy_data *) h->private;
+      d8->last_value = 0;
+      SET_FUNCTION(gf,multiply_region,w64,gf_w64_split_8_64_lazy_multiply_region)
+#if defined(INTEL_SSE4) || defined(ARCH_AARCH64)
+    }
 #endif
   }
-#else
-  if (h->mult_type == GF_MULT_DEFAULT) {
-    d8 = (struct gf_split_8_64_lazy_data *) h->private;
-    d8->last_value = 0;
-    gf->multiply_region.w64 = gf_w64_split_8_64_lazy_multiply_region;
-  }
-#endif
 
   if ((h->arg1 == 4 && h->arg2 == 64) || (h->arg1 == 64 && h->arg2 == 4)) {
     d4 = (struct gf_split_4_64_lazy_data *) h->private;
@@ -2022,44 +2033,51 @@ int gf_w64_split_init(gf_t *gf)
     if(h->region_type & GF_REGION_ALTMAP)
     {
       #ifdef INTEL_SSSE3
-        gf->multiply_region.w64 = gf_w64_split_4_64_lazy_sse_altmap_multiply_region; 
+        if (gf_cpu_supports_intel_ssse3) {
+          SET_FUNCTION(gf,multiply_region,w64,gf_w64_split_4_64_lazy_sse_altmap_multiply_region)
+        } else
       #elif defined(ARCH_AARCH64)
-        gf_w64_neon_split_init(gf);
-      #else
-        return 0;
+        if (gf_cpu_supports_arm_neon) {
+          gf_w64_neon_split_init(gf);
+        } else
       #endif
+        return 0;
     }
     else //no altmap
     {
       #if defined(INTEL_SSE4) || defined(ARCH_AARCH64)
-        if(h->region_type & GF_REGION_NOSIMD)
-          gf->multiply_region.w64 = gf_w64_split_4_64_lazy_multiply_region;
-        else
-        #if defined(INTEL_SSE4)
-          gf->multiply_region.w64 = gf_w64_split_4_64_lazy_sse_multiply_region;
-        #elif defined(ARCH_AARCH64)
-          gf_w64_neon_split_init(gf);
-        #endif
-      #else
-        gf->multiply_region.w64 = gf_w64_split_4_64_lazy_multiply_region;
+        if(gf_cpu_supports_intel_sse4 || gf_cpu_supports_arm_neon) {
+          if (h->region_type & GF_REGION_NOSIMD) {
+            SET_FUNCTION(gf,multiply_region,w64,gf_w64_split_4_64_lazy_multiply_region)
+          } else
+          #if defined(INTEL_SSE4)
+            SET_FUNCTION(gf,multiply_region,w64,gf_w64_split_4_64_lazy_sse_multiply_region)
+          #elif defined(ARCH_AARCH64)
+            gf_w64_neon_split_init(gf);
+          #endif
+        } else {
+      #endif
+        SET_FUNCTION(gf,multiply_region,w64,gf_w64_split_4_64_lazy_multiply_region)
         if(h->region_type & GF_REGION_SIMD)
           return 0;
+      #if defined(INTEL_SSE4) || defined(ARCH_AARCH64)
+        }
       #endif
     }
   }
   if ((h->arg1 == 8 && h->arg2 == 64) || (h->arg1 == 64 && h->arg2 == 8)) {
     d8 = (struct gf_split_8_64_lazy_data *) h->private;
     d8->last_value = 0;
-    gf->multiply_region.w64 = gf_w64_split_8_64_lazy_multiply_region;
+    SET_FUNCTION(gf,multiply_region,w64,gf_w64_split_8_64_lazy_multiply_region)
   }
   if ((h->arg1 == 16 && h->arg2 == 64) || (h->arg1 == 64 && h->arg2 == 16)) {
     d16 = (struct gf_split_16_64_lazy_data *) h->private;
     d16->last_value = 0;
-    gf->multiply_region.w64 = gf_w64_split_16_64_lazy_multiply_region;
+    SET_FUNCTION(gf,multiply_region,w64,gf_w64_split_16_64_lazy_multiply_region)
   }
   if ((h->arg1 == 8 && h->arg2 == 8)) {
     d88 = (struct gf_split_8_8_data *) h->private;
-    gf->multiply.w64 = gf_w64_split_8_8_multiply;
+    SET_FUNCTION(gf,multiply,w64,gf_w64_split_8_8_multiply)
 
     /* The performance of this guy sucks, so don't bother with a region op */
     
@@ -2114,11 +2132,15 @@ int gf_w64_scratch_size(int mult_type, int region_type, int divide_type, int arg
        * then fall through to split table scratch size code. */
 
 #if defined(INTEL_SSE4) || defined(ARCH_AARCH64)
+    if (gf_cpu_supports_intel_sse4 || gf_cpu_supports_arm_neon) {
       arg1 = 64;
       arg2 = 4;
-#else
+    } else {
+#endif
       arg1 = 64;
       arg2 = 8;
+#if defined(INTEL_SSE4) || defined(ARCH_AARCH64)
+    }
 #endif
 
     case GF_MULT_SPLIT_TABLE:
@@ -2169,10 +2191,10 @@ int gf_w64_init(gf_t *gf)
     } 
   }
 
-  gf->multiply.w64 = NULL;
-  gf->divide.w64 = NULL;
-  gf->inverse.w64 = NULL;
-  gf->multiply_region.w64 = NULL;
+  SET_FUNCTION(gf,multiply,w64,NULL)
+  SET_FUNCTION(gf,divide,w64,NULL)
+  SET_FUNCTION(gf,inverse,w64,NULL)
+  SET_FUNCTION(gf,multiply_region,w64,NULL)
 
   switch(h->mult_type) {
     case GF_MULT_CARRY_FREE:  if (gf_w64_cfm_init(gf) == 0) return 0; break;
@@ -2186,27 +2208,27 @@ int gf_w64_init(gf_t *gf)
     default: return 0;
   }
   if (h->divide_type == GF_DIVIDE_EUCLID) {
-    gf->divide.w64 = gf_w64_divide_from_inverse;
-    gf->inverse.w64 = gf_w64_euclid;
+    SET_FUNCTION(gf,divide,w64,gf_w64_divide_from_inverse)
+    SET_FUNCTION(gf,inverse,w64,gf_w64_euclid)
   } 
 
   if (gf->inverse.w64 != NULL && gf->divide.w64 == NULL) {
-    gf->divide.w64 = gf_w64_divide_from_inverse;
+    SET_FUNCTION(gf,divide,w64,gf_w64_divide_from_inverse)
   }
   if (gf->inverse.w64 == NULL && gf->divide.w64 != NULL) {
-    gf->inverse.w64 = gf_w64_inverse_from_divide;
+    SET_FUNCTION(gf,inverse,w64,gf_w64_inverse_from_divide)
   }
 
   if (h->region_type == GF_REGION_CAUCHY) return 0;
 
   if (h->region_type & GF_REGION_ALTMAP) {
     if (h->mult_type == GF_MULT_COMPOSITE) {
-      gf->extract_word.w64 = gf_w64_composite_extract_word;
+      SET_FUNCTION(gf,extract_word,w64,gf_w64_composite_extract_word)
     } else if (h->mult_type == GF_MULT_SPLIT_TABLE) {
-      gf->extract_word.w64 = gf_w64_split_extract_word;
+      SET_FUNCTION(gf,extract_word,w64,gf_w64_split_extract_word)
     }
   } else {
-    gf->extract_word.w64 = gf_w64_extract_word;
+    SET_FUNCTION(gf,extract_word,w64,gf_w64_extract_word)
   }
 
   return 1;
