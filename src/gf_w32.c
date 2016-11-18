@@ -407,9 +407,9 @@ gf_w32_cfmgk_multiply_region_from_single(gf_t *gf, void *src, void *dest, uint32
   q_plus = *(uint64_t *) h->private;
   g_star = *((uint64_t *) h->private + 1);
 
+  a = _mm_insert_epi32 (_mm_setzero_si128(), val, 0);
   g = _mm_insert_epi64 (a, g_star, 0);
   q = _mm_insert_epi64 (a, q_plus, 0);
-  a = _mm_insert_epi32 (_mm_setzero_si128(), val, 0);
   s32 = (uint32_t *) src;
   d32 = (uint32_t *) dest; 
  
