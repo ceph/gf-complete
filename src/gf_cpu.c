@@ -22,6 +22,18 @@ int gf_cpu_supports_arm_neon = 0;
 
 #if defined(__x86_64__)
 
+/* CPUID Feature Bits */
+
+/* ECX */
+#define GF_CPU_SSE3     (1 << 0)
+#define GF_CPU_PCLMUL   (1 << 1)
+#define GF_CPU_SSSE3    (1 << 9)
+#define GF_CPU_SSE41    (1 << 19)
+#define GF_CPU_SSE42    (1 << 20)
+
+/* EDX */
+#define GF_CPU_SSE2     (1 << 26)
+
 #if defined(_MSC_VER)
 
 #define cpuid(info, x)    __cpuidex(info, x, 0)
@@ -50,7 +62,7 @@ void gf_cpu_identify(void)
   cpuid(reg, 1);
 
 #if defined(INTEL_SSE4_PCLMUL)
-  if ((reg[2] & 1) != 0 && !getenv("GF_COMPLETE_DISABLE_SSE4_PCLMUL")) {
+  if ((reg[2] & GF_CPU_PCLMUL) != 0 && !getenv("GF_COMPLETE_DISABLE_SSE4_PCLMUL")) {
       gf_cpu_supports_intel_pclmul = 1;
 #ifdef DEBUG_CPU_DETECTION
       printf("#gf_cpu_supports_intel_pclmul\n");
@@ -59,7 +71,7 @@ void gf_cpu_identify(void)
 #endif
 
 #if defined(INTEL_SSE4)
-  if (((reg[2] & (1<<20)) != 0 || (reg[2] & (1<<19)) != 0) && !getenv("GF_COMPLETE_DISABLE_SSE4")) {
+  if (((reg[2] & GF_CPU_SSE42) != 0 || (reg[2] & GF_CPU_SSE41) != 0) && !getenv("GF_COMPLETE_DISABLE_SSE4")) {
       gf_cpu_supports_intel_sse4 = 1;
 #ifdef DEBUG_CPU_DETECTION
       printf("#gf_cpu_supports_intel_sse4\n");
@@ -68,7 +80,7 @@ void gf_cpu_identify(void)
 #endif
 
 #if defined(INTEL_SSSE3)
-  if ((reg[2] & (1<<9)) != 0 && !getenv("GF_COMPLETE_DISABLE_SSSE3")) {
+  if ((reg[2] & GF_CPU_SSSE3) != 0 && !getenv("GF_COMPLETE_DISABLE_SSSE3")) {
       gf_cpu_supports_intel_ssse3 = 1;
 #ifdef DEBUG_CPU_DETECTION
       printf("#gf_cpu_supports_intel_ssse3\n");
@@ -77,7 +89,7 @@ void gf_cpu_identify(void)
 #endif
 
 #if defined(INTEL_SSE3)
-  if ((reg[2] & 1) != 0 && !getenv("GF_COMPLETE_DISABLE_SSE3")) {
+  if ((reg[2] & GF_CPU_SSE3) != 0 && !getenv("GF_COMPLETE_DISABLE_SSE3")) {
       gf_cpu_supports_intel_sse3 = 1;
 #ifdef DEBUG_CPU_DETECTION
       printf("#gf_cpu_supports_intel_sse3\n");
@@ -86,7 +98,7 @@ void gf_cpu_identify(void)
 #endif
 
 #if defined(INTEL_SSE2)
-  if ((reg[3] & (1<<26)) != 0 && !getenv("GF_COMPLETE_DISABLE_SSE2")) {
+  if ((reg[3] & GF_CPU_SSE2) != 0 && !getenv("GF_COMPLETE_DISABLE_SSE2")) {
       gf_cpu_supports_intel_sse2 = 1;
 #ifdef DEBUG_CPU_DETECTION
       printf("#gf_cpu_supports_intel_sse2\n");
