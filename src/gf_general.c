@@ -137,7 +137,7 @@ int gf_general_s_to_val(gf_general_t *v, int w, char *s, int hex)
     }
     if (w == 32) return 1;
     if (w == 31) {
-      if (v->w32 & (1 << 31)) return 0;
+      if (v->w32 & ((gf_val_32_t)1 << 31)) return 0;
       return 1;
     } 
     if (v->w32 & ~((1 << w)-1)) return 0;

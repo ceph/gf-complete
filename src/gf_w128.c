@@ -413,7 +413,7 @@ gf_w128_sse_bytwo_p_multiply(gf_t *gf, gf_val_128_t a128, gf_val_128_t b128, gf_
     }
     amask = _mm_srli_epi64(amask, 1); /*so does this one, but we can just replace after loop*/
   }
-  amask = _mm_insert_epi32(amask, 1 << 31, 0x1);
+  amask = _mm_insert_epi32(amask, (gf_val_32_t)1 << 31, 0x1);
   for (i = 64; i < 128; i++) {
     topbit = (_mm_extract_epi32(prod, 0x3) & pmask);
     middlebit = (_mm_extract_epi32(prod, 0x1) & pmask);
