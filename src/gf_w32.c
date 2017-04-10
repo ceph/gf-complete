@@ -1079,7 +1079,7 @@ gf_w32_bytwo_p_sse_multiply_region(gf_t *gf, void *src, void *dest, gf_val_32_t 
   vrev = 0;
   for (i = 0; i < 32; i++) {
     vrev <<= 1;
-    if (!(val & (1 << i))) vrev |= 1;
+    if (!(val & ((gf_val_32_t)1 << i))) vrev |= 1;
   }
 
   s8 = (uint8_t *) rd.s_start;

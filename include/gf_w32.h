@@ -14,7 +14,7 @@
 #include <stdint.h>
 
 #define GF_FIELD_WIDTH (32)
-#define GF_FIRST_BIT (1 << 31)
+#define GF_FIRST_BIT ((gf_val_32_t)1 << 31)
 
 #define GF_BASE_FIELD_WIDTH (16)
 #define GF_BASE_FIELD_SIZE       (1 << GF_BASE_FIELD_WIDTH)
